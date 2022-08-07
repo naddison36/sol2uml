@@ -19,6 +19,7 @@ const networks = <const>[
     'bsc',
     'arbitrum',
     'optimistic',
+    'snowtrace',
 ]
 type Network = typeof networks[number]
 
@@ -43,6 +44,8 @@ export class EtherscanParser {
             this.apikey = 'APYH49FXVY9UA3KTDI6F4WP3KPIC86NITN'
         } else if (network === 'arbitrum') {
             this.url = 'https://api.arbiscan.io/api'
+        } else if (network === 'snowtrace') {
+            this.url = 'https://api.snowtrace.io/api';
         } else {
             this.url = `https://api-${network}.etherscan.io/api`
         }
