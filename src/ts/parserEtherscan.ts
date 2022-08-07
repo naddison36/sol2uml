@@ -18,6 +18,7 @@ const networks = <const>[
     'polygon',
     'bsc',
     'arbitrum',
+    'optimistic',
 ]
 type Network = typeof networks[number]
 

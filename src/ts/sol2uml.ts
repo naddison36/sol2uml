@@ -57,6 +57,7 @@ The Solidity code can be pulled from verified source code on Blockchain explorer
                 'rinkeby',
                 'goerli',
                 'sepolia',
+                'optimistic',
             ])
             .default('mainnet')
             .env('ETH_NETWORK')
@@ -64,7 +65,7 @@ The Solidity code can be pulled from verified source code on Blockchain explorer
     .addOption(
         new Option(
             '-k, --apiKey <key>',
-            'Etherscan, Polygonscan, BscScan or Arbiscan API key'
+            'Etherscan, Polygonscan, BscScan, Optimistic, or Arbiscan API key'
         ).env('SCAN_API_KEY')
     )
     .option('-v, --verbose', 'run with debugging statements', false)
