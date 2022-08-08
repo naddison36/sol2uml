@@ -73,9 +73,9 @@ program
 
 Generates UML diagrams from Solidity source code.
 
-If no file, folder or address is passes as the first argument, the working folder is used.
+If no file, folder or address is passed as the first argument, the working folder is used.
 When a folder is used, all *.sol files are found in that folder and all sub folders.
-A comma separated list of files and folders can also used. For example
+A comma separated list of files and folders can also be used. For example
     sol2uml contracts,node_modules/openzeppelin-solidity
 
 If an Ethereum address with a 0x prefix is passed, the verified source code from Etherscan will be used. For example
