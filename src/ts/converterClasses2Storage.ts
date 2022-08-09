@@ -77,7 +77,8 @@ export const convertClasses2Storages = (
         return (
             name === contractName &&
             (relativePath == contractFilename ||
-                path.basename(relativePath) === contractFilename)
+                path.basename(relativePath) ===
+                    path.normalize(contractFilename))
         )
     })
     if (!umlClass) {
