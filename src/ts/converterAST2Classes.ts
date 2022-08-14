@@ -13,6 +13,7 @@ import {
     VariableDeclaration,
 } from '@solidity-parser/parser/dist/src/ast-types'
 import * as path from 'path'
+import { posix } from 'path'
 
 import {
     AttributeType,
@@ -49,8 +50,6 @@ export function convertAST2UmlClasses(
     if (node.type === 'SourceUnit') {
         node.children.forEach((childNode) => {
             if (childNode.type === 'ContractDefinition') {
-                debug(`Adding contract ${childNode.name}`)
-
                 let umlClass = new UmlClass({
                     name: childNode.name,
                     absolutePath: filesystem
@@ -60,6 +59,8 @@ export function convertAST2UmlClasses(
                 })
 
                 umlClass = parseContractDefinition(umlClass, childNode)
+
+                debug(`Added contract ${childNode.name}`)
 
                 umlClasses.push(umlClass)
             } else if (childNode.type === 'StructDefinition') {
@@ -76,6 +77,8 @@ export function convertAST2UmlClasses(
 
                 umlClass = parseStructDefinition(umlClass, childNode)
 
+                debug(`Added struct ${umlClass.name}`)
+
                 umlClasses.push(umlClass)
             } else if (childNode.type === 'EnumDefinition') {
                 debug(`Adding enum ${childNode.name}`)
@@ -89,6 +92,8 @@ export function convertAST2UmlClasses(
                     relativePath,
                 })
 
+                debug(`Added enum ${umlClass.name}`)
+
                 umlClass = parseEnumDefinition(umlClass, childNode)
 
                 umlClasses.push(umlClass)
@@ -100,7 +105,7 @@ export function convertAST2UmlClasses(
                         const importPath = require.resolve(childNode.path, {
                             paths: [codeFolder],
                         })
-                        imports.push({
+                        const newImport = {
                             absolutePath: importPath,
                             classNames: childNode.symbolAliases
                                 ? childNode.symbolAliases.map((alias) => {
@@ -110,7 +115,11 @@ export function convertAST2UmlClasses(
                                       }
                                   })
                                 : [],
-                        })
+                        }
+                        debug(
+                            `Added filesystem import ${newImport.absolutePath} with class names ${newImport.classNames}`
+                        )
+                        imports.push(newImport)
                     } catch (err) {
                         debug(
                             `Failed to resolve import ${childNode.path} from file ${relativePath}`
@@ -119,10 +128,14 @@ export function convertAST2UmlClasses(
                 } else {
                     // this has come from Etherscan
                     const importPath =
-                        childNode.path[0] === '@'
-                            ? childNode.path
-                            : path.join(codeFolder, childNode.path)
-                    imports.push({
+                        childNode.path[0] === '.'
+                            ? // Use Linux paths, not Windows paths, to resolve Etherscan files
+                              posix.join(codeFolder.toString(), childNode.path)
+                            : childNode.path
+                    debug(
+                        `codeFolder ${codeFolder} childNode.path ${childNode.path}`
+                    )
+                    const newImport = {
                         absolutePath: importPath,
                         classNames: childNode.symbolAliases
                             ? childNode.symbolAliases.map((alias) => {

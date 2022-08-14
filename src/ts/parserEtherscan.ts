@@ -103,6 +103,7 @@ export class EtherscanParser {
         let umlClasses: UmlClass[] = []
 
         for (const file of files) {
+            debug(`Parsing source file ${file.filename}`)
             const node = await this.parseSourceCode(file.code)
             const umlClass = convertAST2UmlClasses(node, file.filename)
             umlClasses = umlClasses.concat(umlClass)

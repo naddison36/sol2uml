@@ -74,7 +74,7 @@ sol2uml class -c -f png -o examples/inheritanceDiamond.png ./src/contracts/inher
 
 The storage slots for contract `D` in [inheritance/common.sol](../../src/contracts/inheritance/common.sol).
 
-![Inheritance](./inheritanceStorage.png)
+![Inheritance](./inheritanceStorage.svg)
 
 ```
 sol2uml storage -c D -o examples/storage/inheritanceStorage.svg ./src/contracts/inheritance
