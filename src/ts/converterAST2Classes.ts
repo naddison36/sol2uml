@@ -145,9 +145,14 @@ export function convertAST2UmlClasses(
                                   }
                               })
                             : [],
-                    })
+                    }
+                    debug(
+                        `Added Etherscan import ${newImport.absolutePath} with class names: ${newImport.classNames}`
+                    )
+                    imports.push(newImport)
                 }
             }
+            // TODO add file level constants
         })
     } else {
         throw new Error(`AST node not of type SourceUnit`)

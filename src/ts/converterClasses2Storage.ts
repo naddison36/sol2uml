@@ -76,7 +76,7 @@ export const convertClasses2Storages = (
         }
         return (
             name === contractName &&
-            (relativePath == contractFilename ||
+            (relativePath == path.normalize(contractFilename) ||
                 path.basename(relativePath) ===
                     path.normalize(contractFilename))
         )
