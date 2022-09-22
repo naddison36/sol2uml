@@ -15,6 +15,7 @@ export enum ClassStereotype {
     Struct,
     Enum,
     Constant,
+    Import,
 }
 
 export enum OperatorStereotype {

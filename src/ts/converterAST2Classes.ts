@@ -189,9 +189,22 @@ export function convertAST2UmlClasses(
         throw new Error(`AST node not of type SourceUnit`)
     }
 
-    umlClasses.forEach((umlClass) => {
-        umlClass.imports = imports
-    })
+    if (umlClasses.length > 0) {
+        umlClasses.forEach((umlClass) => {
+            umlClass.imports = imports
+        })
+    } else {
+        const importUmlClass = new UmlClass({
+            name: 'Import',
+            stereotype: ClassStereotype.Import,
+            absolutePath: filesystem
+                ? path.resolve(relativePath) // resolve the absolute path
+                : relativePath, // from Etherscan so don't resolve
+            relativePath,
+        })
+        importUmlClass.imports = imports
+        umlClasses = [importUmlClass]
+    }
 
     return umlClasses
 }

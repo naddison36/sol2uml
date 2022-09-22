@@ -341,7 +341,7 @@ In order for the merged code to compile, the following is done:
     })
 
 program.on('option:verbose', () => {
-    debugControl.enable('sol2uml')
+    debugControl.enable('sol2uml,axios')
     debug('verbose on')
 })
 

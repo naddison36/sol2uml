@@ -6,6 +6,7 @@ import { convertAST2UmlClasses } from './converterAST2Classes'
 import { UmlClass } from './umlClass'
 import { topologicalSortClasses } from './filterClasses'
 
+require('axios-debug-log')
 const debug = require('debug')('sol2uml')
 
 export const networks = <const>[
@@ -150,6 +151,7 @@ export class EtherscanParser {
             (f) => !dependentFilenames.includes(f.filename)
         )
         const nonDependentFilenames = nonDependentFiles.map((f) => f.filename)
+        debug(`Failed to find dependencies to files: ${nonDependentFilenames}`)
 
         let solidityCode = ''
         // output non dependent code before the dependent files just in case sol2uml missed some dependencies

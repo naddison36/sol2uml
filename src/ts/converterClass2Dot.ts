@@ -31,6 +31,7 @@ export const convertClass2Dot = (
 ): string => {
     // do not include library, interface, abstracts, struct or enum classes if hidden
     if (
+        umlClass.stereotype === ClassStereotype.Import ||
         (options.hideLibraries &&
             umlClass.stereotype === ClassStereotype.Library) ||
         (options.hideInterfaces &&
