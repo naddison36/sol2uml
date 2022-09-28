@@ -5,6 +5,7 @@ import { parse } from '@solidity-parser/parser'
 import { convertAST2UmlClasses } from './converterAST2Classes'
 import { UmlClass } from './umlClass'
 import { topologicalSortClasses } from './filterClasses'
+import { parseSolidityVersion } from './utils/regEx'
 
 require('axios-debug-log')
 const debug = require('debug')('sol2uml')
@@ -125,9 +126,8 @@ export class EtherscanParser {
     async getSolidityCode(
         contractAddress: string
     ): Promise<{ solidityCode: string; contractName: string }> {
-        const { files, contractName } = await this.getSourceCode(
-            contractAddress
-        )
+        const { files, contractName, compilerVersion } =
+            await this.getSourceCode(contractAddress)
 
         // Parse the UmlClasses from the Solidity code in each file
         let umlClasses: UmlClass[] = []
@@ -153,7 +153,9 @@ export class EtherscanParser {
         const nonDependentFilenames = nonDependentFiles.map((f) => f.filename)
         debug(`Failed to find dependencies to files: ${nonDependentFilenames}`)
 
-        let solidityCode = ''
+        const solidityVersion = parseSolidityVersion(compilerVersion)
+        let solidityCode = `pragma solidity = ${solidityVersion};\n`
+
         // output non dependent code before the dependent files just in case sol2uml missed some dependencies
         const filenames = [...nonDependentFilenames, ...dependentFilenames]
 
@@ -164,11 +166,17 @@ export class EtherscanParser {
             if (!file)
                 throw Error(`Failed to find file with filename "${filename}"`)
 
+            // comment out any pragma solidity lines as its set from the compiler version
+            const removedPragmaSolidity = file.code.replace(
+                /(\s)(pragma\s+solidity.*;)/gm,
+                '$1/* $2 */'
+            )
+
             // comment out any import statements
             // match whitespace before import
             // and characters after import up to ;
             // replace all in file and match across multiple lines
-            const removedImports = file.code.replace(
+            const removedImports = removedPragmaSolidity.replace(
                 /(\s)(import.*;)/gm,
                 '$1/* $2 */'
             )
@@ -207,6 +215,7 @@ export class EtherscanParser {
     async getSourceCode(contractAddress: string): Promise<{
         files: { code: string; filename: string }[]
         contractName: string
+        compilerVersion: string
     }> {
         const description = `get verified source code for address ${contractAddress} from Etherscan API.`
 
@@ -286,6 +295,7 @@ export class EtherscanParser {
             return {
                 files: results.flat(1),
                 contractName: response.data.result[0].ContractName,
+                compilerVersion: response.data.result[0].CompilerVersion,
             }
         } catch (err) {
             if (err.message) {

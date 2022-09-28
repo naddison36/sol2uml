@@ -42,6 +42,7 @@ export declare class EtherscanParser {
             filename: string;
         }[];
         contractName: string;
+        compilerVersion: string;
     }>;
 }
 export {};

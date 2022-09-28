@@ -14,6 +14,8 @@ describe('Etherscan', () => {
             '0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413'
         )
         expect(sourceCode.files).toHaveLength(1)
+        expect(sourceCode.contractName).toEqual('DAO')
+        expect(sourceCode.compilerVersion).toEqual('v0.3.1-2016-04-12-3ad5e82')
     })
 
     test('Get UML Classes', async () => {

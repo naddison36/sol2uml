@@ -305,9 +305,11 @@ program
         `<contractAddress> [options]
 
 In order for the merged code to compile, the following is done:
-1. File imports are commented out.
-2. "SPDX-License-Identifier" is renamed to "SPDX--License-Identifier".
-3. Contract dependencies are analysed so the files are merged in an order that will compile.`
+1. pragma solidity is set using the compiler of the verified contract.
+2. All pragma solidity lines in the source files are commented out.
+3. File imports are commented out.
+4. "SPDX-License-Identifier" is renamed to "SPDX--License-Identifier".
+5. Contract dependencies are analysed so the files are merged in an order that will compile.`
     )
     .argument(
         '<contractAddress>',
