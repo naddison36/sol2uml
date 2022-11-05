@@ -7,3 +7,4 @@ logs
 *.logs
 *.dot
 testDiagrams
+converterTest.svg
