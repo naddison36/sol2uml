@@ -12,5 +12,6 @@ export interface ClassOptions {
     hidePrivates?: boolean;
     hideAbstracts?: boolean;
     hideFilename?: boolean;
+    hideSourceContract?: boolean;
 }
 export declare const convertClass2Dot: (umlClass: UmlClass, options?: ClassOptions) => string;

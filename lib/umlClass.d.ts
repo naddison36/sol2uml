@@ -44,6 +44,7 @@ export interface Attribute {
     type?: string;
     attributeType?: AttributeType;
     compiled?: boolean;
+    sourceContract?: string;
 }
 export interface Parameter {
     name?: string;
@@ -55,6 +56,9 @@ export interface Operator extends Attribute {
     returnParameters?: Parameter[];
     isPayable?: boolean;
     modifiers?: string[];
+    hash?: string;
+    inheritancePosition?: number;
+    sourceContract?: string;
 }
 export declare enum ReferenceType {
     Memory = 0,
@@ -63,12 +67,12 @@ export declare enum ReferenceType {
 export interface Association {
     referenceType: ReferenceType;
     targetUmlClassName: string;
-    targetUmlClassStereotype?: ClassStereotype;
     realization?: boolean;
 }
 export interface Constants {
     name: string;
     value: number;
+    sourceContract?: string;
 }
 export interface ClassProperties {
     name: string;

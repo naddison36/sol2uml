@@ -23,6 +23,7 @@ export interface ClassOptions {
     hidePrivates?: boolean
     hideAbstracts?: boolean
     hideFilename?: boolean
+    hideSourceContract?: boolean
 }
 
 export const convertClass2Dot = (
@@ -105,7 +106,7 @@ const dotClassTitle = (
 
 const dotAttributeVisibilities = (
     umlClass: UmlClass,
-    options: { hidePrivates?: boolean }
+    options: { hidePrivates?: boolean; hideSourceContract?: boolean }
 ): string => {
     if (umlClass.attributes.length === 0) return ''
 
@@ -116,7 +117,10 @@ const dotAttributeVisibilities = (
         umlClass.stereotype === ClassStereotype.Enum ||
         umlClass.stereotype === ClassStereotype.Constant
     ) {
-        return dotString + dotAttributes(umlClass.attributes, undefined, false)
+        return (
+            dotString +
+            dotAttributes(umlClass.attributes, options, undefined, false)
+        )
     }
 
     // For each visibility group
@@ -154,7 +158,7 @@ const dotAttributeVisibilities = (
             }
         }
 
-        dotString += dotAttributes(attributes, vizGroup)
+        dotString += dotAttributes(attributes, options, vizGroup)
     }
 
     return dotString
@@ -162,6 +166,7 @@ const dotAttributeVisibilities = (
 
 const dotAttributes = (
     attributes: Attribute[],
+    options: { hideSourceContract?: boolean },
     vizGroup?: string,
     indent = true
 ): string => {
@@ -174,7 +179,11 @@ const dotAttributes = (
 
     // for each attribute
     attributes.forEach((attribute) => {
-        dotString += `${indentString}${attribute.name}: ${attribute.type}\\l`
+        const sourceContract =
+            attribute.sourceContract && !options.hideSourceContract
+                ? ` \\<\\<${attribute.sourceContract}\\>\\>`
+                : ''
+        dotString += `${indentString}${attribute.name}: ${attribute.type}${sourceContract}\\l`
     })
 
     return dotString
@@ -240,6 +249,7 @@ const dotOperators = (
     options: {
         hideModifiers?: boolean
         hideEvents?: boolean
+        hideSourceContract?: boolean
     }
 ): string => {
     // Skip if there are no operators
@@ -282,6 +292,9 @@ const dotOperators = (
         if (options.hideModifiers === false && operator.modifiers?.length > 0) {
             dotString += ` \\<\\<${operator.modifiers.join(', ')}\\>\\>`
         }
+
+        if (operator.sourceContract && !options.hideSourceContract)
+            dotString += ` \\<\\<${operator.sourceContract}\\>\\>`
 
         dotString += '\\l'
     }

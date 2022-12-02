@@ -50,6 +50,8 @@ export interface Attribute {
     type?: string
     attributeType?: AttributeType
     compiled?: boolean // true for constants and immutables
+    // Used for squashed classes
+    sourceContract?: string
 }
 
 export interface Parameter {
@@ -64,6 +66,10 @@ export interface Operator extends Attribute {
     returnParameters?: Parameter[]
     isPayable?: boolean
     modifiers?: string[]
+    // Used by squashed classes
+    hash?: string
+    inheritancePosition?: number
+    sourceContract?: string
 }
 
 export enum ReferenceType {
@@ -74,13 +80,14 @@ export enum ReferenceType {
 export interface Association {
     referenceType: ReferenceType
     targetUmlClassName: string
-    targetUmlClassStereotype?: ClassStereotype
     realization?: boolean
 }
 
 export interface Constants {
     name: string
     value: number
+    // Used for squashed classes
+    sourceContract?: string
 }
 
 export interface ClassProperties {
@@ -104,7 +111,7 @@ export class UmlClass implements ClassProperties {
     name: string
     absolutePath: string
     relativePath: string
-    imports: Import[]
+    imports: Import[] = []
     stereotype?: ClassStereotype
 
     constants: Constants[] = []
@@ -159,10 +166,7 @@ export class UmlClass implements ClassProperties {
      */
     getParentContracts(): Association[] {
         return Object.values(this.associations).filter(
-            (association) =>
-                association.realization &&
-                association.targetUmlClassStereotype !==
-                    ClassStereotype.Interface
+            (association) => association.realization
         )
     }
 }

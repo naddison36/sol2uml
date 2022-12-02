@@ -13,6 +13,7 @@ import { convertStorages2Dot } from './converterStorage2Dot'
 import { isAddress } from './utils/regEx'
 import { writeOutputFiles, writeSolidity } from './writerFiles'
 import { basename } from 'path'
+import { squashUmlClasses } from './squashClasses'
 const program = new Command()
 
 const version =
@@ -133,6 +134,12 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
     .option('-hi, --hideInterfaces', 'hide interfaces', false)
     .option('-ha, --hideAbstracts', 'hide abstract contracts', false)
     .option('-hn, --hideFilename', 'hide relative path and file name', false)
+    .option('-s, --squash', 'squash inherited contracts', false)
+    .option(
+        '-hsc, --hideSourceContract',
+        'hide the source contract when using squash',
+        false
+    )
     .action(async (fileFolderAddress, options, command) => {
         try {
             const combinedOptions = {
@@ -145,6 +152,12 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
                 combinedOptions
             )
 
+            if (options.squash && !options.baseContractNames) {
+                throw Error(
+                    'Must specify base contract(s) when using the squash option.'
+                )
+            }
+
             let filteredUmlClasses = umlClasses
             if (options.baseContractNames) {
                 const baseContractNames = options.baseContractNames.split(',')
@@ -154,6 +167,14 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
                     options.depth
                 )
                 contractName = baseContractNames[0]
+
+                // squash contracts
+                if (options.squash) {
+                    filteredUmlClasses = squashUmlClasses(
+                        filteredUmlClasses,
+                        baseContractNames
+                    )
+                }
             }
 
             const dotString = convertUmlClasses2Dot(
