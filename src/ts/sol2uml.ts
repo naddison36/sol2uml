@@ -134,7 +134,11 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
     .option('-hi, --hideInterfaces', 'hide interfaces', false)
     .option('-ha, --hideAbstracts', 'hide abstract contracts', false)
     .option('-hn, --hideFilename', 'hide relative path and file name', false)
-    .option('-s, --squash', 'squash inherited contracts', false)
+    .option(
+        '-s, --squash',
+        'squash inherited contracts to the base contract(s)',
+        false
+    )
     .option(
         '-hsc, --hideSourceContract',
         'hide the source contract when using squash',
@@ -152,29 +156,33 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
                 combinedOptions
             )
 
-            if (options.squash && !options.baseContractNames) {
+            if (
+                options.squash &&
+                // Must specify base contract(s) or parse from Etherscan to get contractName
+                !(options.baseContractNames || contractName)
+            ) {
                 throw Error(
-                    'Must specify base contract(s) when using the squash option.'
+                    'Must specify base contract(s) when using the squash option against local Solidity files.'
                 )
             }
 
             let filteredUmlClasses = umlClasses
-            if (options.baseContractNames) {
-                const baseContractNames = options.baseContractNames.split(',')
+            const baseContractNames = options.baseContractNames?.split(',')
+            if (baseContractNames) {
                 filteredUmlClasses = classesConnectedToBaseContracts(
                     umlClasses,
                     baseContractNames,
                     options.depth
                 )
                 contractName = baseContractNames[0]
+            }
 
-                // squash contracts
-                if (options.squash) {
-                    filteredUmlClasses = squashUmlClasses(
-                        filteredUmlClasses,
-                        baseContractNames
-                    )
-                }
+            // squash contracts
+            if (options.squash) {
+                filteredUmlClasses = squashUmlClasses(
+                    filteredUmlClasses,
+                    baseContractNames || [contractName]
+                )
             }
 
             const dotString = convertUmlClasses2Dot(

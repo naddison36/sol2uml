@@ -13,7 +13,7 @@ export const squashUmlClasses = (
         let baseIndex = umlClasses.findIndex(({ name }) => {
             return name === squashContractName
         })
-        if (!baseIndex) {
+        if (baseIndex === undefined) {
             throw Error(
                 `Failed to find contract with name "${squashContractName}" to squash`
             )
@@ -40,8 +40,15 @@ export const squashUmlClasses = (
 
         umlClasses[baseIndex] = squashedClass
     }
-    // remove any squashed classes
-    return umlClasses.filter((u) => !removedClassIds.includes(u.id))
+
+    // filter the list of classes that will be rendered
+    return umlClasses.filter(
+        (u) =>
+            // remove any squashed inherited contracts
+            !removedClassIds.includes(u.id) ||
+            // Include all base contracts
+            squashContractNames.includes(u.name)
+    )
 }
 
 const recursiveSquash = (

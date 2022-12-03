@@ -106,7 +106,7 @@ Options:
   -hi, --hideInterfaces            hide interfaces (default: false)
   -ha, --hideAbstracts             hide abstract contracts (default: false)
   -hn, --hideFilename              hide relative path and file name (default: false)
-  -s, --squash                     squash inherited contracts (default: false)
+  -s, --squash                     squash inherited contracts to the base contract(s) (default: false)
   -hsc, --hideSourceContract       hide the source contract when using squash (default: false)
   -h, --help                       display help for command
 ```
