@@ -5,8 +5,30 @@ import {
     TopologicalSort,
     WeightedDiGraph,
 } from 'js-graph-algorithms'
-import { UmlClass } from './umlClass'
+import { ClassStereotype, UmlClass } from './umlClass'
 import { findAssociatedClass } from './associations'
+import { ClassOptions } from './converterClass2Dot'
+
+export const filterHiddenClasses = (
+    umlClasses: UmlClass[],
+    options: ClassOptions
+): UmlClass[] => {
+    return umlClasses.filter(
+        (u) =>
+            (u.stereotype === ClassStereotype.Enum && !options.hideEnums) ||
+            (u.stereotype === ClassStereotype.Struct && !options.hideStructs) ||
+            (u.stereotype === ClassStereotype.Abstract &&
+                !options.hideAbstracts) ||
+            (u.stereotype === ClassStereotype.Interface &&
+                !options.hideInterfaces) ||
+            (u.stereotype === ClassStereotype.Constant &&
+                !options.hideConstants) ||
+            (u.stereotype === ClassStereotype.Library &&
+                !options.hideLibraries) ||
+            u.stereotype === ClassStereotype.None ||
+            u.stereotype === ClassStereotype.Contract
+    )
+}
 
 export const classesConnectedToBaseContracts = (
     umlClasses: UmlClass[],
@@ -63,7 +85,10 @@ export const classesConnectedToBaseContract = (
 }
 
 function loadWeightedDirectedGraph(umlClasses: UmlClass[]): WeightedDiGraph {
-    const weightedDirectedGraph = new WeightedDiGraph(umlClasses.length) // the number vertices in the graph
+    const weightedDirectedGraph = new WeightedDiGraph(
+        // the number vertices in the graph
+        UmlClass.idCounter + 1
+    )
 
     for (const sourceUmlClass of umlClasses) {
         for (const association of Object.values(sourceUmlClass.associations)) {
@@ -77,7 +102,10 @@ function loadWeightedDirectedGraph(umlClasses: UmlClass[]): WeightedDiGraph {
             if (!targetUmlClass) {
                 continue
             }
-
+            const isTarget = umlClasses.find((u) => u.id === targetUmlClass.id)
+            console.log(
+                `isTarget ${isTarget} Adding edge from ${sourceUmlClass.name} with id ${sourceUmlClass.id} to ${targetUmlClass.name} with id ${targetUmlClass.id} and type ${targetUmlClass.stereotype}`
+            )
             weightedDirectedGraph.addEdge(
                 new Edge(sourceUmlClass.id, targetUmlClass.id, 1)
             )

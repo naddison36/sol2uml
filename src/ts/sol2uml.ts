@@ -3,7 +3,10 @@
 import { convertUmlClasses2Dot } from './converterClasses2Dot'
 import { parserUmlClasses } from './parserGeneral'
 import { EtherscanParser, networks } from './parserEtherscan'
-import { classesConnectedToBaseContracts } from './filterClasses'
+import {
+    classesConnectedToBaseContracts,
+    filterHiddenClasses,
+} from './filterClasses'
 import { Command, Option } from 'commander'
 import {
     addStorageValues,
@@ -166,11 +169,14 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
                 )
             }
 
-            let filteredUmlClasses = umlClasses
+            // Filter out any class stereotypes that are to be hidden
+            let filteredUmlClasses = filterHiddenClasses(umlClasses, options)
+
             const baseContractNames = options.baseContractNames?.split(',')
             if (baseContractNames) {
+                // Find all the classes connected to the base classes
                 filteredUmlClasses = classesConnectedToBaseContracts(
-                    umlClasses,
+                    filteredUmlClasses,
                     baseContractNames,
                     options.depth
                 )

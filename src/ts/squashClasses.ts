@@ -141,7 +141,7 @@ const recursiveSquash = (
 const hash = (operator: Operator): string => {
     const hash = crypto.createHash('sha256')
 
-    let data = operator.name
+    let data = operator.name ?? 'fallback'
     operator.parameters?.forEach((p) => {
         data += ',' + p.type
     })
