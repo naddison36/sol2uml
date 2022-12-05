@@ -1,6 +1,6 @@
 {
   "name": "sol2uml",
-  "version": "2.2.6",
+  "version": "2.3.0",
   "description": "Solidity contract visualisation tool.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
