@@ -563,8 +563,8 @@
 <text text-anchor="start" x="38.61" y="-792.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;modifier&gt;&gt; onlyOwner()</text>
 <text text-anchor="start" x="38.61" y="-775.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;constructor()</text>
 <text text-anchor="start" x="38.61" y="-758.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;owner(): address</text>
-<text text-anchor="start" x="38.61" y="-741.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;renounceOwnership()</text>
-<text text-anchor="start" x="38.61" y="-724.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;transferOwnership(newOwner: address)</text>
+<text text-anchor="start" x="38.61" y="-741.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;renounceOwnership() &lt;&lt;onlyOwner&gt;&gt;</text>
+<text text-anchor="start" x="38.61" y="-724.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;transferOwnership(newOwner: address) &lt;&lt;onlyOwner&gt;&gt;</text>
 </g>
 <!-- 20&#45;&gt;0 -->
 <g id="edge37" class="edge">
@@ -591,14 +591,14 @@
 <text text-anchor="start" x="725.88" y="-176.7" font-family="Times,serif" font-size="14.00">Public:</text>
 <text text-anchor="start" x="725.88" y="-159.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; mintApe(numberOfTokens: uint)</text>
 <text text-anchor="start" x="725.88" y="-143.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;constructor(name: string, symbol: string, maxNftSupply: uint256, saleStart: uint256)</text>
-<text text-anchor="start" x="725.88" y="-126.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;withdraw()</text>
-<text text-anchor="start" x="725.88" y="-109.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;reserveApes()</text>
-<text text-anchor="start" x="725.88" y="-92.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setRevealTimestamp(revealTimeStamp: uint256)</text>
-<text text-anchor="start" x="725.88" y="-75.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProvenanceHash(provenanceHash: string)</text>
-<text text-anchor="start" x="725.88" y="-59.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setBaseURI(baseURI: string)</text>
-<text text-anchor="start" x="725.88" y="-42.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;flipSaleState()</text>
+<text text-anchor="start" x="725.88" y="-126.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;withdraw() &lt;&lt;onlyOwner&gt;&gt;</text>
+<text text-anchor="start" x="725.88" y="-109.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;reserveApes() &lt;&lt;onlyOwner&gt;&gt;</text>
+<text text-anchor="start" x="725.88" y="-92.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setRevealTimestamp(revealTimeStamp: uint256) &lt;&lt;onlyOwner&gt;&gt;</text>
+<text text-anchor="start" x="725.88" y="-75.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProvenanceHash(provenanceHash: string) &lt;&lt;onlyOwner&gt;&gt;</text>
+<text text-anchor="start" x="725.88" y="-59.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setBaseURI(baseURI: string) &lt;&lt;onlyOwner&gt;&gt;</text>
+<text text-anchor="start" x="725.88" y="-42.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;flipSaleState() &lt;&lt;onlyOwner&gt;&gt;</text>
 <text text-anchor="start" x="725.88" y="-25.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setStartingIndex()</text>
-<text text-anchor="start" x="725.88" y="-8.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;emergencySetStartingIndexBlock()</text>
+<text text-anchor="start" x="725.88" y="-8.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;emergencySetStartingIndexBlock() &lt;&lt;onlyOwner&gt;&gt;</text>
 </g>
 <!-- 21&#45;&gt;7 -->
 <g id="edge40" class="edge">

@@ -1,4 +1,4 @@
-export declare type OutputFormats = 'svg' | 'png' | 'dot' | 'all';
+export type OutputFormats = 'svg' | 'png' | 'dot' | 'all';
 export declare const writeOutputFiles: (dot: string, fileFolderAddress: string, contractName: string, outputFormat?: OutputFormats, outputFilename?: string) => Promise<void>;
 export declare function convertDot2Svg(dot: string): any;
 export declare function writeSolidity(code: string, filename?: string): void;
