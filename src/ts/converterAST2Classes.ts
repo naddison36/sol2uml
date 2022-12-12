@@ -37,8 +37,15 @@ import {
 
 const debug = require('debug')('sol2uml')
 
-let umlClasses: UmlClass[] = []
+let umlClasses: UmlClass[]
 
+/**
+ * Convert solidity parser output of type `ASTNode` to UML classes of type `UMLClass`
+ * @param node output of Solidity parser of type `ASTNode`
+ * @param relativePath relative path from the working directory to the Solidity source file
+ * @param filesystem flag if Solidity source code was parsed from the filesystem or Etherscan
+ * @return umlClasses array of UML class definitions of type `UmlClass`
+ */
 export function convertAST2UmlClasses(
     node: ASTNode,
     relativePath: string,
@@ -58,7 +65,7 @@ export function convertAST2UmlClasses(
                     relativePath,
                 })
 
-                umlClass = parseContractDefinition(umlClass, childNode)
+                parseContractDefinition(childNode, umlClass)
 
                 debug(`Added contract ${childNode.name}`)
 
@@ -75,7 +82,7 @@ export function convertAST2UmlClasses(
                     relativePath,
                 })
 
-                umlClass = parseStructDefinition(umlClass, childNode)
+                parseStructDefinition(childNode, umlClass)
 
                 debug(`Added struct ${umlClass.name}`)
 
@@ -94,7 +101,7 @@ export function convertAST2UmlClasses(
 
                 debug(`Added enum ${umlClass.name}`)
 
-                umlClass = parseEnumDefinition(umlClass, childNode)
+                parseEnumDefinition(childNode, umlClass)
 
                 umlClasses.push(umlClass)
             } else if (childNode.type === 'ImportDirective') {
@@ -209,10 +216,12 @@ export function convertAST2UmlClasses(
     return umlClasses
 }
 
-function parseStructDefinition(
-    umlClass: UmlClass,
-    node: StructDefinition
-): UmlClass {
+/**
+ * Parse struct definition for UML attributes and associations.
+ * @param node defined in ASTNode as `StructDefinition`
+ * @param umlClass that has struct attributes and associations added. This parameter is mutated.
+ */
+function parseStructDefinition(node: StructDefinition, umlClass: UmlClass) {
     node.members.forEach((member: VariableDeclaration) => {
         const [type, attributeType] = parseTypeName(member.typeName)
         umlClass.attributes.push({
@@ -223,15 +232,15 @@ function parseStructDefinition(
     })
 
     // Recursively parse struct members for associations
-    umlClass = addAssociations(node.members, umlClass)
-
-    return umlClass
+    addAssociations(node.members, umlClass)
 }
 
-function parseEnumDefinition(
-    umlClass: UmlClass,
-    node: EnumDefinition
-): UmlClass {
+/**
+ * Parse enum definition for UML attributes and associations.
+ * @param node defined in ASTNode as `EnumDefinition`
+ * @param umlClass that has enum attributes and associations added. This parameter is mutated.
+ */
+function parseEnumDefinition(node: EnumDefinition, umlClass: UmlClass) {
     let index = 0
     node.members.forEach((member: EnumValue) => {
         umlClass.attributes.push({
@@ -241,15 +250,15 @@ function parseEnumDefinition(
     })
 
     // Recursively parse struct members for associations
-    umlClass = addAssociations(node.members, umlClass)
-
-    return umlClass
+    addAssociations(node.members, umlClass)
 }
 
-function parseContractDefinition(
-    umlClass: UmlClass,
-    node: ContractDefinition
-): UmlClass {
+/**
+ * Parse contract definition for UML attributes, operations and associations.
+ * @param node defined in ASTNode as `ContractDefinition`
+ * @param umlClass that has attributes, operations and associations added. This parameter is mutated.
+ */
+function parseContractDefinition(node: ContractDefinition, umlClass: UmlClass) {
     umlClass.stereotype = parseContractKind(node.kind)
 
     // For each base contract
@@ -295,7 +304,7 @@ function parseContractDefinition(
             )
 
             // Recursively parse variables for associations
-            umlClass = addAssociations(subNode.variables, umlClass)
+            addAssociations(subNode.variables, umlClass)
         } else if (isUsingForDeclaration(subNode)) {
             // Add association to library contract
             umlClass.addAssociation({
@@ -316,7 +325,7 @@ function parseContractDefinition(
                     name: '',
                     stereotype: OperatorStereotype.Fallback,
                     parameters: parseParameters(subNode.parameters),
-                    isPayable: parsePayable(subNode.stateMutability),
+                    stateMutability: subNode.stateMutability,
                 })
             } else {
                 let stereotype = OperatorStereotype.None
@@ -338,9 +347,9 @@ function parseContractDefinition(
             }
 
             // Recursively parse function parameters for associations
-            umlClass = addAssociations(subNode.parameters, umlClass)
+            addAssociations(subNode.parameters, umlClass)
             if (subNode.returnParameters) {
-                umlClass = addAssociations(subNode.returnParameters, umlClass)
+                addAssociations(subNode.returnParameters, umlClass)
             }
 
             // If no body to the function, it must be either an Interface or Abstract
@@ -351,10 +360,7 @@ function parseContractDefinition(
                 }
             } else {
                 // Recursively parse function statements for associations
-                umlClass = addAssociations(
-                    subNode.body.statements as ASTNode[],
-                    umlClass
-                )
+                addAssociations(subNode.body.statements as ASTNode[], umlClass)
             }
         } else if (isModifierDefinition(subNode)) {
             umlClass.operators.push({
@@ -365,10 +371,7 @@ function parseContractDefinition(
 
             if (subNode.body && subNode.body.statements) {
                 // Recursively parse modifier statements for associations
-                umlClass = addAssociations(
-                    subNode.body.statements as ASTNode[],
-                    umlClass
-                )
+                addAssociations(subNode.body.statements as ASTNode[], umlClass)
             }
         } else if (isEventDefinition(subNode)) {
             umlClass.operators.push({
@@ -378,7 +381,7 @@ function parseContractDefinition(
             })
 
             // Recursively parse event parameters for associations
-            umlClass = addAssociations(subNode.parameters, umlClass)
+            addAssociations(subNode.parameters, umlClass)
         } else if (isStructDefinition(subNode)) {
             const structClass = new UmlClass({
                 name: subNode.name,
@@ -386,7 +389,7 @@ function parseContractDefinition(
                 relativePath: umlClass.relativePath,
                 stereotype: ClassStereotype.Struct,
             })
-            parseStructDefinition(structClass, subNode)
+            parseStructDefinition(subNode, structClass)
             umlClasses.push(structClass)
 
             // list as contract level struct
@@ -398,27 +401,29 @@ function parseContractDefinition(
                 relativePath: umlClass.relativePath,
                 stereotype: ClassStereotype.Enum,
             })
-            parseEnumDefinition(enumClass, subNode)
+            parseEnumDefinition(subNode, enumClass)
             umlClasses.push(enumClass)
 
             // list as contract level enum
             umlClass.enums.push(enumClass.id)
         }
     })
-
-    return umlClass
 }
 
-// Recursively parse AST nodes for associations
+/**
+ * Recursively parse a list of ASTNodes for UML associations
+ * @param nodes array of parser output of type ASTNode
+ * @param umlClass that has associations added of type `Association`. This parameter is mutated.
+ */
 function addAssociations(
     nodes: (ASTNode & { isStateVar?: boolean })[],
     umlClass: UmlClass
-): UmlClass {
+) {
     if (!nodes || !Array.isArray(nodes)) {
         debug(
             'Warning - can not recursively parse AST nodes for associations. Invalid nodes array'
         )
-        return umlClass
+        return
     }
 
     for (const node of nodes) {
@@ -454,11 +459,8 @@ function addAssociations(
                         })
                     }
                 } else if (node.typeName.type === 'Mapping') {
-                    umlClass = addAssociations(
-                        [node.typeName.keyType],
-                        umlClass
-                    )
-                    umlClass = addAssociations(
+                    addAssociations([node.typeName.keyType], umlClass)
+                    addAssociations(
                         [
                             {
                                 ...node.typeName.valueType,
@@ -498,134 +500,117 @@ function addAssociations(
                 })
                 break
             case 'Block':
-                umlClass = addAssociations(
-                    node.statements as ASTNode[],
-                    umlClass
-                )
+                addAssociations(node.statements as ASTNode[], umlClass)
                 break
             case 'StateVariableDeclaration':
             case 'VariableDeclarationStatement':
-                umlClass = addAssociations(
-                    node.variables as ASTNode[],
-                    umlClass
-                )
-                umlClass = parseExpression(node.initialValue, umlClass)
+                addAssociations(node.variables as ASTNode[], umlClass)
+                parseExpression(node.initialValue, umlClass)
                 break
             case 'ForStatement':
                 if ('statements' in node.body) {
-                    umlClass = addAssociations(
-                        node.body.statements as ASTNode[],
-                        umlClass
-                    )
+                    addAssociations(node.body.statements as ASTNode[], umlClass)
                 }
-                umlClass = parseExpression(node.conditionExpression, umlClass)
-                umlClass = parseExpression(
-                    node.loopExpression.expression,
-                    umlClass
-                )
+                parseExpression(node.conditionExpression, umlClass)
+                parseExpression(node.loopExpression.expression, umlClass)
                 break
             case 'WhileStatement':
                 if ('statements' in node.body) {
-                    umlClass = addAssociations(
-                        node.body.statements as ASTNode[],
-                        umlClass
-                    )
+                    addAssociations(node.body.statements as ASTNode[], umlClass)
                 }
                 break
             case 'DoWhileStatement':
                 if ('statements' in node.body) {
-                    umlClass = addAssociations(
-                        node.body.statements as ASTNode[],
-                        umlClass
-                    )
+                    addAssociations(node.body.statements as ASTNode[], umlClass)
                 }
-                umlClass = parseExpression(node.condition, umlClass)
+                parseExpression(node.condition, umlClass)
                 break
             case 'ReturnStatement':
             case 'ExpressionStatement':
-                umlClass = parseExpression(node.expression, umlClass)
+                parseExpression(node.expression, umlClass)
                 break
             case 'IfStatement':
                 if (node.trueBody) {
                     if ('statements' in node.trueBody) {
-                        umlClass = addAssociations(
+                        addAssociations(
                             node.trueBody.statements as ASTNode[],
                             umlClass
                         )
                     }
                     if ('expression' in node.trueBody) {
-                        umlClass = parseExpression(
-                            node.trueBody.expression,
-                            umlClass
-                        )
+                        parseExpression(node.trueBody.expression, umlClass)
                     }
                 }
                 if (node.falseBody) {
                     if ('statements' in node.falseBody) {
-                        umlClass = addAssociations(
+                        addAssociations(
                             node.falseBody.statements as ASTNode[],
                             umlClass
                         )
                     }
                     if ('expression' in node.falseBody) {
-                        umlClass = parseExpression(
-                            node.falseBody.expression,
-                            umlClass
-                        )
+                        parseExpression(node.falseBody.expression, umlClass)
                     }
                 }
 
-                umlClass = parseExpression(node.condition, umlClass)
+                parseExpression(node.condition, umlClass)
                 break
             default:
                 break
         }
     }
-
-    return umlClass
 }
 
-function parseExpression(expression: Expression, umlClass: UmlClass): UmlClass {
+/**
+ * Recursively parse an expression to add UML associations to other contracts, constants, enums or structs.
+ * @param expression defined in ASTNode as `Expression`
+ * @param umlClass that has associations added of type `Association`. This parameter is mutated.
+ */
+function parseExpression(expression: Expression, umlClass: UmlClass) {
     if (!expression || !expression.type) {
-        return umlClass
+        return
     }
     if (expression.type === 'BinaryOperation') {
-        umlClass = parseExpression(expression.left, umlClass)
-        umlClass = parseExpression(expression.right, umlClass)
+        parseExpression(expression.left, umlClass)
+        parseExpression(expression.right, umlClass)
     } else if (expression.type === 'FunctionCall') {
-        umlClass = parseExpression(expression.expression, umlClass)
+        parseExpression(expression.expression, umlClass)
         expression.arguments.forEach((arg) => {
-            umlClass = parseExpression(arg, umlClass)
+            parseExpression(arg, umlClass)
         })
     } else if (expression.type === 'IndexAccess') {
-        umlClass = parseExpression(expression.base, umlClass)
-        umlClass = parseExpression(expression.index, umlClass)
+        parseExpression(expression.base, umlClass)
+        parseExpression(expression.index, umlClass)
     } else if (expression.type === 'TupleExpression') {
         expression.components.forEach((component) => {
-            umlClass = parseExpression(component as Expression, umlClass)
+            parseExpression(component as Expression, umlClass)
         })
     } else if (expression.type === 'MemberAccess') {
-        umlClass = parseExpression(expression.expression, umlClass)
+        parseExpression(expression.expression, umlClass)
     } else if (expression.type === 'Conditional') {
-        umlClass = addAssociations([expression.trueExpression], umlClass)
-        umlClass = addAssociations([expression.falseExpression], umlClass)
+        addAssociations([expression.trueExpression], umlClass)
+        addAssociations([expression.falseExpression], umlClass)
     } else if (expression.type === 'Identifier') {
         umlClass.addAssociation({
             referenceType: ReferenceType.Memory,
             targetUmlClassName: expression.name,
         })
     } else if (expression.type === 'NewExpression') {
-        umlClass = addAssociations([expression.typeName], umlClass)
+        addAssociations([expression.typeName], umlClass)
     } else if (
         expression.type === 'UnaryOperation' &&
         expression.subExpression
     ) {
-        umlClass = parseExpression(expression.subExpression, umlClass)
+        parseExpression(expression.subExpression, umlClass)
     }
-
-    return umlClass
 }
 
+/**
+ * Convert user defined type to class name and struct or enum.
+ * eg `Set.Data` has class `Set` and struct or enum of `Data`
+ * @param rawClassName can be `TypeName` properties `namePath`, `length.name` or `baseTypeName.namePath` as defined in the ASTNode
+ * @return object with `umlClassName` and `structOrEnum` of type string
+ */
 function parseClassName(rawClassName: string): {
     umlClassName: string
     structOrEnum: string
@@ -649,6 +634,11 @@ function parseClassName(rawClassName: string): {
     }
 }
 
+/**
+ * Converts the contract visibility to attribute or operator visibility of type `Visibility`
+ * @param params defined in ASTNode as VariableDeclaration.visibility, FunctionDefinition.visibility or FunctionTypeName.visibility
+ * @return visibility `Visibility` enum used by the `visibility` property on UML `Attribute` or `Operator`
+ */
 function parseVisibility(visibility: string): Visibility {
     switch (visibility) {
         case 'default':
@@ -668,6 +658,12 @@ function parseVisibility(visibility: string): Visibility {
     }
 }
 
+/**
+ * Recursively converts contract variables to UMLClass attribute types.
+ * Types can be standard Solidity types, arrays, mappings or user defined types like structs and enums.
+ * @param typeName defined in ASTNode as `TypeName`
+ * @return attributeTypes array of type string and `AttributeType`
+ */
 function parseTypeName(typeName: TypeName): [string, AttributeType] {
     switch (typeName.type) {
         case 'ElementaryTypeName':
@@ -703,6 +699,11 @@ function parseTypeName(typeName: TypeName): [string, AttributeType] {
     }
 }
 
+/**
+ * Converts the contract params to `Operator` properties `parameters` or `returnParameters`
+ * @param params defined in ASTNode as `VariableDeclaration`
+ * @return parameters or `returnParameters` of the `Operator` of type `Parameter`
+ */
 function parseParameters(params: VariableDeclaration[]): Parameter[] {
     if (!params || !params) {
         return []
@@ -721,6 +722,11 @@ function parseParameters(params: VariableDeclaration[]): Parameter[] {
     return parameters
 }
 
+/**
+ * Converts the contract `kind` to `UMLClass` stereotype
+ * @param kind defined in ASTNode as ContractDefinition.kind
+ * @return stereotype of the `UMLClass` with type `ClassStereotype
+ */
 function parseContractKind(kind: string): ClassStereotype {
     switch (kind) {
         case 'contract':
@@ -734,8 +740,4 @@ function parseContractKind(kind: string): ClassStereotype {
         default:
             throw Error(`Invalid kind ${kind}`)
     }
-}
-
-function parsePayable(stateMutability: string): boolean {
-    return stateMutability === 'payable'
 }

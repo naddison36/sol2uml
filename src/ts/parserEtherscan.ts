@@ -33,7 +33,7 @@ export const networks = <const>[
     'kovan-optimistic',
     'gnosisscan',
 ]
-type Network = typeof networks[number]
+export type Network = typeof networks[number]
 
 export class EtherscanParser {
     readonly url: string

@@ -3,19 +3,25 @@ import * as crypto from 'crypto'
 
 const debug = require('debug')('sol2uml')
 
+/**
+ * Flattens the inheritance hierarchy for each base contract.
+ * @param umlClasses array of UML classes of type `UMLClass`
+ * @param baseContractNames array of contract names to be rendered in squashed format.
+ * @return squashUmlClasses array of UML classes of type `UMLClass`
+ */
 export const squashUmlClasses = (
     umlClasses: UmlClass[],
-    squashContractNames: string[]
+    baseContractNames: string[]
 ): UmlClass[] => {
     let removedClassIds: number[] = []
-    for (const squashContractName of squashContractNames) {
+    for (const baseContractName of baseContractNames) {
         // Find the base UML Class to squash
         let baseIndex = umlClasses.findIndex(({ name }) => {
-            return name === squashContractName
+            return name === baseContractName
         })
         if (baseIndex === undefined) {
             throw Error(
-                `Failed to find contract with name "${squashContractName}" to squash`
+                `Failed to find contract with name "${baseContractName}" to squash`
             )
         }
         const baseClass = umlClasses[baseIndex]
@@ -47,7 +53,7 @@ export const squashUmlClasses = (
             // remove any squashed inherited contracts
             !removedClassIds.includes(u.id) ||
             // Include all base contracts
-            squashContractNames.includes(u.name)
+            baseContractNames.includes(u.name)
     )
 }
 

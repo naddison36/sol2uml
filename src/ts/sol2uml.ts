@@ -154,6 +154,7 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
                 ...options,
             }
 
+            // Parse Solidity code from local file system or verified source code on Etherscan.
             let { umlClasses, contractName } = await parserUmlClasses(
                 fileFolderAddress,
                 combinedOptions
@@ -191,12 +192,14 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
                 )
             }
 
+            // Convert UML classes to Graphviz dot format.
             const dotString = convertUmlClasses2Dot(
                 filteredUmlClasses,
                 combinedOptions.clusterFolders,
                 combinedOptions
             )
 
+            // Convert Graphviz dot format to file formats. eg svg or png
             await writeOutputFiles(
                 dotString,
                 fileFolderAddress,

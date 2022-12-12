@@ -9,6 +9,12 @@ import { ClassStereotype, UmlClass } from './umlClass'
 import { findAssociatedClass } from './associations'
 import { ClassOptions } from './converterClass2Dot'
 
+/**
+ * Filter out any UML Class types that are to be hidden.
+ * @param umlClasses array of UML classes of type `UMLClass`
+ * @param options sol2uml class options
+ * @return umlClasses filtered list of UML classes of type `UMLClass`
+ */
 export const filterHiddenClasses = (
     umlClasses: UmlClass[],
     options: ClassOptions
@@ -30,6 +36,14 @@ export const filterHiddenClasses = (
     )
 }
 
+/**
+ * Finds all the UML classes that have an association with a list of base contract names.
+ * The associated classes can be contracts, abstract contracts, interfaces, libraries, enums, structs or constants.
+ * @param umlClasses array of UML classes of type `UMLClass`
+ * @param baseContractNames array of base contract names
+ * @param depth limit the number of associations from the base contract.
+ * @return filteredUmlClasses list of UML classes of type `UMLClass`
+ */
 export const classesConnectedToBaseContracts = (
     umlClasses: UmlClass[],
     baseContractNames: string[],
@@ -54,6 +68,15 @@ export const classesConnectedToBaseContracts = (
     return Object.values(filteredUmlClasses)
 }
 
+/**
+ * Finds all the UML classes that have an association with a base contract name.
+ * The associated classes can be contracts, abstract contracts, interfaces, libraries, enums, structs or constants.
+ * @param umlClasses array of UML classes of type `UMLClass`
+ * @param baseContractName base contract name
+ * @param weightedDirectedGraph graph of type WeightedDiGraph from the `js-graph-algorithms` package
+ * @param depth limit the number of associations from the base contract.
+ * @return filteredUmlClasses list of UML classes of type `UMLClass`
+ */
 export const classesConnectedToBaseContract = (
     umlClasses: UmlClass[],
     baseContractName: string,

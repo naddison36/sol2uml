@@ -43,6 +43,7 @@ export interface Import {
     }[]
 }
 
+// Contract variables are modelled as UML attributes
 export interface Attribute {
     visibility?: Visibility
     name: string
@@ -60,11 +61,12 @@ export interface Parameter {
     type: string
 }
 
+/// Contract functions, modifiers, events are modelled as UML operators
 export interface Operator extends Attribute {
     stereotype?: OperatorStereotype
     parameters?: Parameter[]
     returnParameters?: Parameter[]
-    isPayable?: boolean
+    stateMutability?: string
     modifiers?: string[]
     // Used by squashed classes
     hash?: string

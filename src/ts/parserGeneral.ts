@@ -1,13 +1,25 @@
-import { EtherscanParser } from './parserEtherscan'
+import { EtherscanParser, Network } from './parserEtherscan'
 import { parseUmlClassesFromFiles } from './parserFiles'
 import { UmlClass } from './umlClass'
 import { isAddress } from './utils/regEx'
 
 const debug = require('debug')('sol2uml')
 
+export interface ParserOptions {
+    apiKey?: string
+    network?: Network
+    subfolders?: string
+    ignoreFilesOrFolders?: string
+}
+
+/**
+ * Parses Solidity source code from a local filesystem or verified code on Etherscan
+ * @param fileFolderAddress filename, folder name or contract address
+ * @param options of type `ParserOptions`
+ */
 export const parserUmlClasses = async (
     fileFolderAddress: string,
-    options: any
+    options: ParserOptions
 ): Promise<{ umlClasses: UmlClass[]; contractName?: string }> => {
     let result: { umlClasses: UmlClass[]; contractName?: string } = {
         umlClasses: [],

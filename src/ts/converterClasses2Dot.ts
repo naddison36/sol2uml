@@ -10,6 +10,14 @@ import { findAssociatedClass } from './associations'
 
 const debug = require('debug')('sol2uml')
 
+/**
+ * Converts UML classes to Graphviz's DOT format.
+ * The DOT grammar defines Graphviz nodes, edges, graphs, subgraphs, and clusters http://www.graphviz.org/doc/info/lang.html
+ * @param umlClasses array of UML classes of type `UMLClass`
+ * @param clusterFolders flag if UML classes are to be clustered into folders their source code was in
+ * @param classOptions command line options for the `class` command
+ * @return dotString Graphviz's DOT format for defining nodes, edges and clusters.
+ */
 export function convertUmlClasses2Dot(
     umlClasses: UmlClass[],
     clusterFolders: boolean = false,

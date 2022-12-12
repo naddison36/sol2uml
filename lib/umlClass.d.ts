@@ -54,7 +54,7 @@ export interface Operator extends Attribute {
     stereotype?: OperatorStereotype;
     parameters?: Parameter[];
     returnParameters?: Parameter[];
-    isPayable?: boolean;
+    stateMutability?: string;
     modifiers?: string[];
     hash?: string;
     inheritancePosition?: number;
