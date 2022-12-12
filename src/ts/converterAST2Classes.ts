@@ -507,6 +507,14 @@ function addAssociations(
                 addAssociations(node.variables as ASTNode[], umlClass)
                 parseExpression(node.initialValue, umlClass)
                 break
+            case 'EmitStatement':
+                addAssociations(node.eventCall.arguments as ASTNode[], umlClass)
+                parseExpression(node.eventCall.expression, umlClass)
+                break
+            case 'FunctionCall':
+                addAssociations(node.arguments as ASTNode[], umlClass)
+                parseExpression(node.expression, umlClass)
+                break
             case 'ForStatement':
                 if ('statements' in node.body) {
                     addAssociations(node.body.statements as ASTNode[], umlClass)

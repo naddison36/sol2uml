@@ -40,6 +40,10 @@ contract FunctionReturnParamAssoc {
     string public test = 'Concrete contract referenced by function return parameter';
 }
 
+contract ConstructorContract {
+    constructor(uint256 value) {}
+}
+
 interface ContractInterface {
     function someFunction() external returns (bool);
 }
@@ -127,6 +131,18 @@ contract NewAddressConcrete {
 library VariableDeclarationLibrary {
     function max(uint256 a, uint256 b) internal pure returns (uint256) {
         return a >= b ? a : b;
+    }
+}
+
+library ParamDeclarationLibrary {
+    function min(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a <= b ? a : b;
+    }
+}
+
+library ConstructorDeclarationLibrary {
+    function min(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a <= b ? a : b;
     }
 }
 
@@ -283,5 +299,17 @@ contract Associations is ContractInterface, ContractAbstract, ContractConcrete {
     }
 
     function usingStructArray(FunctionParamArrayStruct[] memory params) public {
+    }
+
+    function internalCalc(uint256 input) internal {
+
+    }
+
+    function callInternalCalcUsingLibFunction() {
+        internalCalc(ParamDeclarationLibrary.min(1,2));
+    }
+
+    function createContractUsingLibFunction() private {
+        new ConstructorContract(ConstructorDeclarationLibrary.min(2,3));
     }
 }
