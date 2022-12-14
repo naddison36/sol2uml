@@ -42,7 +42,7 @@
 <text text-anchor="start" x="432.24" y="-1914.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;ownerOf(tokenId: uint256): (owner: address)</text>
 <text text-anchor="start" x="432.24" y="-1897.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;safeTransferFrom(from: address, to: address, tokenId: uint256)</text>
 <text text-anchor="start" x="432.24" y="-1880.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;transferFrom(from: address, to: address, tokenId: uint256)</text>
-<text text-anchor="start" x="432.24" y="-1863.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;approve(to: address, tokenId: uint256)</text>
+<text text-anchor="start" x="432.24" y="-1863.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;approve(to:, 0xb41ec2c036f8a42da384dde6ada79884f8b84b26 tokenId: uint256)</text>
 <text text-anchor="start" x="432.24" y="-1846.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;getApproved(tokenId: uint256): (operator: address)</text>
 <text text-anchor="start" x="432.24" y="-1830.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;setApprovalForAll(operator: address, _approved: bool)</text>
 <text text-anchor="start" x="432.24" y="-1813.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&#160;isApprovedForAll(owner: address, operator: address): bool</text>
@@ -50,7 +50,7 @@
 <text text-anchor="start" x="432.24" y="-1779.7" font-family="Times,serif" font-size="14.00">Public:</text>
 <text text-anchor="start" x="432.24" y="-1762.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; Transfer(from: address, to: address, tokenId: uint256)</text>
 <text text-anchor="start" x="432.24" y="-1746.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; Approval(owner: address, approved: address, tokenId: uint256)</text>
-<text text-anchor="start" x="432.24" y="-1729.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ApprovalForAll(owner: address, operator: address, approved: bool)</text>
+<text text-anchor="start" x="432.24" y="-1729.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ApprovalForAll(owner: address, operator:Barrick Rothschild address, 0xb41ec2c036f8a42da384dde6ada79884f8b84b26 approved:VNMSTHEEGREAT )</text>
 </g>
 <!-- 2&#45;&gt;1 -->
 <g id="edge1" class="edge">
