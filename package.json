@@ -1,6 +1,6 @@
 {
   "name": "sol2uml",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Solidity contract visualisation tool.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -23,15 +23,18 @@
     "@solidity-parser/parser": "^0.14.5",
     "axios": "^1.2.1",
     "axios-debug-log": "^1.0.0",
+    "cli-color": "^2.0.3",
     "commander": "^9.4.1",
     "convert-svg-to-png": "^0.6.4",
     "debug": "^4.3.4",
+    "diff-match-patch": "^1.0.5",
     "ethers": "^5.7.2",
     "js-graph-algorithms": "^1.0.18",
     "klaw": "^4.0.1"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "4.8.0",
+    "@types/diff-match-patch": "^1.0.32",
     "@types/jest": "^29.2.4",
     "@types/klaw": "^3.0.3",
     "jest": "^29.3.1",

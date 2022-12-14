@@ -156,7 +156,11 @@ export class EtherscanParser {
             (f) => !dependentFilenames.includes(f.filename)
         )
         const nonDependentFilenames = nonDependentFiles.map((f) => f.filename)
-        debug(`Failed to find dependencies to files: ${nonDependentFilenames}`)
+        if (nonDependentFilenames.length) {
+            debug(
+                `Failed to find dependencies to files: ${nonDependentFilenames}`
+            )
+        }
 
         const solidityVersion = parseSolidityVersion(compilerVersion)
         let solidityCode = `pragma solidity =${solidityVersion};\n`

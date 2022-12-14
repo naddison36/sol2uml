@@ -49,6 +49,7 @@ The three subcommands:
 * class:    Generates a UML class diagram from Solidity source code. default
 * storage:  Generates a diagram of a contract's storage slots.
 * flatten:  Merges verified source files from a Blockchain explorer into one local file.
+* diff:     Compares the flattened Solidity code from a Blockchain explorer for two contracts.
 
 The Solidity code can be pulled from verified source code on Blockchain explorers like Etherscan or from local Solidity files.
 
@@ -73,7 +74,7 @@ Commands:
 ### Class usage
 
 ```
-Usage: sol2uml class <fileFolderAddress> [options]
+Usage: sol2uml class [options] <fileFolderAddress>
 
 Generates UML diagrams from Solidity source code.
 
@@ -114,7 +115,7 @@ Options:
 ### Storage usage
 
 ```
-Usage: sol2uml storage <fileFolderAddress> [options]
+Usage: sol2uml storage [options] <fileFolderAddress>
 
 WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.
 
@@ -136,7 +137,7 @@ Options:
 ### Flatten usage
 
 ```
-Usage: sol2uml flatten <contractAddress> [options]
+Usage: sol2uml flatten <contractAddress>
 
 In order for the merged code to compile, the following is done:
 1. pragma solidity is set using the compiler of the verified contract.
@@ -152,6 +153,28 @@ Arguments:
 
 Options:
   -h, --help       display help for command
+```
+
+### Diff usage
+
+```
+Usage: sol2uml diff [options] <addressA> <addressB>
+
+The results show the comparision of contract A to B.
+The green sections are additions to contract B that are not in contract A.
+The red sections are removals from contract A that are not in contract B.
+The line numbers are from contract B. There are no line numbers for the red sections as they are not in contract B.
+
+Compare verified Solidity code differences between two contracts.
+
+Arguments:
+  addressA                  Contract address in hexadecimal format with a 0x prefix.
+  addressB                  Contract address in hexadecimal format with a 0x prefix.
+
+Options:
+  -l, --lineBuffer <value>  Minimum number a lines before and after changes (default: "4")
+  -s, --saveFiles           Save the flattened contract code to the filesystem. The file names will be the contract address with a .sol extension. (default: false)
+  -h, --help                display help for command
 ```
 
 ## UML Class diagram examples

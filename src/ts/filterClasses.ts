@@ -149,11 +149,12 @@ export const topologicalSortClasses = (umlClasses: UmlClass[]): UmlClass[] => {
         umlClasses.find((umlClass) => umlClass.id === umlClassId)
     )
 
-    return sortedUmlClasses
+    // Filter out any unfound classes. This happens when diff sources the second contract.
+    return sortedUmlClasses.filter((umlClass) => umlClass !== undefined)
 }
 
 const loadDirectedAcyclicGraph = (umlClasses: UmlClass[]): DiGraph => {
-    const directedAcyclicGraph = new DiGraph(umlClasses.length) // the number vertices in the graph
+    const directedAcyclicGraph = new DiGraph(UmlClass.idCounter) // the number vertices in the graph
 
     for (const sourceUmlClass of umlClasses) {
         for (const association of Object.values(sourceUmlClass.associations)) {

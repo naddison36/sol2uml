@@ -17,6 +17,9 @@ import { isAddress } from './utils/regEx'
 import { writeOutputFiles, writeSolidity } from './writerFiles'
 import { basename } from 'path'
 import { squashUmlClasses } from './squashClasses'
+import { diffCode } from './diff'
+
+const clc = require('cli-color')
 const program = new Command()
 
 const version =
@@ -35,7 +38,8 @@ program
 sol2uml comes with three subcommands:
 * class:    Generates a UML class diagram from Solidity source code. (default)
 * storage:  Generates a diagram of a contract's storage slots.
-* flatten:  Merges verified source files from a Blockchain explorer into one local file.
+* flatten:  Merges verified Solidity files from a Blockchain explorer into one local file.
+* diff:     Compares the flattened Solidity code from a Blockchain explorer for two contracts.
 
 The Solidity code can be pulled from verified source code on Blockchain explorers like Etherscan or from local Solidity files.`
     )
@@ -73,7 +77,7 @@ program
     .command('class', { isDefault: true })
     .description('Generates a UML class diagram from Solidity source code.')
     .usage(
-        `<fileFolderAddress> [options]
+        `sol2uml [options] <fileFolderAddress>
 
 Generates UML diagrams from Solidity source code.
 
@@ -219,7 +223,7 @@ program
     .command('storage')
     .description("Visually display a contract's storage slots.")
     .usage(
-        `<fileFolderAddress> [options]
+        `[options] <fileFolderAddress>
 
 WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.`
     )
@@ -340,7 +344,7 @@ program
         'Merges verified source files for a contract from a Blockchain explorer into one local file.'
     )
     .usage(
-        `<contractAddress> [options]
+        `<contractAddress>
 
 In order for the merged code to compile, the following is done:
 1. pragma solidity is set using the compiler of the verified contract.
@@ -374,6 +378,89 @@ In order for the merged code to compile, the following is done:
             const outputFilename =
                 combinedOptions.outputFileName || contractName
             await writeSolidity(solidityCode, outputFilename)
+        } catch (err) {
+            console.error(err)
+            process.exit(2)
+        }
+    })
+
+program
+    .command('diff')
+    .description(
+        'Compare verified Solidity code differences between two contracts.'
+    )
+    .usage(
+        `[options] <addressA> <addressB>
+
+The results show the comparision of contract A to B.
+The ${clc.green(
+            'green'
+        )} sections are additions to contract B that are not in contract A.
+The ${clc.red(
+            'red'
+        )} sections are removals from contract A that are not in contract B.
+The line numbers are from contract B. There are no line numbers for the red sections as they are not in contract B.`
+    )
+    .argument(
+        '<addressA>',
+        'Contract address in hexadecimal format with a 0x prefix.'
+    )
+    .argument(
+        '<addressB>',
+        'Contract address in hexadecimal format with a 0x prefix.'
+    )
+    .addOption(
+        new Option(
+            '-l, --lineBuffer <value>',
+            'Minimum number a lines before and after changes'
+        ).default('4')
+    )
+    .option(
+        '-s, --saveFiles',
+        'Save the flattened contract code to the filesystem. The file names will be the contract address with a .sol extension.',
+        false
+    )
+    .action(async (addressA, addressB, options, command) => {
+        try {
+            debug(`About to diff ${addressA} and ${addressB}`)
+
+            const combinedOptions = {
+                ...command.parent._optionValues,
+                ...options,
+            }
+
+            // Diff solidity code
+            const lineBuffer = parseInt(options.lineBuffer)
+            if (isNaN(lineBuffer))
+                throw Error(
+                    `Invalid line buffer "${options.lineBuffer}". Must be a number`
+                )
+
+            const etherscanParser = new EtherscanParser(
+                combinedOptions.apiKey,
+                combinedOptions.network
+            )
+
+            // Get verified Solidity code from Etherscan and flatten
+            const { solidityCode: codeA, contractName: contractNameA } =
+                await etherscanParser.getSolidityCode(addressA)
+            const { solidityCode: codeB, contractName: contractNameB } =
+                await etherscanParser.getSolidityCode(addressB)
+
+            console.log(`Difference between`)
+            console.log(
+                `A. ${addressA} ${contractNameA} on ${combinedOptions.network}`
+            )
+            console.log(
+                `B. ${addressB} ${contractNameB} on ${combinedOptions.network}\n`
+            )
+
+            diffCode(codeA, codeB, lineBuffer)
+
+            if (options.saveFiles) {
+                await writeSolidity(codeA, addressA)
+                await writeSolidity(codeB, addressB)
+            }
         } catch (err) {
             console.error(err)
             process.exit(2)
