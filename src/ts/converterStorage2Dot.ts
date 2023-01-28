@@ -25,8 +25,8 @@ node [shape=record, style=filled, fillcolor=gray95 fontname="Courier New"]`
     // link contract and structs to structs
     storages.forEach((slot) => {
         slot.variables.forEach((storage) => {
-            if (storage.referenceStorageId) {
-                dotString += `\n ${slot.id}:${storage.id} -> ${storage.referenceStorageId}`
+            if (storage.referenceSectionId) {
+                dotString += `\n ${slot.id}:${storage.id} -> ${storage.referenceSectionId}`
             }
         })
     })
@@ -120,7 +120,7 @@ export function convertStorage2Dot(
 
 const dotVariable = (storage: Variable, contractName: string): string => {
     const port =
-        storage.referenceStorageId !== undefined ? `<${storage.id}>` : ''
+        storage.referenceSectionId !== undefined ? `<${storage.id}>` : ''
     const contractNamePrefix =
         storage.contractName !== contractName ? `${storage.contractName}.` : ''
 

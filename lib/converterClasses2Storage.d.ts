@@ -17,7 +17,7 @@ export interface Variable {
     contractName?: string;
     noValue: boolean;
     value?: string;
-    referenceStorageId?: number;
+    referenceSectionId?: number;
     enumId?: number;
 }
 export interface StorageSection {

@@ -26,7 +26,7 @@ export interface Variable {
     contractName?: string
     noValue: boolean
     value?: string
-    referenceStorageId?: number
+    referenceSectionId?: number
     enumId?: number
 }
 
@@ -114,6 +114,7 @@ export const convertClasses2StorageSections = (
         []
     )
 
+    // Add new storage section to the beginning of the array
     storageSections.unshift({
         id: storageId++,
         name: contractName,
@@ -178,11 +179,7 @@ const parseVariables = (
             umlClass,
             umlClasses
         )
-        const noValue =
-            attribute.attributeType === AttributeType.Mapping ||
-            attribute.attributeType === AttributeType.UserDefined ||
-            attribute.attributeType === AttributeType.Function ||
-            (attribute.attributeType === AttributeType.Array && !dynamic)
+        const noValue = calcNoValue(attribute, dynamic)
 
         // find any dependent storage section locations
         const referenceStorageSection = parseReferenceStorageSection(
@@ -214,7 +211,7 @@ const parseVariables = (
                 noValue,
                 variable: attribute.name,
                 contractName: umlClass.name,
-                referenceStorageId: referenceStorageSection?.id,
+                referenceSectionId: referenceStorageSection?.id,
             }
         } else {
             newVariable = {
@@ -228,7 +225,7 @@ const parseVariables = (
                 noValue,
                 variable: attribute.name,
                 contractName: umlClass.name,
-                referenceStorageId: referenceStorageSection?.id,
+                referenceSectionId: referenceStorageSection?.id,
             }
         }
         if (referenceStorageSection) {
@@ -241,6 +238,10 @@ const parseVariables = (
             } else if (attribute.attributeType === AttributeType.Array) {
                 // attribute is a dynamic array
                 referenceStorageSection.slotKey = calcSlotKey(newVariable)
+                // TODO find a more recursive solution as this won't work for multi dimensional arrays
+                // Get the slotKey of the referenced type
+                storageSections[referenceStorageSection.id - 2].slotKey =
+                    referenceStorageSection.slotKey
             }
         }
         variables.push(newVariable)
@@ -292,6 +293,7 @@ export const parseReferenceStorageSection = (
             arrayItemSize > 16
                 ? 32 * Math.ceil(arrayItemSize / 32)
                 : arrayItemSize
+        const noValue = calcNoValue(baseAttribute, dynamic)
 
         const variables: Variable[] = []
         variables[0] = {
@@ -302,7 +304,7 @@ export const parseReferenceStorageSection = (
             byteOffset: 0,
             type: baseType,
             dynamic,
-            noValue: false,
+            noValue,
         }
         if (arrayLength > 1) {
             // For fixed length arrays. Dynamic arrays will have undefined arrayLength
@@ -328,7 +330,7 @@ export const parseReferenceStorageSection = (
                 otherClasses,
                 storageSections
             )
-            variables[0].referenceStorageId = referenceStorageSection?.id
+            variables[0].referenceSectionId = referenceStorageSection?.id
         }
 
         const newStorageSection: StorageSection = {
@@ -661,10 +663,10 @@ export const offsetStorageSlots = (
     storageSection.variables.forEach((variable) => {
         variable.fromSlot += slots
         variable.toSlot += slots
-        if (variable.referenceStorageId) {
+        if (variable.referenceSectionId) {
             // recursively offset the referenced storage
             const referenceStorageSection = storageSections.find(
-                (ss) => ss.id === variable.referenceStorageId
+                (ss) => ss.id === variable.referenceSectionId
             )
             if (!referenceStorageSection.arrayDynamic) {
                 offsetStorageSlots(
@@ -699,3 +701,16 @@ export const findDimensionLength = (
         return constant.value
     }
 }
+
+/**
+ * Calculate if the storage slot value should NOT be retrieved for the attribute.
+ * Only retrieve values for Elementary types or dynamic arrays
+ * @param attribute
+ * @param dynamic flags if the variable is of dynamic size
+ * @return noValue true if the slot value should NOT be retrieved
+ */
+const calcNoValue = (attribute: Attribute, dynamic: boolean): boolean =>
+    !(
+        attribute.attributeType === AttributeType.Elementary ||
+        (attribute.attributeType === AttributeType.Array && dynamic)
+    )
