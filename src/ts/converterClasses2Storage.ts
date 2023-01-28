@@ -1,7 +1,7 @@
 import { Attribute, AttributeType, ClassStereotype, UmlClass } from './umlClass'
 import { findAssociatedClass } from './associations'
 import { getStorageValues } from './slotValues'
-import { keccak256, toUtf8Bytes } from 'ethers/lib/utils'
+import { hexZeroPad, keccak256 } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
 import path from 'path'
 import { BigNumberish } from '@ethersproject/bignumber'
@@ -30,7 +30,7 @@ export interface Variable {
     enumId?: number
 }
 
-export interface Storage {
+export interface StorageSection {
     id: number
     name: string
     address?: string
@@ -49,17 +49,21 @@ let variableId = 1
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
  * @param contractAddress Contract address to get the storage slot values from.
  * If proxied, use proxy and not the implementation contract.
- * @param storage is mutated with the storage values
+ * @param storageSection is mutated with the storage values
  * @param blockTag block number or `latest`
  */
 export const addStorageValues = async (
     url: string,
     contractAddress: string,
-    storage: Storage,
+    storageSection: StorageSection,
     blockTag?: BigNumberish | 'latest'
 ) => {
-    const valueVariables = storage.variables.filter((s) => !s.noValue)
-    const slots = valueVariables.map((s) => s.fromSlot)
+    const valueVariables = storageSection.variables.filter((s) => !s.noValue)
+    const slots = storageSection.slotKey
+        ? valueVariables.map((s) =>
+              BigNumber.from(storageSection.slotKey).add(s.fromSlot)
+          )
+        : valueVariables.map((s) => s.fromSlot)
 
     const values = await getStorageValues(url, contractAddress, slots, blockTag)
     valueVariables.forEach((valueVariable, i) => {
@@ -72,13 +76,13 @@ export const addStorageValues = async (
  * @param contractName name of the contract to get storage layout.
  * @param umlClasses array of UML classes of type `UMLClass`
  * @param contractFilename relative path of the contract in the file system
- * @return array of storage objects with consecutive slots
+ * @return storageSections array of storageSection objects
  */
-export const convertClasses2Storages = (
+export const convertClasses2StorageSections = (
     contractName: string,
     umlClasses: UmlClass[],
     contractFilename?: string
-): Storage[] => {
+): StorageSection[] => {
     // Find the base UML Class from the base contract name
     const umlClass = umlClasses.find(({ name, relativePath }) => {
         if (!contractFilename) {
@@ -101,17 +105,23 @@ export const convertClasses2Storages = (
     }
     debug(`Found contract "${contractName}" in ${umlClass.absolutePath}`)
 
-    const storages: Storage[] = []
-    const variables = parseVariables(umlClass, umlClasses, [], storages, [])
+    const storageSections: StorageSection[] = []
+    const variables = parseVariables(
+        umlClass,
+        umlClasses,
+        [],
+        storageSections,
+        []
+    )
 
-    storages.unshift({
+    storageSections.unshift({
         id: storageId++,
         name: contractName,
         type: StorageType.Contract,
         variables: variables,
     })
 
-    return storages
+    return storageSections
 }
 
 /**
@@ -119,13 +129,13 @@ export const convertClasses2Storages = (
  * @param umlClass contract or file level struct
  * @param umlClasses other contracts, structs and enums that may be a type of a storage variable.
  * @param variables mutable array of storage slots that is appended to
- * @param storages mutable array of storages that is appended with structs
+ * @param storageSections mutable array of storageSection objects
  */
 const parseVariables = (
     umlClass: UmlClass,
     umlClasses: UmlClass[],
     variables: Variable[],
-    storages: Storage[],
+    storageSections: StorageSection[],
     inheritedContracts: string[]
 ): Variable[] => {
     // Add storage slots from inherited contracts first.
@@ -153,7 +163,7 @@ const parseVariables = (
             parentClass,
             umlClasses,
             variables,
-            storages,
+            storageSections,
             inheritedContracts
         )
     })
@@ -170,23 +180,25 @@ const parseVariables = (
         )
         const noValue =
             attribute.attributeType === AttributeType.Mapping ||
+            attribute.attributeType === AttributeType.UserDefined ||
+            attribute.attributeType === AttributeType.Function ||
             (attribute.attributeType === AttributeType.Array && !dynamic)
 
-        // find any dependent storage locations
-        const referenceStorage = parseReferenceStorage(
+        // find any dependent storage section locations
+        const referenceStorageSection = parseReferenceStorageSection(
             attribute,
             umlClass,
             umlClasses,
-            storages
+            storageSections
         )
 
         // Get the toSlot of the last storage item
         let lastToSlot = 0
         let nextOffset = 0
         if (variables.length > 0) {
-            const lastStorage = variables[variables.length - 1]
-            lastToSlot = lastStorage.toSlot
-            nextOffset = lastStorage.byteOffset + lastStorage.byteSize
+            const lastVariable = variables[variables.length - 1]
+            lastToSlot = lastVariable.toSlot
+            nextOffset = lastVariable.byteOffset + lastVariable.byteSize
         }
         let newVariable: Variable
         if (nextOffset + byteSize > 32) {
@@ -202,7 +214,7 @@ const parseVariables = (
                 noValue,
                 variable: attribute.name,
                 contractName: umlClass.name,
-                referenceStorageId: referenceStorage?.id,
+                referenceStorageId: referenceStorageSection?.id,
             }
         } else {
             newVariable = {
@@ -216,18 +228,19 @@ const parseVariables = (
                 noValue,
                 variable: attribute.name,
                 contractName: umlClass.name,
-                referenceStorageId: referenceStorage?.id,
+                referenceStorageId: referenceStorageSection?.id,
             }
         }
-        if (referenceStorage) {
+        if (referenceStorageSection) {
             if (!newVariable.dynamic) {
                 offsetStorageSlots(
-                    referenceStorage,
+                    referenceStorageSection,
                     newVariable.fromSlot,
-                    storages
+                    storageSections
                 )
             } else if (attribute.attributeType === AttributeType.Array) {
-                referenceStorage.slotKey = calcSlotKey(newVariable)
+                // attribute is a dynamic array
+                referenceStorageSection.slotKey = calcSlotKey(newVariable)
             }
         }
         variables.push(newVariable)
@@ -236,12 +249,12 @@ const parseVariables = (
     return variables
 }
 
-export const parseReferenceStorage = (
+export const parseReferenceStorageSection = (
     attribute: Attribute,
     umlClass: UmlClass,
     otherClasses: UmlClass[],
-    storages: Storage[]
-): Storage | undefined => {
+    storageSections: StorageSection[]
+): StorageSection | undefined => {
     if (attribute.attributeType === AttributeType.Array) {
         // storage is dynamic if the attribute type ends in []
         const result = attribute.type.match(/\[(\w*)]$/)
@@ -309,16 +322,16 @@ export const parseReferenceStorage = (
 
         // recursively add storage
         if (baseAttributeType !== AttributeType.Elementary) {
-            const referenceStorage = parseReferenceStorage(
+            const referenceStorageSection = parseReferenceStorageSection(
                 baseAttribute,
                 umlClass,
                 otherClasses,
-                storages
+                storageSections
             )
-            variables[0].referenceStorageId = referenceStorage?.id
+            variables[0].referenceStorageId = referenceStorageSection?.id
         }
 
-        const newStorage: Storage = {
+        const newStorageSection: StorageSection = {
             id: storageId++,
             name: `${attribute.type}: ${attribute.name}`,
             type: StorageType.Array,
@@ -326,9 +339,9 @@ export const parseReferenceStorage = (
             arrayLength,
             variables,
         }
-        storages.push(newStorage)
+        storageSections.push(newStorageSection)
 
-        return newStorage
+        return newStorageSection
     }
     if (attribute.attributeType === AttributeType.UserDefined) {
         // Is the user defined type linked to another Contract, Struct or Enum?
@@ -346,18 +359,18 @@ export const parseReferenceStorage = (
                 dependentClass,
                 otherClasses,
                 [],
-                storages,
+                storageSections,
                 []
             )
-            const newStorage = {
+            const newStorageSection = {
                 id: storageId++,
                 name: attribute.type,
                 type: StorageType.Struct,
                 variables,
             }
-            storages.push(newStorage)
+            storageSections.push(newStorageSection)
 
-            return newStorage
+            return newStorageSection
         }
         return undefined
     }
@@ -383,18 +396,18 @@ export const parseReferenceStorage = (
                     typeClass,
                     otherClasses,
                     [],
-                    storages,
+                    storageSections,
                     []
                 )
-                const newStorage = {
+                const newStorageSection = {
                     id: storageId++,
                     name: typeClass.name,
                     type: StorageType.Struct,
                     variables,
                 }
-                storages.push(newStorage)
+                storageSections.push(newStorageSection)
 
-                return newStorage
+                return newStorageSection
             }
         }
         return undefined
@@ -630,31 +643,37 @@ export const isElementary = (type: string): boolean => {
 
 export const calcSlotKey = (variable: Variable): string | undefined => {
     if (variable.dynamic) {
-        return keccak256(
-            toUtf8Bytes(BigNumber.from(variable.fromSlot).toHexString())
+        const hexStringOf32Bytes = hexZeroPad(
+            BigNumber.from(variable.fromSlot).toHexString(),
+            32
         )
+        return keccak256(hexStringOf32Bytes)
     }
     return BigNumber.from(variable.fromSlot).toHexString()
 }
 
-// recursively offset the slots numbers of a storage item
+// recursively offset the slots numbers of a variables in the storage section
 export const offsetStorageSlots = (
-    storage: Storage,
+    storageSection: StorageSection,
     slots: number,
-    storages: Storage[]
+    storageSections: StorageSection[]
 ) => {
-    storage.variables.forEach((variable) => {
+    storageSection.variables.forEach((variable) => {
         variable.fromSlot += slots
         variable.toSlot += slots
         if (variable.referenceStorageId) {
             // recursively offset the referenced storage
-            const referenceStorage = storages.find(
-                (s) => s.id === variable.referenceStorageId
+            const referenceStorageSection = storageSections.find(
+                (ss) => ss.id === variable.referenceStorageId
             )
-            if (!referenceStorage.arrayDynamic) {
-                offsetStorageSlots(referenceStorage, slots, storages)
+            if (!referenceStorageSection.arrayDynamic) {
+                offsetStorageSlots(
+                    referenceStorageSection,
+                    slots,
+                    storageSections
+                )
             } else {
-                referenceStorage.slotKey = calcSlotKey(variable)
+                referenceStorageSection.slotKey = calcSlotKey(variable)
             }
         }
     })

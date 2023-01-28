@@ -5,8 +5,13 @@ import {
     ClassStereotype,
     UmlClass,
 } from '../umlClass'
-import { calcStorageByteSize, isElementary } from '../converterClasses2Storage'
+import {
+    calcSlotKey,
+    calcStorageByteSize,
+    isElementary,
+} from '../converterClasses2Storage'
 import { formatBytes32String, parseBytes32String } from 'ethers/lib/utils'
+import { BigNumber } from 'ethers'
 
 describe('storage parser', () => {
     describe('calc storage bytes size of', () => {
@@ -354,6 +359,28 @@ describe('storage parser', () => {
         it('string to bytes', () => {
             expect(formatBytes32String('Less than 31 bytes')).toEqual(
                 '0x4c657373207468616e2033312062797465730000000000000000000000000000'
+            )
+        })
+    })
+    describe.only('calc dynamic array starting slot', () => {
+        const variable = {
+            id: 0,
+            toSlot: 2,
+            byteSize: 32,
+            byteOffset: 0,
+            type: 'array',
+            dynamic: true,
+            noValue: false,
+        }
+        test.each`
+            slot                 | expected
+            ${1}                 | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+            ${BigNumber.from(1)} | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+            ${'1'}               | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+            ${'0x01'}            | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+        `('slot $slot', ({ slot, expected }) => {
+            expect(calcSlotKey({ ...variable, fromSlot: slot })).toEqual(
+                expected
             )
         })
     })

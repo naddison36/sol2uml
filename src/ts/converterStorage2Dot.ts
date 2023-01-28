@@ -1,9 +1,13 @@
-import { Storage, StorageType, Variable } from './converterClasses2Storage'
+import {
+    StorageSection,
+    StorageType,
+    Variable,
+} from './converterClasses2Storage'
 
 const debug = require('debug')('sol2uml')
 
 export const convertStorages2Dot = (
-    storages: Storage[],
+    storages: StorageSection[],
     options: { data: boolean }
 ): string => {
     let dotString: string = `
@@ -36,7 +40,7 @@ node [shape=record, style=filled, fillcolor=gray95 fontname="Courier New"]`
 }
 
 export function convertStorage2Dot(
-    storage: Storage,
+    storage: StorageSection,
     dotString: string,
     options: { data: boolean }
 ): string {

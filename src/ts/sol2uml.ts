@@ -10,7 +10,7 @@ import {
 import { Command, Option } from 'commander'
 import {
     addStorageValues,
-    convertClasses2Storages,
+    convertClasses2StorageSections,
 } from './converterClasses2Storage'
 import { convertStorages2Dot } from './converterStorage2Dot'
 import { isAddress } from './utils/regEx'
@@ -280,7 +280,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
             )
 
             contractName = combinedOptions.contract || contractName
-            const storages = convertClasses2Storages(
+            const storages = convertClasses2StorageSections(
                 contractName,
                 umlClasses,
                 combinedOptions.contractFile
@@ -309,17 +309,15 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                     storageAddress = fileFolderAddress
                 }
 
-                const storage = storages.find((so) => so.name === contractName)
-                if (!storageAddress)
-                    throw Error(
-                        `Could not find the "${contractName}" contract in list of parsed storages`
+                // Get storage values for each storage block
+                for (const storage of storages) {
+                    await addStorageValues(
+                        combinedOptions.url,
+                        storageAddress,
+                        storage,
+                        combinedOptions.block
                     )
-                await addStorageValues(
-                    combinedOptions.url,
-                    storageAddress,
-                    storage,
-                    combinedOptions.block
-                )
+                }
             }
 
             const dotString = convertStorages2Dot(storages, combinedOptions)

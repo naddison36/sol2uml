@@ -20,7 +20,7 @@ export interface Variable {
     referenceStorageId?: number;
     enumId?: number;
 }
-export interface Storage {
+export interface StorageSection {
     id: number;
     name: string;
     address?: string;
@@ -35,24 +35,24 @@ export interface Storage {
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
  * @param contractAddress Contract address to get the storage slot values from.
  * If proxied, use proxy and not the implementation contract.
- * @param storage is mutated with the storage values
+ * @param storageSection is mutated with the storage values
  * @param blockTag block number or `latest`
  */
-export declare const addStorageValues: (url: string, contractAddress: string, storage: Storage, blockTag?: BigNumberish | 'latest') => Promise<void>;
+export declare const addStorageValues: (url: string, contractAddress: string, storageSection: StorageSection, blockTag?: BigNumberish | 'latest') => Promise<void>;
 /**
  *
  * @param contractName name of the contract to get storage layout.
  * @param umlClasses array of UML classes of type `UMLClass`
  * @param contractFilename relative path of the contract in the file system
- * @return array of storage objects with consecutive slots
+ * @return storageSections array of storageSection objects
  */
-export declare const convertClasses2Storages: (contractName: string, umlClasses: UmlClass[], contractFilename?: string) => Storage[];
-export declare const parseReferenceStorage: (attribute: Attribute, umlClass: UmlClass, otherClasses: UmlClass[], storages: Storage[]) => Storage | undefined;
+export declare const convertClasses2StorageSections: (contractName: string, umlClasses: UmlClass[], contractFilename?: string) => StorageSection[];
+export declare const parseReferenceStorageSection: (attribute: Attribute, umlClass: UmlClass, otherClasses: UmlClass[], storageSections: StorageSection[]) => StorageSection | undefined;
 export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlClass, otherClasses: UmlClass[]) => {
     size: number;
     dynamic: boolean;
 };
 export declare const isElementary: (type: string) => boolean;
 export declare const calcSlotKey: (variable: Variable) => string | undefined;
-export declare const offsetStorageSlots: (storage: Storage, slots: number, storages: Storage[]) => void;
+export declare const offsetStorageSlots: (storageSection: StorageSection, slots: number, storageSections: StorageSection[]) => void;
 export declare const findDimensionLength: (umlClass: UmlClass, dimension: string) => number;
