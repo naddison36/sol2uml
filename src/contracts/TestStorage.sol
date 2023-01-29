@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.17;
 
 struct SubOneSlot {
     address account; // 20 bytes
@@ -128,9 +128,9 @@ contract TestStorage is Parent, Parent2 {
     IERC20 token = IERC20(0x34f08F2A3f4a86531e9C4139Fde571a62689AFEC);
     address[] tokensDyn = [
         0x1000000000000000000000000000000000000001,
-        0x2000000000000000000000000000000000000002,
-        0x3000000000000000000000000000000000000003,
-        0x4000000000000000000000000000000000000004
+        0x1000000000000000000000000000000000000002,
+        0x1000000000000000000000000000000000000003,
+        0x1000000000000000000000000000000000000004
     ];
     IERC20[2] tokenPair = [
         IERC20(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5),
@@ -138,26 +138,26 @@ contract TestStorage is Parent, Parent2 {
     ];
     address[12] dozenTokens = [
         0xa57Bd00134B2850B2a1c55860c9e9ea100fDd6CF,
-        0x1000000000000000000000000000000000000001,
+        0x2000000000000000000000000000000000000001,
         0x2000000000000000000000000000000000000002,
-        0x3000000000000000000000000000000000000003,
-        0x4000000000000000000000000000000000000004,
-        0x5000000000000000000000000000000000000005,
-        0x6000000000000000000000000000000000000006,
-        0x7000000000000000000000000000000000000007,
-        0x8000000000000000000000000000000000000008,
-        0x9000000000000000000000000000000000000009,
+        0x2000000000000000000000000000000000000003,
+        0x2000000000000000000000000000000000000004,
+        0x2000000000000000000000000000000000000005,
+        0x2000000000000000000000000000000000000006,
+        0x2000000000000000000000000000000000000007,
+        0x2000000000000000000000000000000000000008,
+        0x2000000000000000000000000000000000000009,
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
     ];
     address[N_COINS] coins = [
-        0x1000000000000000000000000000000000000001,
-        0x2000000000000000000000000000000000000002
+        0x3000000000000000000000000000000000000001,
+        0x3000000000000000000000000000000000000002
     ];
     address[N_COINS][3][N_COINS] multiDimension;
     uint256[MAX_COINS] maxCoins = [1234, 567, 8910];
     IERC20[N_COINS] tokens = [
-        IERC20(0x1000000000000000000000000000000000000001),
-        IERC20(0x2000000000000000000000000000000000000002)
+        IERC20(0x4000000000000000000000000000000000000001),
+        IERC20(0x4000000000000000000000000000000000000002)
     ];
     // address[2 * N_COINS] doubleTokens;
 
@@ -184,6 +184,9 @@ contract TestStorage is Parent, Parent2 {
     bool[33][2] public flags33x2 = [[true, true, false, true], [true, false, true, true]];
     bool[2][33] public flags2x33 = [[true, true], [true, false], [false, true], [false, false]];
     bool public flag8 = true;
+    bool[] public flagsDyn = [true, true, true, false, true, false, true];
+    bool[][] public flagsDynDyn;
+    bool[][][] public flagsDynDynDyn;
     bool[2][] public flags2xDyn = [
         [true, true],
         [true, true],
@@ -193,10 +196,7 @@ contract TestStorage is Parent, Parent2 {
         [true, true]
     ];
     bool public flag9 = true;
-    bool[][2] public flagsDynx2 = [
-        [true, false, false, true, true],
-        [true, false, true, false, true]
-    ];
+    bool[][2] public flagsDynx2;
     bool[][16] public flagsDynx16;
     bool[][32] public flagsDynx32;
     bool[32][] public flags32xDyn;
@@ -242,8 +242,11 @@ contract TestStorage is Parent, Parent2 {
     FixedArray public fixedArray;
     FlagsStruct public flagStruct;
     int16 public arrayCount = -2000;
-    uint64[] public dynamicIntArray = [2000, 1, 254, 0, 254, 2, 256];
+    uint64[] public dynamicInt64Array = [2000, 1, 254, 1e19, 254, 2, 256];
+    uint128[] public dynamicInt128Array = [1e38, 2e38, 3e38];
     uint256[3] public fixedIntArray = [1000, 2000, 3000];
+    uint256[][] public dynamicDynIntArray;
+    uint256[][][] public dynamicDynDynIntArray;
     mapping(address => bool) public blacklist;
     mapping(address => uint256) public balance;
     mapping(address => ContractLevelStruct2) public mapStruct;
@@ -274,12 +277,72 @@ contract TestStorage is Parent, Parent2 {
 
     constructor(address _superUser) {
         superUser = _superUser;
+
+        multiDimension[0][0][0] = 0xFfffFfFFFfFFFFfFFfFFFfFFFfFFfFFFfFfFfFf1;
+        multiDimension[0][0][1] = 0xfffFFFFFFFfFFFFfFFfFfFFffFfFfFffFFFFfFf2;
+
+        flags33x2[0][32] = true;
+
+        flagsDynx2[0] = [true, false, false, true, true, false, true, true, false, false, true, true, false, true, false, false, true, false, true, false, true, false, false, true, true, false, true, true, false, false, true, true, true, false, true];
+        flagsDynx2[1] = [true, false, true, false, true, true, true, true, false, true];
+
+        flagsDynDyn.push([true, true, false, true, true]);
+        flagsDynDyn.push([true, false, true]);
+        flagsDynDyn.push();
+        flagsDynDyn.push([true, true]);
+
+        flagsDynDynDyn.push();
+        flagsDynDynDyn[0].push([true, true, false, true]);
+        flagsDynDynDyn.push();
+        flagsDynDynDyn[1].push([true, false, false, true, true]);
+        flagsDynDynDyn.push();
+        flagsDynDynDyn[2].push();
+        flagsDynDynDyn[2][0].push(true);
+        flagsDynDynDyn[2][0].push(false);
+        flagsDynDynDyn[2][0].push(true);
+
+        flagsDynx16[0].push(true);
+        flagsDynx16[0].push(true);
+        flagsDynx16[0].push(false);
+        flagsDynx16[0].push(true);
+        flagsDynx16[1].push(true);
+        flagsDynx16[1].push(false);
+        flagsDynx16[1].push(true);
+        flagsDynx16[2].push(true);
+        flagsDynx16[2].push(true);
+        flagsDynx16[15].push(true);
+
+        flagsDynx32[0].push(true);
+        flagsDynx32[0].push(true);
+        flagsDynx32[1].push(true);
+
+        flags32xDyn.push([true, false, true]);
+        flags32xDyn.push([true, false, true, false, true]);
+
+        bool_33x2x2[0][0][0] = true;
+        bool_33x2x2[1][1][1] = true;
+
+        bytes30_2x6[0][0] = 0xBBB000000000000000000000000000000000000000000000000000000BBB;
+        bytes30_6x2[0][0] = 0xCCC000000000000000000000000000000000000000000000000000000CCC;
+
         fixedArray.num1 = 65535;
         fixedArray.num2 = 65001;
         fixedArray.data = [
             bytes30(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF),
             0xFFF000000F00000000000000000000000000000000000000000000000FFF
         ];
+
+        dynamicDynIntArray.push([11111, 11122]);
+        dynamicDynIntArray.push([222111, 222222, 222333]);
+
+        dynamicDynDynIntArray.push();
+        dynamicDynDynIntArray[0].push([111111, 111122]);
+        dynamicDynDynIntArray[0].push([112211, 112222, 112233]);
+        dynamicDynDynIntArray.push();
+        dynamicDynDynIntArray[1].push([221111, 221122, 221133, 221144]);
+        dynamicDynDynIntArray[1].push([222211, 222222, 222233, 222244, 222255]);
+        dynamicDynDynIntArray.push();
+        dynamicDynDynIntArray[2].push([331111]);
 
         blacklist[0x2f2Db75C5276481E2B018Ac03e968af7763Ed118] = true;
         blacklist[0xdb2C46Ed8E850668b942d9Bd6D2ae8803c6789DF] = false;

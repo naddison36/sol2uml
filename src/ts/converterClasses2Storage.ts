@@ -8,7 +8,7 @@ import { BigNumberish } from '@ethersproject/bignumber'
 
 const debug = require('debug')('sol2uml')
 
-export enum StorageType {
+export enum StorageSectionType {
     Contract = 'Contract',
     Struct = 'Struct',
     Array = 'Array',
@@ -21,10 +21,11 @@ export interface Variable {
     byteSize: number
     byteOffset: number
     type: string
+    attributeType: AttributeType
     dynamic: boolean
     variable?: string
     contractName?: string
-    noValue: boolean
+    getValue: boolean
     value?: string
     referenceSectionId?: number
     enumId?: number
@@ -34,8 +35,8 @@ export interface StorageSection {
     id: number
     name: string
     address?: string
-    slotKey?: string
-    type: StorageType
+    offset?: string
+    type: StorageSectionType
     arrayLength?: number
     arrayDynamic?: boolean
     variables: Variable[]
@@ -48,7 +49,7 @@ let variableId = 1
  *
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
  * @param contractAddress Contract address to get the storage slot values from.
- * If proxied, use proxy and not the implementation contract.
+ * If contract is proxied, use proxy and not the implementation contract.
  * @param storageSection is mutated with the storage values
  * @param blockTag block number or `latest`
  */
@@ -58,16 +59,39 @@ export const addStorageValues = async (
     storageSection: StorageSection,
     blockTag?: BigNumberish | 'latest'
 ) => {
-    const valueVariables = storageSection.variables.filter((s) => !s.noValue)
-    const slots = storageSection.slotKey
-        ? valueVariables.map((s) =>
-              BigNumber.from(storageSection.slotKey).add(s.fromSlot)
-          )
-        : valueVariables.map((s) => s.fromSlot)
+    const valueVariables = storageSection.variables.filter((ss) => ss.getValue)
+    if (valueVariables.length === 0) return
 
+    const valueFromSlot = valueVariables.map((variable) => variable.fromSlot)
+    // remove duplicate slots
+    const uniqueValueFromSlot = [...new Set(valueFromSlot)]
+
+    // Convert slot numbers to BigNumbers and offset dynamic arrays
+    let slots = uniqueValueFromSlot.map((fromSlot) => {
+        if (storageSection.offset) {
+            return BigNumber.from(storageSection.offset).add(fromSlot)
+        }
+        return BigNumber.from(fromSlot)
+    })
+
+    // Get the contract slot values from the node provider
     const values = await getStorageValues(url, contractAddress, slots, blockTag)
-    valueVariables.forEach((valueVariable, i) => {
-        valueVariable.value = values[i]
+
+    // For each slot value retrieved
+    values.forEach((value, i) => {
+        // Get the corresponding slot number for the slot value
+        const fromSlot = uniqueValueFromSlot[i]
+
+        // For each variable in the storage section
+        for (const variable of storageSection.variables) {
+            if (variable.fromSlot === fromSlot) {
+                variable.value = value
+            }
+            // if variable is past the slot that has the value
+            else if (variable.toSlot > fromSlot) {
+                break
+            }
+        }
     })
 }
 
@@ -118,9 +142,11 @@ export const convertClasses2StorageSections = (
     storageSections.unshift({
         id: storageId++,
         name: contractName,
-        type: StorageType.Contract,
+        type: StorageSectionType.Contract,
         variables: variables,
     })
+
+    processReferenceStorageSections(storageSections[0], 0, storageSections)
 
     return storageSections
 }
@@ -179,7 +205,6 @@ const parseVariables = (
             umlClass,
             umlClasses
         )
-        const noValue = calcNoValue(attribute, dynamic)
 
         // find any dependent storage section locations
         const referenceStorageSection = parseReferenceStorageSection(
@@ -187,6 +212,12 @@ const parseVariables = (
             umlClass,
             umlClasses,
             storageSections
+        )
+
+        const getValue = calcGetValue(
+            attribute.attributeType,
+            dynamic,
+            referenceStorageSection?.type
         )
 
         // Get the toSlot of the last storage item
@@ -207,8 +238,9 @@ const parseVariables = (
                 byteSize,
                 byteOffset: 0,
                 type: attribute.type,
+                attributeType: attribute.attributeType,
                 dynamic,
-                noValue,
+                getValue,
                 variable: attribute.name,
                 contractName: umlClass.name,
                 referenceSectionId: referenceStorageSection?.id,
@@ -221,33 +253,57 @@ const parseVariables = (
                 byteSize,
                 byteOffset: nextOffset,
                 type: attribute.type,
+                attributeType: attribute.attributeType,
                 dynamic,
-                noValue,
+                getValue,
                 variable: attribute.name,
                 contractName: umlClass.name,
                 referenceSectionId: referenceStorageSection?.id,
-            }
-        }
-        if (referenceStorageSection) {
-            if (!newVariable.dynamic) {
-                offsetStorageSlots(
-                    referenceStorageSection,
-                    newVariable.fromSlot,
-                    storageSections
-                )
-            } else if (attribute.attributeType === AttributeType.Array) {
-                // attribute is a dynamic array
-                referenceStorageSection.slotKey = calcSlotKey(newVariable)
-                // TODO find a more recursive solution as this won't work for multi dimensional arrays
-                // Get the slotKey of the referenced type
-                storageSections[referenceStorageSection.id - 2].slotKey =
-                    referenceStorageSection.slotKey
             }
         }
         variables.push(newVariable)
     })
 
     return variables
+}
+
+const processReferenceStorageSections = (
+    storageSection: StorageSection,
+    slotOffset: number,
+    storageSections: StorageSection[]
+) => {
+    // storageSection.offset = 0
+    storageSection.variables.forEach((variable) => {
+        // offset storage slots
+        variable.fromSlot += slotOffset
+        variable.toSlot += slotOffset
+
+        // find storage section that the variable is referencing
+        const referenceStorageSection = storageSections.find(
+            (ss) => ss.id === variable.referenceSectionId
+        )
+
+        if (referenceStorageSection) {
+            referenceStorageSection.offset = storageSection.offset
+
+            if (!variable.dynamic) {
+                processReferenceStorageSections(
+                    referenceStorageSection,
+                    variable.fromSlot,
+                    storageSections
+                )
+            } else if (variable.attributeType === AttributeType.Array) {
+                // attribute is a dynamic array
+                referenceStorageSection.offset = calcSectionOffset(variable)
+
+                processReferenceStorageSections(
+                    referenceStorageSection,
+                    0,
+                    storageSections
+                )
+            }
+        }
+    })
 }
 
 export const parseReferenceStorageSection = (
@@ -261,7 +317,7 @@ export const parseReferenceStorageSection = (
         const result = attribute.type.match(/\[(\w*)]$/)
         const dynamic = result[1] === ''
         const arrayLength = !dynamic
-            ? findDimensionLength(umlClass, result[1])
+            ? findDimensionLength(umlClass, result[1], otherClasses)
             : undefined
 
         // get the type of the array items. eg
@@ -278,6 +334,7 @@ export const parseReferenceStorageSection = (
         } else {
             baseAttributeType = AttributeType.UserDefined
         }
+
         const baseAttribute: Attribute = {
             visibility: attribute.visibility,
             name: baseType,
@@ -289,11 +346,31 @@ export const parseReferenceStorageSection = (
             umlClass,
             otherClasses
         )
+        // If more than 16 bytes, then round up in 32 bytes increments
         const arraySlotSize =
             arrayItemSize > 16
                 ? 32 * Math.ceil(arrayItemSize / 32)
                 : arrayItemSize
-        const noValue = calcNoValue(baseAttribute, dynamic)
+
+        // If base type is not an Elementary type
+        // This can only be Array and UserDefined for base types of arrays.
+        let referenceStorageSection
+        if (baseAttributeType !== AttributeType.Elementary) {
+            // recursively add storage section for Array and UserDefined types
+            referenceStorageSection = parseReferenceStorageSection(
+                baseAttribute,
+                umlClass,
+                otherClasses,
+                storageSections
+            )
+        }
+        const dynamicBase = referenceStorageSection?.arrayDynamic === true
+
+        const getValue = calcGetValue(
+            baseAttribute.attributeType,
+            dynamicBase,
+            referenceStorageSection?.type
+        )
 
         const variables: Variable[] = []
         variables[0] = {
@@ -303,11 +380,16 @@ export const parseReferenceStorageSection = (
             byteSize: arrayItemSize,
             byteOffset: 0,
             type: baseType,
-            dynamic,
-            noValue,
+            attributeType: baseAttributeType,
+            dynamic: dynamicBase,
+            getValue,
+            referenceSectionId: referenceStorageSection?.id,
         }
+
+        // If a fixed size array.
+        // Note dynamic arrays will have undefined arrayLength
         if (arrayLength > 1) {
-            // For fixed length arrays. Dynamic arrays will have undefined arrayLength
+            // Add a variable to the new storage section for each item in the fixed size array
             for (let i = 1; i < arrayLength; i++) {
                 variables.push({
                     id: variableId++,
@@ -316,27 +398,19 @@ export const parseReferenceStorageSection = (
                     byteSize: arrayItemSize,
                     byteOffset: (i * arraySlotSize) % 32,
                     type: baseType,
-                    dynamic,
-                    noValue: false,
+                    attributeType: baseAttributeType,
+                    dynamic: dynamicBase,
+                    getValue,
+                    // only the first variable links to a referenced storage section
+                    referenceSectionId: undefined,
                 })
             }
-        }
-
-        // recursively add storage
-        if (baseAttributeType !== AttributeType.Elementary) {
-            const referenceStorageSection = parseReferenceStorageSection(
-                baseAttribute,
-                umlClass,
-                otherClasses,
-                storageSections
-            )
-            variables[0].referenceSectionId = referenceStorageSection?.id
         }
 
         const newStorageSection: StorageSection = {
             id: storageId++,
             name: `${attribute.type}: ${attribute.name}`,
-            type: StorageType.Array,
+            type: StorageSectionType.Array,
             arrayDynamic: dynamic,
             arrayLength,
             variables,
@@ -367,7 +441,7 @@ export const parseReferenceStorageSection = (
             const newStorageSection = {
                 id: storageId++,
                 name: attribute.type,
-                type: StorageType.Struct,
+                type: StorageSectionType.Struct,
                 variables,
             }
             storageSections.push(newStorageSection)
@@ -404,7 +478,7 @@ export const parseReferenceStorageSection = (
                 const newStorageSection = {
                     id: storageId++,
                     name: typeClass.name,
-                    type: StorageType.Struct,
+                    type: StorageSectionType.Struct,
                     variables,
                 }
                 storageSections.push(newStorageSection)
@@ -443,7 +517,11 @@ export const calcStorageByteSize = (
         let dimension = dimensionsStrReversed.shift()
         const fixedDimensions: number[] = []
         while (dimension && dimension !== '') {
-            const dimensionNum = findDimensionLength(umlClass, dimension)
+            const dimensionNum = findDimensionLength(
+                umlClass,
+                dimension,
+                otherClasses
+            )
             fixedDimensions.push(dimensionNum)
             // read the next dimension for the next loop
             dimension = dimensionsStrReversed.shift()
@@ -643,7 +721,7 @@ export const isElementary = (type: string): boolean => {
     }
 }
 
-export const calcSlotKey = (variable: Variable): string | undefined => {
+export const calcSectionOffset = (variable: Variable): string | undefined => {
     if (variable.dynamic) {
         const hexStringOf32Bytes = hexZeroPad(
             BigNumber.from(variable.fromSlot).toHexString(),
@@ -654,63 +732,111 @@ export const calcSlotKey = (variable: Variable): string | undefined => {
     return BigNumber.from(variable.fromSlot).toHexString()
 }
 
-// recursively offset the slots numbers of a variables in the storage section
-export const offsetStorageSlots = (
-    storageSection: StorageSection,
-    slots: number,
-    storageSections: StorageSection[]
-) => {
-    storageSection.variables.forEach((variable) => {
-        variable.fromSlot += slots
-        variable.toSlot += slots
-        if (variable.referenceSectionId) {
-            // recursively offset the referenced storage
-            const referenceStorageSection = storageSections.find(
-                (ss) => ss.id === variable.referenceSectionId
-            )
-            if (!referenceStorageSection.arrayDynamic) {
-                offsetStorageSlots(
-                    referenceStorageSection,
-                    slots,
-                    storageSections
-                )
-            } else {
-                referenceStorageSection.slotKey = calcSlotKey(variable)
-            }
-        }
-    })
-}
-
 export const findDimensionLength = (
     umlClass: UmlClass,
-    dimension: string
+    dimension: string,
+    otherClasses: UmlClass[]
 ): number => {
     const dimensionNum = parseInt(dimension)
     if (Number.isInteger(dimensionNum)) {
         return dimensionNum
-    } else {
-        // Try and size array dimension from declared constants
-        const constant = umlClass.constants.find(
-            (constant) => constant.name === dimension
-        )
-        if (!constant) {
-            throw Error(
-                `Could not size fixed sized array with dimension "${dimension}"`
-            )
-        }
+    }
+
+    // Try and size array dimension from declared constants
+    const constant = umlClass.constants.find(
+        (constant) => constant.name === dimension
+    )
+    if (constant) {
         return constant.value
     }
+
+    // Try and size array dimension from file constants
+    const fileConstant = otherClasses.find(
+        (umlClass) =>
+            umlClass.name === dimension &&
+            umlClass.stereotype === ClassStereotype.Constant
+    )
+    if (fileConstant?.constants[0]?.value) {
+        return fileConstant.constants[0].value
+    }
+    throw Error(
+        `Could not size fixed sized array with dimension "${dimension}"`
+    )
 }
 
 /**
- * Calculate if the storage slot value should NOT be retrieved for the attribute.
- * Only retrieve values for Elementary types or dynamic arrays
- * @param attribute
+ * Calculate if the storage slot value should be retrieved for the attribute.
+ *
+ * Elementary types should return true.
+ * Dynamic Array types should return true.
+ * Static Array types should return false.
+ * UserDefined types that are Structs should return false.
+ * UserDefined types that are Enums or alias to Elementary type should return true.
+ *
+ * @param attributeType
  * @param dynamic flags if the variable is of dynamic size
- * @return noValue true if the slot value should NOT be retrieved
+ * @param storageSectionType
+ * @return getValue true if the slot value should be retrieved.
  */
-const calcNoValue = (attribute: Attribute, dynamic: boolean): boolean =>
-    !(
-        attribute.attributeType === AttributeType.Elementary ||
-        (attribute.attributeType === AttributeType.Array && dynamic)
-    )
+const calcGetValue = (
+    attributeType: AttributeType,
+    dynamic: boolean,
+    storageSectionType?: StorageSectionType
+): boolean =>
+    attributeType === AttributeType.Elementary ||
+    (attributeType === AttributeType.UserDefined &&
+        storageSectionType !== StorageSectionType.Struct) ||
+    (attributeType === AttributeType.Array && dynamic)
+
+// recursively adds dynamic array variables
+export const addDynamicArrayVariables = (
+    storageSection: StorageSection,
+    storageSections: StorageSection[]
+) => {
+    storageSection.variables.forEach((variable) => {
+        if (variable.attributeType !== AttributeType.Array) return
+
+        // find storage section that the variable is referencing
+        const referenceStorageSection = storageSections.find(
+            (ss) => ss.id === variable.referenceSectionId
+        )
+
+        if (!referenceStorageSection) return
+
+        // recursively add dynamic array variables
+        addDynamicArrayVariables(referenceStorageSection, storageSections)
+
+        if (!variable.dynamic) return
+
+        const arrayItemSize = referenceStorageSection.variables[0].byteSize
+        // If more than 16 bytes, then round up in 32 bytes increments
+        const arraySlotSize =
+            arrayItemSize > 16
+                ? 32 * Math.ceil(arrayItemSize / 32)
+                : arrayItemSize
+
+        const arrayLength = BigNumber.from(variable.value).toNumber()
+        for (let i = 1; i < arrayLength; i++) {
+            const fromSlot = Math.floor((i * arraySlotSize) / 32)
+            const toSlot = Math.floor(((i + 1) * arraySlotSize - 1) / 32)
+            const byteOffset = (i * arraySlotSize) % 32
+            const value =
+                fromSlot === 0
+                    ? referenceStorageSection.variables[0].value
+                    : undefined
+
+            // add extra variables
+            referenceStorageSection.variables.push({
+                ...referenceStorageSection.variables[0],
+                id: variableId++,
+                fromSlot,
+                toSlot,
+                byteOffset,
+                value,
+                referenceSectionId: undefined,
+            })
+
+            // TODO get missing slot values
+        }
+    })
+}

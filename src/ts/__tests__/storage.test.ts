@@ -6,7 +6,7 @@ import {
     UmlClass,
 } from '../umlClass'
 import {
-    calcSlotKey,
+    calcSectionOffset,
     calcStorageByteSize,
     isElementary,
 } from '../converterClasses2Storage'
@@ -362,15 +362,16 @@ describe('storage parser', () => {
             )
         })
     })
-    describe.only('calc dynamic array starting slot', () => {
+    describe('calc dynamic array starting slot', () => {
         const variable = {
             id: 0,
             toSlot: 2,
             byteSize: 32,
             byteOffset: 0,
             type: 'array',
+            attributeType: AttributeType.Array,
             dynamic: true,
-            noValue: false,
+            getValue: false,
         }
         test.each`
             slot                 | expected
@@ -379,7 +380,7 @@ describe('storage parser', () => {
             ${'1'}               | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
             ${'0x01'}            | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
         `('slot $slot', ({ slot, expected }) => {
-            expect(calcSlotKey({ ...variable, fromSlot: slot })).toEqual(
+            expect(calcSectionOffset({ ...variable, fromSlot: slot })).toEqual(
                 expected
             )
         })

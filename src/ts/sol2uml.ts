@@ -9,6 +9,7 @@ import {
 } from './filterClasses'
 import { Command, Option } from 'commander'
 import {
+    addDynamicArrayVariables,
     addStorageValues,
     convertClasses2StorageSections,
 } from './converterClasses2Storage'
@@ -280,7 +281,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
             )
 
             contractName = combinedOptions.contract || contractName
-            const storages = convertClasses2StorageSections(
+            const storageSections = convertClasses2StorageSections(
                 contractName,
                 umlClasses,
                 combinedOptions.contractFile
@@ -288,9 +289,9 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
 
             if (isAddress(fileFolderAddress)) {
                 // The first storage is the contract
-                storages[0].address = fileFolderAddress
+                storageSections[0].address = fileFolderAddress
             }
-            debug(storages)
+            debug(storageSections)
 
             if (combinedOptions.data) {
                 let storageAddress = combinedOptions.storage
@@ -310,17 +311,23 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                 }
 
                 // Get storage values for each storage block
-                for (const storage of storages) {
+                for (const storageSection of storageSections) {
                     await addStorageValues(
                         combinedOptions.url,
                         storageAddress,
-                        storage,
+                        storageSection,
                         combinedOptions.block
                     )
                 }
+
+                // Add storage variables for dynamic arrays
+                addDynamicArrayVariables(storageSections[0], storageSections)
             }
 
-            const dotString = convertStorages2Dot(storages, combinedOptions)
+            const dotString = convertStorages2Dot(
+                storageSections,
+                combinedOptions
+            )
 
             await writeOutputFiles(
                 dotString,

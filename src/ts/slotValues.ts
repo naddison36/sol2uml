@@ -25,8 +25,13 @@ export const getStorageValues = async (
     blockTag: BigNumberish | 'latest' = 'latest'
 ): Promise<string[]> => {
     try {
+        if (slots.length === 0) {
+            return []
+        }
         debug(
-            `About to get ${slots.length} storage values for ${contractAddress} at block ${blockTag}`
+            `About to get ${
+                slots.length
+            } storage values for ${contractAddress} at block ${blockTag} starting at slot ${slots[0].toString()}`
         )
         const block =
             blockTag === 'latest'
@@ -61,7 +66,7 @@ export const getStorageValues = async (
         )
     } catch (err) {
         throw new Error(
-            `Failed to get ${slots.length} storage values for ${contractAddress} from ${url}`,
+            `Failed to get ${slots.length} storage values for contract ${contractAddress} from ${url}`,
             { cause: err }
         )
     }

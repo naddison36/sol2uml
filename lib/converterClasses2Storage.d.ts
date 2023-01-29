@@ -1,6 +1,6 @@
-import { Attribute, UmlClass } from './umlClass';
+import { Attribute, AttributeType, UmlClass } from './umlClass';
 import { BigNumberish } from '@ethersproject/bignumber';
-export declare enum StorageType {
+export declare enum StorageSectionType {
     Contract = "Contract",
     Struct = "Struct",
     Array = "Array"
@@ -12,10 +12,11 @@ export interface Variable {
     byteSize: number;
     byteOffset: number;
     type: string;
+    attributeType: AttributeType;
     dynamic: boolean;
     variable?: string;
     contractName?: string;
-    noValue: boolean;
+    getValue: boolean;
     value?: string;
     referenceSectionId?: number;
     enumId?: number;
@@ -24,8 +25,8 @@ export interface StorageSection {
     id: number;
     name: string;
     address?: string;
-    slotKey?: string;
-    type: StorageType;
+    offset?: string;
+    type: StorageSectionType;
     arrayLength?: number;
     arrayDynamic?: boolean;
     variables: Variable[];
@@ -34,7 +35,7 @@ export interface StorageSection {
  *
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
  * @param contractAddress Contract address to get the storage slot values from.
- * If proxied, use proxy and not the implementation contract.
+ * If contract is proxied, use proxy and not the implementation contract.
  * @param storageSection is mutated with the storage values
  * @param blockTag block number or `latest`
  */
@@ -53,6 +54,6 @@ export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlCl
     dynamic: boolean;
 };
 export declare const isElementary: (type: string) => boolean;
-export declare const calcSlotKey: (variable: Variable) => string | undefined;
-export declare const offsetStorageSlots: (storageSection: StorageSection, slots: number, storageSections: StorageSection[]) => void;
-export declare const findDimensionLength: (umlClass: UmlClass, dimension: string) => number;
+export declare const calcSectionOffset: (variable: Variable) => string | undefined;
+export declare const findDimensionLength: (umlClass: UmlClass, dimension: string, otherClasses: UmlClass[]) => number;
+export declare const addDynamicArrayVariables: (storageSection: StorageSection, storageSections: StorageSection[]) => void;

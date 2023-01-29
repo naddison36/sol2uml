@@ -1,8 +1,9 @@
 import {
     StorageSection,
-    StorageType,
+    StorageSectionType,
     Variable,
 } from './converterClasses2Storage'
+import { AttributeType } from './umlClass'
 
 const debug = require('debug')('sol2uml')
 
@@ -47,7 +48,7 @@ export function convertStorage2Dot(
     // write storage header with name and optional address
     dotString += `\n${storage.id} [label="${storage.name} \\<\\<${
         storage.type
-    }\\>\\>\\n${storage.address || storage.slotKey || ''}`
+    }\\>\\>\\n${storage.address || storage.offset || ''}`
 
     dotString += ' | {'
 
@@ -74,7 +75,9 @@ export function convertStorage2Dot(
     }
 
     const contractVariablePrefix =
-        storage.type === StorageType.Contract ? '\\<inherited contract\\>.' : ''
+        storage.type === StorageSectionType.Contract
+            ? '\\<inherited contract\\>.'
+            : ''
     dotString += `} | { type: ${contractVariablePrefix}variable (bytes)`
 
     // For each slot
@@ -93,8 +96,9 @@ export function convertStorage2Dot(
                 byteSize: 32 - usedBytes,
                 byteOffset: usedBytes,
                 type: 'unallocated',
+                attributeType: AttributeType.UserDefined,
                 dynamic: false,
-                noValue: true,
+                getValue: false,
                 contractName: variable.contractName,
                 variable: '',
             })
