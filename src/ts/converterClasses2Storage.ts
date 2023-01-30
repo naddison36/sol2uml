@@ -763,6 +763,30 @@ export const addDynamicVariables = async (
                     })
                 }
 
+                // add unallocated variable
+                const unusedBytes = 32 - (size - 32 * maxSlotNumber)
+                if (unusedBytes > 0) {
+                    const lastVariable = variables.at(-1)
+                    variables.push({
+                        ...lastVariable,
+                        byteOffset: unusedBytes + 1,
+                    })
+
+                    variables[maxSlotNumber] = {
+                        id: variableId++,
+                        fromSlot: maxSlotNumber,
+                        toSlot: maxSlotNumber,
+                        byteSize: unusedBytes,
+                        byteOffset: 0,
+                        type: 'unallocated',
+                        attributeType: AttributeType.UserDefined,
+                        contractName: variable.contractName,
+                        name: '',
+                        dynamic: true,
+                        getValue: false,
+                    }
+                }
+
                 const newStorageSection: StorageSection = {
                     id: storageId++,
                     name: `${variable.type}: ${variable.name}`,
