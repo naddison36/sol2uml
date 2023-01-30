@@ -174,7 +174,7 @@ const parseVariables = (
         )
 
         // Get the toSlot of the last storage item
-        const lastVariable = variables.at(-1)
+        const lastVariable = variables[variables.length - 1]
         let lastToSlot = lastVariable ? lastVariable.toSlot : 0
         let nextOffset = lastVariable
             ? lastVariable.byteOffset + lastVariable.byteSize
@@ -766,7 +766,7 @@ export const addDynamicVariables = async (
                 // add unallocated variable
                 const unusedBytes = 32 - (size - 32 * maxSlotNumber)
                 if (unusedBytes > 0) {
-                    const lastVariable = variables.at(-1)
+                    const lastVariable = variables[variables.length - 1]
                     variables.push({
                         ...lastVariable,
                         byteOffset: unusedBytes + 1,
