@@ -31,4 +31,10 @@ export declare const getSlotValues: (url: string, contractAddress: string, slotK
  * @return slotValue 32 byte slot value as hexadecimal string
  */
 export declare const getSlotValue: (url: string, contractAddress: string, slotKey: BigNumberish, blockTag?: BigNumberish | 'latest') => Promise<string>;
+/**
+ * See the following for how string and bytes are stored in storage slots
+ * https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#bytes-and-string
+ * @param slotValue the slot value in hexadecimal format
+ * @return bytes the number of bytes of the dynamic slot. If static, zero is return.
+ */
 export declare const dynamicSlotSize: (slotValue: string) => number;

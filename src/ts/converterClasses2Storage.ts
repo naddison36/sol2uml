@@ -738,12 +738,9 @@ export const addDynamicVariables = async (
     for (const variable of storageSection.variables) {
         // STEP 1 - add slots for dynamic string and bytes
         if (variable.type === 'string' || variable.type === 'bytes') {
-            const rawSize = dynamicSlotSize(variable.slotValue)
-            // The length of strings is measured in half bytes (4 bits)
-            const size =
-                variable.type === 'string' ? Math.ceil(rawSize / 2) : rawSize
+            const size = dynamicSlotSize(variable.slotValue)
             if (size > 31) {
-                const maxSlotNumber = Math.floor(size / 32)
+                const maxSlotNumber = Math.floor((size - 1) / 32)
                 const variables: Variable[] = []
 
                 // For each dynamic slot

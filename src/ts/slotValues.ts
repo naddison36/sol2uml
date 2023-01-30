@@ -156,7 +156,19 @@ export const getSlotValue = async (
     return values[0]
 }
 
+/**
+ * See the following for how string and bytes are stored in storage slots
+ * https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#bytes-and-string
+ * @param slotValue the slot value in hexadecimal format
+ * @return bytes the number of bytes of the dynamic slot. If static, zero is return.
+ */
 export const dynamicSlotSize = (slotValue: string): number => {
-    const sizeHex = '0x' + slotValue.slice(-2)
-    return BigNumber.from(sizeHex).toNumber()
+    const last4bits = '0x' + slotValue.slice(-1)
+    const last4bitsNum = BigNumber.from(last4bits).toNumber()
+    // If the last 4 bits is an even number then it's not a dynamic slot
+    if (last4bitsNum % 2 === 0) return 0
+
+    const sizeRaw = BigNumber.from(slotValue).toNumber()
+    // Adjust the size to bytes
+    return (sizeRaw - 1) / 2
 }

@@ -274,10 +274,10 @@ contract TestStorage is Parent, Parent2 {
 
     // The following can be publicly changed for testing purposes
     string public testString = "This can be publicly changed by anyone";
-    bytes public testBytes = bytes("0xEB1000001FD");
-    bytes public exactly31Bytes = bytes("0xec0b854938343f85eb39a6648b9e449c2e4aee4dc9b4e96ab592f9f497d051");
-    bytes public exactly32Bytes = bytes("0x2619ec68b255542e3da68c054bfe0d7d0f27b7fdbefc8bbccdd23188fc71fe7f");
-    bytes public long3Bytes = bytes("0x34d3c319f536deb74ed8f1f3205d9aefef7487c819e77d3351630820dbff1118cc7ee599e5d59fee88c83157bd897847c5911dc7d317b3175e0b085198349973fff");
+    bytes public testBytes = hex"FFEEDDCCBBAA9988770011";
+    bytes public exactly31Bytes = hex"ec0b854938343f85eb39a6648b9e449c2e4aee4dc9b4e96ab592f9f497d051";
+    bytes public exactly32Bytes = hex"2619ec68b255542e3da68c054bfe0d7d0f27b7fdbefc8bbccdd23188fc71fe7f";
+    bytes public long3Bytes = hex"f34d3c319f536deb74ed8f1f3205d9aefef7487c819e77d3351630820dbff1118cc7ee599e5d59fee88c83157bd897847c5911dc7d317b3175e0b085198349973fff";
     uint256 public testUint256 = 0xFEDCBA9876543210;
     int256 public testInt256 = -1023;
     address public testAddress;
