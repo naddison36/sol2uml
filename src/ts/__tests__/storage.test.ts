@@ -51,124 +51,133 @@ describe('storage parser', () => {
             }),
         ]
         test.each`
-            type         | expected
-            ${'address'} | ${20}
-            ${'bool'}    | ${1}
-            ${'int'}     | ${32}
-            ${'uint'}    | ${32}
-            ${'int256'}  | ${32}
-            ${'uint256'} | ${32}
-            ${'uint8'}   | ${1}
-            ${'int8'}    | ${1}
-            ${'uint32'}  | ${4}
-            ${'int32'}   | ${4}
-            ${'bytes'}   | ${32}
-            ${'bytes32'} | ${32}
-            ${'bytes1'}  | ${1}
-            ${'bytes31'} | ${31}
-            ${'string'}  | ${32}
-        `('elementary type $type', ({ type, expected }) => {
-            const umlClass = new UmlClass(defaultClassProperties)
-            const attribute: Attribute = {
-                attributeType: AttributeType.Elementary,
-                type,
-                name: 'varName',
+            type         | expectedSize | expectedDynamic
+            ${'address'} | ${20}        | ${false}
+            ${'bool'}    | ${1}         | ${false}
+            ${'int'}     | ${32}        | ${false}
+            ${'uint'}    | ${32}        | ${false}
+            ${'int256'}  | ${32}        | ${false}
+            ${'uint256'} | ${32}        | ${false}
+            ${'uint8'}   | ${1}         | ${false}
+            ${'int8'}    | ${1}         | ${false}
+            ${'uint32'}  | ${4}         | ${false}
+            ${'int32'}   | ${4}         | ${false}
+            ${'bytes'}   | ${32}        | ${true}
+            ${'bytes32'} | ${32}        | ${false}
+            ${'bytes1'}  | ${1}         | ${false}
+            ${'bytes31'} | ${31}        | ${false}
+            ${'string'}  | ${32}        | ${true}
+        `(
+            'elementary type $type',
+            ({ type, expectedSize, expectedDynamic }) => {
+                const umlClass = new UmlClass(defaultClassProperties)
+                const attribute: Attribute = {
+                    attributeType: AttributeType.Elementary,
+                    type,
+                    name: 'varName',
+                }
+                const { size, dynamic } = calcStorageByteSize(
+                    attribute,
+                    umlClass,
+                    []
+                )
+                expect(size).toEqual(expectedSize)
+                expect(dynamic).toEqual(expectedDynamic)
             }
-            const { size } = calcStorageByteSize(attribute, umlClass, [])
-            expect(size).toEqual(expected)
-        })
+        )
 
         // TODO implement support for sizing expressions. eg
         // ${'address[N_COINS * 2]'}      | ${128}
         test.each`
-            type                           | expected
-            ${'address[]'}                 | ${32}
-            ${'address[1]'}                | ${32}
-            ${'address[2]'}                | ${64}
-            ${'address[3]'}                | ${96}
-            ${'address[4]'}                | ${128}
-            ${'address[2][2]'}             | ${128}
-            ${'address[32]'}               | ${1024}
-            ${'address[][2]'}              | ${64}
-            ${'address[2][]'}              | ${32}
-            ${'address[][10]'}             | ${320}
-            ${'address[][][2]'}            | ${64}
-            ${'address[][4][3]'}           | ${384}
-            ${'address[][3][][2]'}         | ${64}
-            ${'address[3][2][]'}           | ${32}
-            ${'address[][2][2][2]'}        | ${256}
-            ${'address[][2][]'}            | ${32}
-            ${'address[N_COINS]'}          | ${64}
-            ${'address[N_COINS][N_COINS]'} | ${128}
-            ${'IERC20[]'}                  | ${32}
-            ${'IERC20[1]'}                 | ${32}
-            ${'IERC20[2]'}                 | ${64}
-            ${'IERC20[3]'}                 | ${96}
-            ${'IERC20[4]'}                 | ${128}
-            ${'uint8[33][2][2]'}           | ${256}
-            ${'bytes32[]'}                 | ${32}
-            ${'bytes1[1]'}                 | ${32}
-            ${'bytes1[2]'}                 | ${32}
-            ${'bytes1[16]'}                | ${32}
-            ${'bytes1[17]'}                | ${32}
-            ${'bytes1[32]'}                | ${32}
-            ${'bytes1[33]'}                | ${64}
-            ${'bytes16[2]'}                | ${32}
-            ${'bytes17[2]'}                | ${64}
-            ${'bytes30[2]'}                | ${64}
-            ${'bytes30[6][2]'}             | ${384}
-            ${'bytes30[2][6]'}             | ${384}
-            ${'bytes128[4]'}               | ${512}
-            ${'bytes256[2]'}               | ${512}
-            ${'bytes256[]'}                | ${32}
-            ${'bytes32[1]'}                | ${32}
-            ${'bytes32[2]'}                | ${64}
-            ${'bool[1]'}                   | ${32}
-            ${'bool[16]'}                  | ${32}
-            ${'bool[32]'}                  | ${32}
-            ${'bool[33]'}                  | ${64}
-            ${'bool[2][3]'}                | ${3 * 32}
-            ${'bool[3][2]'}                | ${2 * 32}
-            ${'bool[2][]'}                 | ${32}
-            ${'bool[][2]'}                 | ${2 * 32}
-            ${'bool[][16]'}                | ${16 * 32}
-            ${'bool[][32]'}                | ${32 * 32}
-            ${'bool[][33]'}                | ${33 * 32}
-            ${'bool[33][3]'}               | ${3 * 2 * 32}
-            ${'bool[][2][3]'}              | ${3 * 2 * 32}
-            ${'bool[][][2][3]'}            | ${3 * 2 * 32}
-            ${'bool[][2][]'}               | ${32}
-            ${'bool[][][3]'}               | ${3 * 32}
-            ${'bool[33][2]'}               | ${2 * 2 * 32}
-            ${'bool[33][2][2]'}            | ${2 * 2 * 2 * 32}
-            ${'bool[][4][3]'}              | ${3 * 4 * 32}
-            ${'bool[][64][64]'}            | ${64 * 64 * 32}
-            ${'bool[64][][64]'}            | ${64 * 32}
-            ${'bool[64][64][]'}            | ${32}
-            ${'uint120[2]'}                | ${32}
-            ${'uint120[3]'}                | ${64}
-            ${'uint120[4]'}                | ${64}
-            ${'uint120[6]'}                | ${96}
-            ${'TwoSlots[3][4]'}            | ${4 * 3 * 2 * 32}
-            ${'TwoSlots[4][3]'}            | ${3 * 4 * 2 * 32}
-            ${'TwoSlots[][3]'}             | ${3 * 32}
-            ${'TwoSlots[3][]'}             | ${32}
-            ${'TwoSlots[][]'}              | ${32}
-            ${'TwoSlots[][4][3]'}          | ${3 * 4 * 32}
-            ${'TwoSlots[4][3][]'}          | ${32}
-        `('array type $type', ({ type, expected }) => {
+            type                           | expectedSize      | expectedDynamic
+            ${'address[]'}                 | ${32}             | ${true}
+            ${'address[1]'}                | ${32}             | ${false}
+            ${'address[2]'}                | ${64}             | ${false}
+            ${'address[3]'}                | ${96}             | ${false}
+            ${'address[4]'}                | ${128}            | ${false}
+            ${'address[2][2]'}             | ${128}            | ${false}
+            ${'address[32]'}               | ${1024}           | ${false}
+            ${'address[][2]'}              | ${64}             | ${false}
+            ${'address[2][]'}              | ${32}             | ${true}
+            ${'address[][10]'}             | ${320}            | ${false}
+            ${'address[][][2]'}            | ${64}             | ${false}
+            ${'address[][4][3]'}           | ${384}            | ${false}
+            ${'address[][3][][2]'}         | ${64}             | ${false}
+            ${'address[3][2][]'}           | ${32}             | ${true}
+            ${'address[][2][2][2]'}        | ${256}            | ${false}
+            ${'address[][2][]'}            | ${32}             | ${true}
+            ${'address[N_COINS]'}          | ${64}             | ${false}
+            ${'address[N_COINS][N_COINS]'} | ${128}            | ${false}
+            ${'IERC20[]'}                  | ${32}             | ${true}
+            ${'IERC20[1]'}                 | ${32}             | ${false}
+            ${'IERC20[2]'}                 | ${64}             | ${false}
+            ${'IERC20[3]'}                 | ${96}             | ${false}
+            ${'IERC20[4]'}                 | ${128}            | ${false}
+            ${'uint8[33][2][2]'}           | ${256}            | ${false}
+            ${'bytes32[]'}                 | ${32}             | ${true}
+            ${'bytes1[1]'}                 | ${32}             | ${false}
+            ${'bytes1[2]'}                 | ${32}             | ${false}
+            ${'bytes1[16]'}                | ${32}             | ${false}
+            ${'bytes1[17]'}                | ${32}             | ${false}
+            ${'bytes1[32]'}                | ${32}             | ${false}
+            ${'bytes1[33]'}                | ${64}             | ${false}
+            ${'bytes16[2]'}                | ${32}             | ${false}
+            ${'bytes17[2]'}                | ${64}             | ${false}
+            ${'bytes30[2]'}                | ${64}             | ${false}
+            ${'bytes30[6][2]'}             | ${384}            | ${false}
+            ${'bytes30[2][6]'}             | ${384}            | ${false}
+            ${'bytes128[4]'}               | ${512}            | ${false}
+            ${'bytes256[2]'}               | ${512}            | ${false}
+            ${'bytes256[]'}                | ${32}             | ${true}
+            ${'bytes32[1]'}                | ${32}             | ${false}
+            ${'bytes32[2]'}                | ${64}             | ${false}
+            ${'bool[1]'}                   | ${32}             | ${false}
+            ${'bool[16]'}                  | ${32}             | ${false}
+            ${'bool[32]'}                  | ${32}             | ${false}
+            ${'bool[33]'}                  | ${64}             | ${false}
+            ${'bool[2][3]'}                | ${3 * 32}         | ${false}
+            ${'bool[3][2]'}                | ${2 * 32}         | ${false}
+            ${'bool[2][]'}                 | ${32}             | ${true}
+            ${'bool[][2]'}                 | ${2 * 32}         | ${false}
+            ${'bool[][16]'}                | ${16 * 32}        | ${false}
+            ${'bool[][32]'}                | ${32 * 32}        | ${false}
+            ${'bool[][33]'}                | ${33 * 32}        | ${false}
+            ${'bool[33][3]'}               | ${3 * 2 * 32}     | ${false}
+            ${'bool[][2][3]'}              | ${3 * 2 * 32}     | ${false}
+            ${'bool[][][2][3]'}            | ${3 * 2 * 32}     | ${false}
+            ${'bool[][2][]'}               | ${32}             | ${true}
+            ${'bool[][][3]'}               | ${3 * 32}         | ${false}
+            ${'bool[33][2]'}               | ${2 * 2 * 32}     | ${false}
+            ${'bool[33][2][2]'}            | ${2 * 2 * 2 * 32} | ${false}
+            ${'bool[][4][3]'}              | ${3 * 4 * 32}     | ${false}
+            ${'bool[][64][64]'}            | ${64 * 64 * 32}   | ${false}
+            ${'bool[64][][64]'}            | ${64 * 32}        | ${false}
+            ${'bool[64][64][]'}            | ${32}             | ${true}
+            ${'uint120[2]'}                | ${32}             | ${false}
+            ${'uint120[3]'}                | ${64}             | ${false}
+            ${'uint120[4]'}                | ${64}             | ${false}
+            ${'uint120[6]'}                | ${96}             | ${false}
+            ${'TwoSlots[3][4]'}            | ${4 * 3 * 2 * 32} | ${false}
+            ${'TwoSlots[4][3]'}            | ${3 * 4 * 2 * 32} | ${false}
+            ${'TwoSlots[][3]'}             | ${3 * 32}         | ${false}
+            ${'TwoSlots[3][]'}             | ${32}             | ${true}
+            ${'TwoSlots[][]'}              | ${32}             | ${true}
+            ${'TwoSlots[][4][3]'}          | ${3 * 4 * 32}     | ${false}
+            ${'TwoSlots[4][3][]'}          | ${32}             | ${true}
+        `('array type $type', ({ type, expectedSize, expectedDynamic }) => {
             const umlCLass = new UmlClass(defaultClassProperties)
             const attribute: Attribute = {
                 attributeType: AttributeType.Array,
                 type,
                 name: 'arrayName',
             }
-            const { size } = calcStorageByteSize(
+            const { size, dynamic } = calcStorageByteSize(
                 attribute,
                 umlCLass,
                 otherClasses
             )
-            expect(size).toEqual(expected)
+            expect(size).toEqual(expectedSize)
+            expect(dynamic).toEqual(expectedDynamic)
         })
         describe('structs', () => {
             const otherClasses: UmlClass[] = [
@@ -340,11 +349,13 @@ describe('storage parser', () => {
                     type: 'ContractLevelStruct',
                     name: 'structName',
                 }
-                const { size } = calcStorageByteSize(attribute, umlCLass, [
-                    ...otherClasses,
-                    testStruct,
-                ])
+                const { size, dynamic } = calcStorageByteSize(
+                    attribute,
+                    umlCLass,
+                    [...otherClasses, testStruct]
+                )
                 expect(size).toEqual(expected)
+                expect(dynamic).toEqual(false)
             })
         })
     })

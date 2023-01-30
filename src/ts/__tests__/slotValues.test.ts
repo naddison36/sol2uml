@@ -1,4 +1,4 @@
-import { getStorageValue, getStorageValues } from '../slotValues'
+import { dynamicSlotSize, getSlotValue, getSlotValues } from '../slotValues'
 import { BigNumber } from 'ethers'
 
 const emissionController = '0xBa69e6FC7Df49a3b75b565068Fb91ff2d9d91780'
@@ -11,14 +11,14 @@ const url = process.env.NODE_URL
 describe('Slot Values', () => {
     test('Emissions controller first slot latest', async () => {
         expect(
-            await getStorageValue(url, emissionController, 1, '15272562')
+            await getSlotValue(url, emissionController, 1, '15272562')
         ).toEqual(
             '0x00000000000000000000000000000000000000000000000000000AB700000A96'
         )
     })
     test('Emissions controller first slot on deployment', async () => {
         expect(
-            await getStorageValue(
+            await getSlotValue(
                 url,
                 emissionController,
                 BigNumber.from(1),
@@ -30,19 +30,19 @@ describe('Slot Values', () => {
     })
     test('Emissions controller first slot before deployment', async () => {
         expect(
-            await getStorageValue(url, emissionController, 1, 13761570)
+            await getSlotValue(url, emissionController, 1, 13761570)
         ).toEqual(
             '0x0000000000000000000000000000000000000000000000000000000000000000'
         )
     })
     test('USDC second slot', async () => {
-        expect(await getStorageValue(url, usdc, 0)).toEqual(
+        expect(await getSlotValue(url, usdc, 0)).toEqual(
             '0x000000000000000000000000FCB19E6A322B27C06842A71E8C725399F049AE3A'
         )
     })
     test('mUSD proxy admin slot', async () => {
         expect(
-            await getStorageValue(
+            await getSlotValue(
                 url,
                 musd,
                 '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
@@ -52,7 +52,7 @@ describe('Slot Values', () => {
         )
     })
     test('Emissions Controller batch', async () => {
-        const values = await getStorageValues(
+        const values = await getSlotValues(
             url,
             emissionController,
             [
@@ -80,7 +80,7 @@ describe('Slot Values', () => {
         ])
     })
     test('Emissions Controller reserve slot order', async () => {
-        const values = await getStorageValues(
+        const values = await getSlotValues(
             url,
             emissionController,
             [2, 1, 0],
@@ -92,5 +92,20 @@ describe('Slot Values', () => {
             '0x00000000000000000000000000000000000000000000000000000AB700000A96',
             '0x0000000000000000000000000000000000000000000000000000000000000001',
         ])
+    })
+    describe('calc dynamic slot size for value', () => {
+        test.each`
+            value                                                                   | expected
+            ${'0x0000000000000000000000000000000000000000000000000000000000000000'} | ${0}
+            ${'0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00'} | ${0}
+            ${'0x0000000000000000000000000000000000000000000000000000000000000001'} | ${1}
+            ${'0x0000000000000000000000000000000000000000000000000000000000000009'} | ${9}
+            ${'0x000000000000000000000000000000000000000000000000000000000000000A'} | ${10}
+            ${'0x0000000000000000000000000000000000000000000000000000000000000010'} | ${16}
+            ${'0x00000000000000000000000000000000000000000000000000000000000000FF'} | ${255}
+            ${'0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'} | ${255}
+        `('$value', ({ value, expected }) => {
+            expect(dynamicSlotSize(value)).toEqual(expected)
+        })
     })
 })

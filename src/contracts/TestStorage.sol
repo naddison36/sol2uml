@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
 struct SubOneSlot {
@@ -127,10 +127,10 @@ contract TestStorage is Parent, Parent2 {
     address owner = 0x2f2Db75C5276481E2B018Ac03e968af7763Ed118;
     IERC20 token = IERC20(0x34f08F2A3f4a86531e9C4139Fde571a62689AFEC);
     address[] tokensDyn = [
-        0x1000000000000000000000000000000000000001,
-        0x1000000000000000000000000000000000000002,
-        0x1000000000000000000000000000000000000003,
-        0x1000000000000000000000000000000000000004
+        0xfF000000000000000000000000000000000000A1,
+        0xff000000000000000000000000000000000000b2,
+        0xFf000000000000000000000000000000000000c3,
+        0xFF000000000000000000000000000000000000d4
     ];
     IERC20[2] tokenPair = [
         IERC20(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5),
@@ -240,10 +240,12 @@ contract TestStorage is Parent, Parent2 {
             0xEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD
         );
     FixedArray public fixedArray;
-    FlagsStruct public flagStruct;
+    FlagsStruct public flagStruct = FlagsStruct(true, [true, true], true);
     int16 public arrayCount = -2000;
     uint64[] public dynamicInt64Array = [2000, 1, 254, 1e19, 254, 2, 256];
     uint128[] public dynamicInt128Array = [1e38, 2e38, 3e38];
+    uint136[] public dynamicInt136Array = [1e40, 2e39];
+    uint256[] public dynamicInt256Array = [1e77, 2e76, 3e76, 4e76];
     uint256[3] public fixedIntArray = [1000, 2000, 3000];
     uint256[][] public dynamicDynIntArray;
     uint256[][][] public dynamicDynDynIntArray;
@@ -263,14 +265,19 @@ contract TestStorage is Parent, Parent2 {
     string public emptyString = "";
     string public name = "TestStorage contract";
     string public short = "Less than 31 bytes";
-    string public exactly32 = "exactly 32 bytes so uses 2 slots";
+    string public exactly30 = "exactly 30 char so uses 1 slot";
+    string public exactly31 = "exactly 31 chars so uses 1 slot";
+    string public exactly32 = "exactly 32 chars so uses 2 slots";
     string public long2 = "more than 31 bytes so data is stored dynamically in 2 slots";
     string public long3 =
         "more than sixty four (64) bytes so data is stored dynamically in three slots";
 
-    // The following can be publically changed for testing purposes
-    string public testString = "This can be publically changed by anyone";
+    // The following can be publicly changed for testing purposes
+    string public testString = "This can be publicly changed by anyone";
     bytes public testBytes = bytes("0xEB1000001FD");
+    bytes public exactly31Bytes = bytes("0xec0b854938343f85eb39a6648b9e449c2e4aee4dc9b4e96ab592f9f497d051");
+    bytes public exactly32Bytes = bytes("0x2619ec68b255542e3da68c054bfe0d7d0f27b7fdbefc8bbccdd23188fc71fe7f");
+    bytes public long3Bytes = bytes("0x34d3c319f536deb74ed8f1f3205d9aefef7487c819e77d3351630820dbff1118cc7ee599e5d59fee88c83157bd897847c5911dc7d317b3175e0b085198349973fff");
     uint256 public testUint256 = 0xFEDCBA9876543210;
     int256 public testInt256 = -1023;
     address public testAddress;

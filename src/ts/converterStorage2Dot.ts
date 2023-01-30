@@ -8,7 +8,7 @@ import { AttributeType } from './umlClass'
 const debug = require('debug')('sol2uml')
 
 export const convertStorages2Dot = (
-    storages: StorageSection[],
+    storageSections: StorageSection[],
     options: { data: boolean }
 ): string => {
     let dotString: string = `
@@ -19,12 +19,12 @@ arrowhead=open
 node [shape=record, style=filled, fillcolor=gray95 fontname="Courier New"]`
 
     // process contract and the struct storages
-    storages.forEach((storage) => {
+    storageSections.forEach((storage) => {
         dotString = convertStorage2Dot(storage, dotString, options)
     })
 
     // link contract and structs to structs
-    storages.forEach((slot) => {
+    storageSections.forEach((slot) => {
         slot.variables.forEach((storage) => {
             if (storage.referenceSectionId) {
                 dotString += `\n ${slot.id}:${storage.id} -> ${storage.referenceSectionId}`
@@ -41,18 +41,18 @@ node [shape=record, style=filled, fillcolor=gray95 fontname="Courier New"]`
 }
 
 export function convertStorage2Dot(
-    storage: StorageSection,
+    storageSection: StorageSection,
     dotString: string,
     options: { data: boolean }
 ): string {
     // write storage header with name and optional address
-    dotString += `\n${storage.id} [label="${storage.name} \\<\\<${
-        storage.type
-    }\\>\\>\\n${storage.address || storage.offset || ''}`
+    dotString += `\n${storageSection.id} [label="${storageSection.name} \\<\\<${
+        storageSection.type
+    }\\>\\>\\n${storageSection.address || storageSection.offset || ''}`
 
     dotString += ' | {'
 
-    const startingVariables = storage.variables.filter(
+    const startingVariables = storageSection.variables.filter(
         (s) => s.byteOffset === 0
     )
 
@@ -70,12 +70,12 @@ export function convertStorage2Dot(
     if (options.data) {
         dotString += '} | {value'
         startingVariables.forEach((variable, i) => {
-            dotString += ` | ${variable.value || ''}`
+            dotString += ` | ${variable.slotValue || ''}`
         })
     }
 
     const contractVariablePrefix =
-        storage.type === StorageSectionType.Contract
+        storageSection.type === StorageSectionType.Contract
             ? '\\<inherited contract\\>.'
             : ''
     dotString += `} | { type: ${contractVariablePrefix}variable (bytes)`
@@ -83,7 +83,7 @@ export function convertStorage2Dot(
     // For each slot
     startingVariables.forEach((variable) => {
         // Get all the storage variables in this slot
-        const slotVariables = storage.variables.filter(
+        const slotVariables = storageSection.variables.filter(
             (s) => s.fromSlot === variable.fromSlot
         )
         const usedBytes = slotVariables.reduce((acc, s) => acc + s.byteSize, 0)
@@ -100,7 +100,7 @@ export function convertStorage2Dot(
                 dynamic: false,
                 getValue: false,
                 contractName: variable.contractName,
-                variable: '',
+                name: '',
             })
         }
         const slotVariablesReversed = slotVariables.reverse()
@@ -108,9 +108,12 @@ export function convertStorage2Dot(
         // For each variable in the slot
         slotVariablesReversed.forEach((variable, i) => {
             if (i === 0) {
-                dotString += ` | { ${dotVariable(variable, storage.name)} `
+                dotString += ` | { ${dotVariable(
+                    variable,
+                    storageSection.name
+                )} `
             } else {
-                dotString += ` | ${dotVariable(variable, storage.name)} `
+                dotString += ` | ${dotVariable(variable, storageSection.name)} `
             }
         })
         dotString += '}'
@@ -122,14 +125,16 @@ export function convertStorage2Dot(
     return dotString
 }
 
-const dotVariable = (storage: Variable, contractName: string): string => {
+const dotVariable = (variable: Variable, contractName: string): string => {
     const port =
-        storage.referenceSectionId !== undefined ? `<${storage.id}>` : ''
+        variable.referenceSectionId !== undefined ? `<${variable.id}>` : ''
     const contractNamePrefix =
-        storage.contractName !== contractName ? `${storage.contractName}.` : ''
+        variable.contractName !== contractName
+            ? `${variable.contractName}.`
+            : ''
 
-    const variable = storage.variable
-        ? `: ${contractNamePrefix}${storage.variable}`
+    const variableName = variable.name
+        ? `: ${contractNamePrefix}${variable.name}`
         : ''
-    return `${port} ${storage.type}${variable} (${storage.byteSize})`
+    return `${port} ${variable.type}${variableName} (${variable.byteSize})`
 }

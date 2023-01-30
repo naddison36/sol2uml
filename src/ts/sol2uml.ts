@@ -9,8 +9,7 @@ import {
 } from './filterClasses'
 import { Command, Option } from 'commander'
 import {
-    addDynamicArrayVariables,
-    addStorageValues,
+    addDynamicVariables,
     convertClasses2StorageSections,
 } from './converterClasses2Storage'
 import { convertStorages2Dot } from './converterStorage2Dot'
@@ -19,6 +18,7 @@ import { writeOutputFiles, writeSolidity } from './writerFiles'
 import { basename } from 'path'
 import { squashUmlClasses } from './squashClasses'
 import { diffCode } from './diff'
+import { addSlotValues } from './slotValues'
 
 const clc = require('cli-color')
 const program = new Command()
@@ -291,7 +291,6 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                 // The first storage is the contract
                 storageSections[0].address = fileFolderAddress
             }
-            debug(storageSections)
 
             if (combinedOptions.data) {
                 let storageAddress = combinedOptions.storage
@@ -310,9 +309,9 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                     storageAddress = fileFolderAddress
                 }
 
-                // Get storage values for each storage block
+                // Get slot values for each storage section
                 for (const storageSection of storageSections) {
-                    await addStorageValues(
+                    await addSlotValues(
                         combinedOptions.url,
                         storageAddress,
                         storageSection,
@@ -320,8 +319,14 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                     )
                 }
 
-                // Add storage variables for dynamic arrays
-                addDynamicArrayVariables(storageSections[0], storageSections)
+                // Add storage variables for dynamic arrays, strings and bytes
+                await addDynamicVariables(
+                    storageSections[0],
+                    storageSections,
+                    combinedOptions.url,
+                    storageAddress,
+                    combinedOptions.block
+                )
             }
 
             const dotString = convertStorages2Dot(
