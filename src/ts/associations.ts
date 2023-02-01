@@ -4,7 +4,7 @@ import { Association, Import, UmlClass } from './umlClass'
 export const findAssociatedClass = (
     association: Association,
     sourceUmlClass: UmlClass,
-    umlClasses: UmlClass[],
+    umlClasses: readonly UmlClass[],
     searchedAbsolutePaths: string[] = []
 ): UmlClass | undefined => {
     let umlClass = umlClasses.find((targetUmlClass) => {
@@ -82,7 +82,7 @@ const isAssociated = (
 const findImplicitImport = (
     association: Association,
     sourceUmlClass: UmlClass,
-    umlClasses: UmlClass[],
+    umlClasses: readonly UmlClass[],
     searchedRelativePaths: string[]
 ): UmlClass | undefined => {
     // Get all implicit imports. That is, imports that do not explicitly import contracts or interfaces.

@@ -21,7 +21,7 @@ export declare const parseValue: (variable: Variable) => string;
  * @param blockTag block number or `latest`
  * @return slotValues array of 32 byte slot values as hexadecimal strings
  */
-export declare const getSlotValues: (url: string, contractAddress: string, slotKeys: BigNumberish[], blockTag?: BigNumberish | 'latest') => Promise<string[]>;
+export declare const getSlotValues: (url: string, contractAddress: string, slotKeys: readonly BigNumberish[], blockTag?: BigNumberish | 'latest') => Promise<string[]>;
 /**
  * Get storage slot values from JSON-RPC API provider.
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy

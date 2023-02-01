@@ -5,13 +5,13 @@ const debug = require('debug')('sol2uml')
 
 /**
  * Flattens the inheritance hierarchy for each base contract.
- * @param umlClasses array of UML classes of type `UMLClass`
+ * @param umlClasses array of UML classes of type `UMLClass`. The new squashed class is added to this array.
  * @param baseContractNames array of contract names to be rendered in squashed format.
- * @return squashUmlClasses array of UML classes of type `UMLClass`
+ * @return squashUmlClasses array of UML classes of type `UMLClass` that are to be rendered
  */
 export const squashUmlClasses = (
     umlClasses: UmlClass[],
-    baseContractNames: string[]
+    baseContractNames: readonly string[]
 ): UmlClass[] => {
     let removedClassIds: number[] = []
     for (const baseContractName of baseContractNames) {
@@ -61,7 +61,7 @@ const recursiveSquash = (
     squashedClass: UmlClass,
     inheritedContractNames: string[],
     baseClass: UmlClass,
-    umlClasses: UmlClass[],
+    umlClasses: readonly UmlClass[],
     startPosition: number
 ): { currentPosition: number; removedClassIds: number[] } => {
     let currentPosition = startPosition
@@ -158,7 +158,7 @@ const hash = (operator: Operator): string => {
     return hash.update(data).digest('hex')
 }
 
-const reduceOperators = (operators: Operator[]): Operator[] => {
+const reduceOperators = (operators: readonly Operator[]): Operator[] => {
     const hashes = new Set(operators.map((o) => o.hash))
 
     const operatorsWithNoHash = operators.filter((o) => !o.hash)

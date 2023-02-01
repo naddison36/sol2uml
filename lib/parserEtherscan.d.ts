@@ -1,7 +1,7 @@
 import { ASTNode } from '@solidity-parser/parser/dist/src/ast-types';
 import { UmlClass } from './umlClass';
 export declare const networks: readonly ["mainnet", "ropsten", "kovan", "rinkeby", "goerli", "sepolia", "polygon", "testnet.polygon", "arbitrum", "testnet.arbitrum", "avalanche", "testnet.avalanche", "bsc", "testnet.bsc", "crono", "fantom", "testnet.fantom", "moonbeam", "optimistic", "kovan-optimistic", "gnosisscan"];
-export type Network = typeof networks[number];
+export type Network = (typeof networks)[number];
 export declare class EtherscanParser {
     protected apikey: string;
     network: Network;
@@ -37,7 +37,7 @@ export declare class EtherscanParser {
      * @param contractAddress Ethereum contract address with a 0x prefix
      */
     getSourceCode(contractAddress: string): Promise<{
-        files: {
+        files: readonly {
             code: string;
             filename: string;
         }[];

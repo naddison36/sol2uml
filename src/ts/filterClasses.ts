@@ -16,7 +16,7 @@ import { ClassOptions } from './converterClass2Dot'
  * @return umlClasses filtered list of UML classes of type `UMLClass`
  */
 export const filterHiddenClasses = (
-    umlClasses: UmlClass[],
+    umlClasses: readonly UmlClass[],
     options: ClassOptions
 ): UmlClass[] => {
     return umlClasses.filter(
@@ -45,8 +45,8 @@ export const filterHiddenClasses = (
  * @return filteredUmlClasses list of UML classes of type `UMLClass`
  */
 export const classesConnectedToBaseContracts = (
-    umlClasses: UmlClass[],
-    baseContractNames: string[],
+    umlClasses: readonly UmlClass[],
+    baseContractNames: readonly string[],
     depth?: number
 ): UmlClass[] => {
     let filteredUmlClasses: { [contractName: string]: UmlClass } = {}
@@ -78,7 +78,7 @@ export const classesConnectedToBaseContracts = (
  * @return filteredUmlClasses list of UML classes of type `UMLClass`
  */
 export const classesConnectedToBaseContract = (
-    umlClasses: UmlClass[],
+    umlClasses: readonly UmlClass[],
     baseContractName: string,
     weightedDirectedGraph: WeightedDiGraph,
     depth: number = 1000
@@ -107,7 +107,9 @@ export const classesConnectedToBaseContract = (
     return filteredUmlClasses
 }
 
-function loadWeightedDirectedGraph(umlClasses: UmlClass[]): WeightedDiGraph {
+function loadWeightedDirectedGraph(
+    umlClasses: readonly UmlClass[]
+): WeightedDiGraph {
     const weightedDirectedGraph = new WeightedDiGraph(
         // the number vertices in the graph
         UmlClass.idCounter + 1
@@ -138,7 +140,9 @@ function loadWeightedDirectedGraph(umlClasses: UmlClass[]): WeightedDiGraph {
     return weightedDirectedGraph
 }
 
-export const topologicalSortClasses = (umlClasses: UmlClass[]): UmlClass[] => {
+export const topologicalSortClasses = (
+    umlClasses: readonly UmlClass[]
+): UmlClass[] => {
     const directedAcyclicGraph = loadDirectedAcyclicGraph(umlClasses)
     const topologicalSort = new TopologicalSort(directedAcyclicGraph)
 
@@ -153,7 +157,7 @@ export const topologicalSortClasses = (umlClasses: UmlClass[]): UmlClass[] => {
     return sortedUmlClasses.filter((umlClass) => umlClass !== undefined)
 }
 
-const loadDirectedAcyclicGraph = (umlClasses: UmlClass[]): DiGraph => {
+const loadDirectedAcyclicGraph = (umlClasses: readonly UmlClass[]): DiGraph => {
     const directedAcyclicGraph = new DiGraph(UmlClass.idCounter) // the number vertices in the graph
 
     for (const sourceUmlClass of umlClasses) {

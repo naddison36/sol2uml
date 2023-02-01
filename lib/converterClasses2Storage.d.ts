@@ -22,7 +22,6 @@ export interface Variable {
     slotValue?: string;
     parsedValue?: string;
     referenceSectionId?: number;
-    enumId?: number;
 }
 export interface StorageSection {
     id: number;
@@ -43,11 +42,11 @@ export interface StorageSection {
  */
 export declare const convertClasses2StorageSections: (contractName: string, umlClasses: UmlClass[], contractFilename?: string) => StorageSection[];
 export declare const parseStorageSectionFromAttribute: (attribute: Attribute, umlClass: UmlClass, otherClasses: UmlClass[], storageSections: StorageSection[]) => StorageSection | undefined;
-export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlClass, otherClasses: UmlClass[]) => {
+export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[]) => {
     size: number;
     dynamic: boolean;
 };
 export declare const isElementary: (type: string) => boolean;
 export declare const calcSectionOffset: (variable: Variable) => string | undefined;
-export declare const findDimensionLength: (umlClass: UmlClass, dimension: string, otherClasses: UmlClass[]) => number;
+export declare const findDimensionLength: (umlClass: UmlClass, dimension: string, otherClasses: readonly UmlClass[]) => number;
 export declare const addDynamicVariables: (storageSection: StorageSection, storageSections: StorageSection[], url: string, storageAddress: string, blockTag?: BigNumberish | 'latest') => Promise<void>;

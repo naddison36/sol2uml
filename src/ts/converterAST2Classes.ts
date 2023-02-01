@@ -712,7 +712,7 @@ function parseTypeName(typeName: TypeName): [string, AttributeType] {
  * @param params defined in ASTNode as `VariableDeclaration`
  * @return parameters or `returnParameters` of the `Operator` of type `Parameter`
  */
-function parseParameters(params: VariableDeclaration[]): Parameter[] {
+function parseParameters(params: readonly VariableDeclaration[]): Parameter[] {
     if (!params || !params) {
         return []
     }

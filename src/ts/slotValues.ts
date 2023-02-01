@@ -170,7 +170,7 @@ let jsonRpcId = 0
 export const getSlotValues = async (
     url: string,
     contractAddress: string,
-    slotKeys: BigNumberish[],
+    slotKeys: readonly BigNumberish[],
     blockTag: BigNumberish | 'latest' = 'latest'
 ): Promise<string[]> => {
     try {

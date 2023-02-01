@@ -31,7 +31,6 @@ export interface Variable {
     slotValue?: string
     parsedValue?: string
     referenceSectionId?: number
-    enumId?: number
 }
 
 export interface StorageSection {
@@ -113,7 +112,7 @@ export const convertClasses2StorageSections = (
  */
 const parseVariables = (
     umlClass: UmlClass,
-    umlClasses: UmlClass[],
+    umlClasses: readonly UmlClass[],
     variables: Variable[],
     storageSections: StorageSection[],
     inheritedContracts: string[]
@@ -257,7 +256,7 @@ const adjustSlots = (
 export const parseStorageSectionFromAttribute = (
     attribute: Attribute,
     umlClass: UmlClass,
-    otherClasses: UmlClass[],
+    otherClasses: readonly UmlClass[],
     storageSections: StorageSection[]
 ): StorageSection | undefined => {
     if (attribute.attributeType === AttributeType.Array) {
@@ -427,12 +426,19 @@ export const parseStorageSectionFromAttribute = (
     return undefined
 }
 
+/**
+ * Finds an attribute's user defined type that can be a Contract, Struct or Enum
+ * @param userType User defined type that is being looked for. This can be the base type of an attribute.
+ * @param attribute the attribute in the class that is user defined. This is just used for logging purposes
+ * @param otherClasses
+ */
 const findTypeClass = (
     userType: string,
     attribute: Attribute,
-    otherClasses: UmlClass[]
+    otherClasses: readonly UmlClass[]
 ): UmlClass => {
     // Find UserDefined type
+    // TODO this just matches on name and doesn't take into account imports
     const typeClass = otherClasses.find(
         ({ name }) => name === userType || name === userType.split('.')[1]
     )
@@ -448,7 +454,7 @@ const findTypeClass = (
 export const calcStorageByteSize = (
     attribute: Attribute,
     umlClass: UmlClass,
-    otherClasses: UmlClass[]
+    otherClasses: readonly UmlClass[]
 ): { size: number; dynamic: boolean } => {
     if (
         attribute.attributeType === AttributeType.Mapping ||
@@ -676,7 +682,7 @@ export const calcSectionOffset = (variable: Variable): string | undefined => {
 export const findDimensionLength = (
     umlClass: UmlClass,
     dimension: string,
-    otherClasses: UmlClass[]
+    otherClasses: readonly UmlClass[]
 ): number => {
     const dimensionNum = parseInt(dimension)
     if (Number.isInteger(dimensionNum)) {

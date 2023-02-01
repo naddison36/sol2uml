@@ -182,6 +182,4 @@ export async function writePng(svg: any, filename: string): Promise<void> {
             cause: err,
         })
     }
-
-    console.log(`Generated png file ${pngFilename}`)
 }

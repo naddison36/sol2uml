@@ -8,7 +8,7 @@ import { AttributeType } from './umlClass'
 const debug = require('debug')('sol2uml')
 
 export const convertStorages2Dot = (
-    storageSections: StorageSection[],
+    storageSections: readonly StorageSection[],
     options: { data: boolean }
 ): string => {
     let dotString: string = `

@@ -33,7 +33,7 @@ export const networks = <const>[
     'kovan-optimistic',
     'gnosisscan',
 ]
-export type Network = typeof networks[number]
+export type Network = (typeof networks)[number]
 
 export class EtherscanParser {
     readonly url: string
@@ -222,7 +222,7 @@ export class EtherscanParser {
      * @param contractAddress Ethereum contract address with a 0x prefix
      */
     async getSourceCode(contractAddress: string): Promise<{
-        files: { code: string; filename: string }[]
+        files: readonly { code: string; filename: string }[]
         contractName: string
         compilerVersion: string
     }> {
