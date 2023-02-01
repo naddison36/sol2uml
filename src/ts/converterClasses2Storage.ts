@@ -29,6 +29,7 @@ export interface Variable {
     contractName?: string
     getValue: boolean
     slotValue?: string
+    parsedValue?: string
     referenceSectionId?: number
     enumId?: number
 }
@@ -413,6 +414,7 @@ export const parseStorageSectionFromAttribute = (
                     id: storageId++,
                     name: typeClass.name,
                     type: StorageSectionType.Struct,
+                    offset: '',
                     variables,
                 }
                 storageSections.push(newStorageSection)
@@ -655,7 +657,7 @@ export const isElementary = (type: string): boolean => {
         case 'fixed':
             return true
         default:
-            const result = type.match(/[u]*(int|fixed|bytes)([0-9]+)/)
+            const result = type.match(/[u]?(int|fixed|bytes)([0-9]+)/)
             return result !== null
     }
 }
@@ -758,7 +760,7 @@ export const addDynamicVariables = async (
                         type: variable.type,
                         contractName: variable.contractName,
                         attributeType: AttributeType.Elementary,
-                        dynamic: true,
+                        dynamic: false,
                         getValue: true,
                     })
                 }
@@ -769,7 +771,7 @@ export const addDynamicVariables = async (
                     const lastVariable = variables[variables.length - 1]
                     variables.push({
                         ...lastVariable,
-                        byteOffset: unusedBytes + 1,
+                        byteOffset: unusedBytes,
                     })
 
                     variables[maxSlotNumber] = {
@@ -782,7 +784,7 @@ export const addDynamicVariables = async (
                         attributeType: AttributeType.UserDefined,
                         contractName: variable.contractName,
                         name: '',
-                        dynamic: true,
+                        dynamic: false,
                         getValue: false,
                     }
                 }
@@ -861,6 +863,7 @@ export const addDynamicVariables = async (
                 byteOffset,
                 slotValue: value,
                 referenceSectionId: undefined,
+                dynamic: false,
             })
 
             // Get missing slot values

@@ -1,5 +1,5 @@
 import { BigNumberish } from '@ethersproject/bignumber';
-import { StorageSection } from './converterClasses2Storage';
+import { StorageSection, Variable } from './converterClasses2Storage';
 /**
  * Adds the slot values to the variables in the storage section.
  * This can be rerun for a section as it will only get if the slot value
@@ -11,6 +11,7 @@ import { StorageSection } from './converterClasses2Storage';
  * @param blockTag block number or `latest`
  */
 export declare const addSlotValues: (url: string, contractAddress: string, storageSection: StorageSection, blockTag?: BigNumberish | 'latest') => Promise<void>;
+export declare const parseValue: (variable: Variable) => string;
 /**
  * Get storage slot values from JSON-RPC API provider.
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy

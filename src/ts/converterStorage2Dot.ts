@@ -55,22 +55,36 @@ export function convertStorage2Dot(
     const startingVariables = storageSection.variables.filter(
         (s) => s.byteOffset === 0
     )
+    // for each slot displayed, does is have any variables with parsed data?
+    const displayData = startingVariables.map((startVar) =>
+        storageSection.variables.some(
+            (variable) =>
+                variable.fromSlot === startVar.fromSlot && variable.parsedValue
+        )
+    )
+
+    const linePad = '\\n\\ '
 
     // write slot numbers
-    dotString += '{ slot'
+    const dataLine = options.data ? linePad : ''
+    dotString += storageSection.offset
+        ? `{ offset${dataLine}`
+        : `{ slot${dataLine}`
     startingVariables.forEach((variable, i) => {
+        const dataLine = options.data && displayData[i] ? linePad : ''
         if (variable.fromSlot === variable.toSlot) {
-            dotString += `| ${variable.fromSlot} `
+            dotString += ` | ${variable.fromSlot}${dataLine}`
         } else {
-            dotString += `| ${variable.fromSlot}-${variable.toSlot} `
+            dotString += ` | ${variable.fromSlot}-${variable.toSlot}${dataLine}`
         }
     })
 
     // write slot values if available
     if (options.data) {
-        dotString += '} | {value'
+        dotString += `} | {value${dataLine}`
         startingVariables.forEach((variable, i) => {
-            dotString += ` | ${variable.slotValue || ''}`
+            const varDataLine = displayData[i] ? linePad : ''
+            dotString += ` | ${variable.slotValue || ''}${varDataLine}`
         })
     }
 
@@ -78,7 +92,8 @@ export function convertStorage2Dot(
         storageSection.type === StorageSectionType.Contract
             ? '\\<inherited contract\\>.'
             : ''
-    dotString += `} | { type: ${contractVariablePrefix}variable (bytes)`
+    const dataLine2 = options.data ? `\\ndecoded data` : ''
+    dotString += `} | { type: ${contractVariablePrefix}variable (bytes)${dataLine2}`
 
     // For each slot
     startingVariables.forEach((variable) => {
@@ -132,9 +147,12 @@ const dotVariable = (variable: Variable, contractName: string): string => {
         variable.contractName !== contractName
             ? `${variable.contractName}.`
             : ''
+    const variableValue = variable.parsedValue
+        ? `\\n\\ ${variable.parsedValue}`
+        : ''
 
     const variableName = variable.name
         ? `: ${contractNamePrefix}${variable.name}`
         : ''
-    return `${port} ${variable.type}${variableName} (${variable.byteSize})`
+    return `${port} ${variable.type}${variableName} (${variable.byteSize})${variableValue}`
 }

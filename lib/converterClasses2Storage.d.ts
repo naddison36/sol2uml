@@ -20,6 +20,7 @@ export interface Variable {
     contractName?: string;
     getValue: boolean;
     slotValue?: string;
+    parsedValue?: string;
     referenceSectionId?: number;
     enumId?: number;
 }

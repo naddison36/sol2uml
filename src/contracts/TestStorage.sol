@@ -265,15 +265,17 @@ contract TestStorage is Parent, Parent2 {
     string public emptyString = "";
     string public name = "TestStorage contract";
     string public short = "Less than 31 bytes";
-    string public exactly30 = "exactly 30 char so uses 1 slot";
     string public exactly31 = "exactly 31 chars so uses 1 slot";
-    string public exactly32 = "exactly 32 chars so uses 2 slots";
-    string public long2 = "more than 31 bytes so data is stored dynamically in 2 slots";
+    string public exactly32 = "32 char so uses one dynamic slot";
+    string public long2 = "more than 32 bytes so data is stored dynamically in 2 slots";
     string public long3 =
         "more than sixty four (64) bytes so data is stored dynamically in three slots";
 
     // The following can be publicly changed for testing purposes
     string public testString = "This can be publicly changed by anyone";
+
+    string public uninitialisedBytes;
+    string public emptyBytes = hex"";
     bytes public testBytes = hex"FFEEDDCCBBAA9988770011";
     bytes public exactly31Bytes = hex"ec0b854938343f85eb39a6648b9e449c2e4aee4dc9b4e96ab592f9f497d051";
     bytes public exactly32Bytes = hex"2619ec68b255542e3da68c054bfe0d7d0f27b7fdbefc8bbccdd23188fc71fe7f";

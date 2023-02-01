@@ -1,6 +1,8 @@
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import axios from 'axios'
-import { StorageSection } from './converterClasses2Storage'
+import { StorageSection, Variable } from './converterClasses2Storage'
+import { AttributeType } from './umlClass'
+import { commify, formatUnits, toUtf8String } from 'ethers/lib/utils'
 
 const debug = require('debug')('sol2uml')
 
@@ -27,7 +29,7 @@ export const addSlotValues = async (
     blockTag?: BigNumberish | 'latest'
 ) => {
     const valueVariables = storageSection.variables.filter(
-        (variable) => variable.getValue || !variable.slotValue
+        (variable) => variable.getValue && !variable.slotValue
     )
     if (valueVariables.length === 0) return
 
@@ -55,6 +57,8 @@ export const addSlotValues = async (
         for (const variable of storageSection.variables) {
             if (variable.fromSlot === fromSlot) {
                 variable.slotValue = value
+                // parse variable value from slot data
+                variable.parsedValue = parseValue(variable)
             }
             // if variable is past the slot that has the value
             else if (variable.toSlot > fromSlot) {
@@ -62,6 +66,95 @@ export const addSlotValues = async (
             }
         }
     })
+}
+
+export const parseValue = (variable: Variable): string => {
+    if (variable.attributeType !== AttributeType.Elementary) return undefined
+
+    const start = 66 - (variable.byteOffset + variable.byteSize) * 2
+    const end = 66 - variable.byteOffset * 2
+    const variableValue = variable.slotValue.substring(start, end)
+
+    try {
+        // TODO dynamic arrays
+
+        if (variable.type === 'bool') {
+            if (variableValue === '00') return 'false'
+            if (variableValue === '01') return 'true'
+            debug(
+                `Failed to parse bool variable ${variable.name} with value "${variableValue}"`
+            )
+            return undefined
+            // TODO throw rather than log once testing has finished
+            // throw Error(`Failed to parse bool variable ${variable.name} with value "${variableValue}"`)
+        }
+        if (variable.type === 'string' || variable.type === 'bytes') {
+            if (variable.dynamic) {
+                const lastByte = variable.slotValue.slice(-2)
+                const size = BigNumber.from('0x' + lastByte).toNumber()
+                if (size <= 0) return ''
+                if (size > 62) {
+                    // Return the number of chars or bytes
+                    return BigNumber.from(variable.slotValue)
+                        .sub(1)
+                        .div(2)
+                        .toString()
+                }
+
+                const hexValue = '0x' + variableValue.slice(0, size)
+                if (variable.type === 'bytes') return hexValue
+                return `\\"${toUtf8String(hexValue)}\\"`
+            }
+            if (variable.type === 'bytes') return '0x' + variableValue
+            return `\\"${toUtf8String('0x' + variableValue)}\\"`
+        }
+        if (variable.type === 'address') {
+            return '0x' + variableValue
+        }
+        if (variable.type.match(/^uint([0-9]*)$/)) {
+            const parsedValue = formatUnits('0x' + variableValue, 0)
+            return commify(parsedValue)
+        }
+        if (variable.type.match(/^bytes([0-9]+)$/)) {
+            return '0x' + variableValue
+        }
+        if (variable.type.match(/^int([0-9]*)/)) {
+            // parse variable value as an unsigned number
+            let rawValue = BigNumber.from('0x' + variableValue)
+
+            // parse the number of bits
+            const result = variable.type.match(/^int([0-9]*$)/)
+            const bitSize = result[1] ? result[1] : 256
+            // Convert the number of bits to the number of hex characters
+            const hexSize = BigNumber.from(bitSize).div(4).toNumber()
+            // bit mask has a leading 1 and the rest 0. 0x8 = 1000 binary
+            const mask = '0x80' + '0'.repeat(hexSize - 2)
+            // is the first bit a 1?
+            const negative = rawValue.and(mask)
+            if (negative.gt(0)) {
+                // Convert unsigned number to a signed negative
+                const negativeOne = '0xFF' + 'F'.repeat(hexSize - 2)
+                rawValue = BigNumber.from(negativeOne)
+                    .sub(rawValue)
+                    .add(1)
+                    .mul(-1)
+            }
+            const parsedValue = formatUnits(rawValue, 0)
+            return commify(parsedValue)
+        }
+        // add fixed point numbers when they are supported by Solidity
+        return undefined
+    } catch (err) {
+        // TODO throw rather than log once testing has finished
+        debug(
+            `Failed to parse variable ${variable.name} of type ${variable.type}, value "${variableValue}"`
+        )
+        // throw Error(
+        //     `Failed to parse variable ${variable.name} of type ${variable.type}, value "${variableValue}"`,
+        //     { cause: err }
+        // )
+        return undefined
+    }
 }
 
 let jsonRpcId = 0
