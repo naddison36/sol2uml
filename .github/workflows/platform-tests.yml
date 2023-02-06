@@ -1,4 +1,4 @@
-name: Platform tests
+name: MOHAMMED990
 on: [push]
 jobs:
   build:
