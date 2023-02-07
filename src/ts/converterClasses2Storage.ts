@@ -41,6 +41,7 @@ export interface StorageSection {
     type: StorageSectionType
     arrayLength?: number
     arrayDynamic?: boolean
+    mapping: boolean // is referenced from a mapping
     variables: Variable[]
 }
 
@@ -87,7 +88,8 @@ export const convertClasses2StorageSections = (
         umlClasses,
         [],
         storageSections,
-        []
+        [],
+        false
     )
 
     // Add new storage section to the beginning of the array
@@ -96,6 +98,7 @@ export const convertClasses2StorageSections = (
         name: contractName,
         type: StorageSectionType.Contract,
         variables: variables,
+        mapping: false,
     })
 
     adjustSlots(storageSections[0], 0, storageSections)
@@ -104,18 +107,22 @@ export const convertClasses2StorageSections = (
 }
 
 /**
- * Recursively parse the storage variables for a given contract.
+ * Recursively parse the storage variables for a given contract or struct.
  * @param umlClass contract or file level struct
  * @param umlClasses other contracts, structs and enums that may be a type of a storage variable.
  * @param variables mutable array of storage slots that is appended to
  * @param storageSections mutable array of storageSection objects
+ * @param inheritedContracts mutable array of contracts that have been inherited already
+ * @param mapping flags that the storage section is under a mapping
+ * @return variables array of storage variables in the `umlClass`
  */
 const parseVariables = (
     umlClass: UmlClass,
     umlClasses: readonly UmlClass[],
     variables: Variable[],
     storageSections: StorageSection[],
-    inheritedContracts: string[]
+    inheritedContracts: string[],
+    mapping: boolean
 ): Variable[] => {
     // Add storage slots from inherited contracts first.
     // Get immediate parent contracts that the class inherits from
@@ -143,7 +150,8 @@ const parseVariables = (
             umlClasses,
             variables,
             storageSections,
-            inheritedContracts
+            inheritedContracts,
+            mapping
         )
     })
 
@@ -163,13 +171,15 @@ const parseVariables = (
             attribute,
             umlClass,
             umlClasses,
-            storageSections
+            storageSections,
+            mapping || attribute.attributeType === AttributeType.Mapping
         )
 
         // should this new variable get the slot value
         const getValue = calcGetValue(
             attribute.attributeType,
             dynamic,
+            mapping,
             referenceStorageSection?.type
         )
 
@@ -253,11 +263,21 @@ const adjustSlots = (
     })
 }
 
+/**
+ * Recursively adds new storage sections under a class attribute.
+ * @param attribute the attribute that is referencing a storage section
+ * @param umlClass contract or file level struct
+ * @param otherClasses array of all the UML Classes
+ * @param storageSections mutable array of storageSection objects
+ * @param mapping flags that the storage section is under a mapping
+ * @return storageSection new storage section that was added or undefined if none was added.
+ */
 export const parseStorageSectionFromAttribute = (
     attribute: Attribute,
     umlClass: UmlClass,
     otherClasses: readonly UmlClass[],
-    storageSections: StorageSection[]
+    storageSections: StorageSection[],
+    mapping: boolean
 ): StorageSection | undefined => {
     if (attribute.attributeType === AttributeType.Array) {
         // storage is dynamic if the attribute type ends in []
@@ -305,13 +325,15 @@ export const parseStorageSectionFromAttribute = (
                 baseAttribute,
                 umlClass,
                 otherClasses,
-                storageSections
+                storageSections,
+                mapping
             )
         }
 
         const getValue = calcGetValue(
             baseAttribute.attributeType,
             dynamicBase,
+            mapping,
             referenceStorageSection?.type
         )
 
@@ -357,6 +379,7 @@ export const parseStorageSectionFromAttribute = (
             arrayDynamic: dynamic,
             arrayLength,
             variables,
+            mapping,
         }
         storageSections.push(newStorageSection)
 
@@ -372,13 +395,15 @@ export const parseStorageSectionFromAttribute = (
                 otherClasses,
                 [],
                 storageSections,
-                []
+                [],
+                mapping
             )
             const newStorageSection = {
                 id: storageId++,
                 name: attribute.type,
                 type: StorageSectionType.Struct,
                 variables,
+                mapping,
             }
             storageSections.push(newStorageSection)
 
@@ -402,7 +427,8 @@ export const parseStorageSectionFromAttribute = (
                     otherClasses,
                     [],
                     storageSections,
-                    []
+                    [],
+                    true
                 )
                 // set getValue to false as Struct is in a mapping
                 variables = variables.map((v) => ({
@@ -413,7 +439,7 @@ export const parseStorageSectionFromAttribute = (
                     id: storageId++,
                     name: typeClass.name,
                     type: StorageSectionType.Struct,
-                    offset: '',
+                    mapping: true,
                     variables,
                 }
                 storageSections.push(newStorageSection)
@@ -714,6 +740,7 @@ export const findDimensionLength = (
 /**
  * Calculate if the storage slot value should be retrieved for the attribute.
  *
+ * Storage sections with true mapping should return false.
  * Elementary types should return true.
  * Dynamic Array types should return true.
  * Static Array types should return false.
@@ -722,18 +749,21 @@ export const findDimensionLength = (
  *
  * @param attributeType
  * @param dynamic flags if the variable is of dynamic size
+ * @param mapping flags if the storage section is referenced by a mapping
  * @param storageSectionType
  * @return getValue true if the slot value should be retrieved.
  */
 const calcGetValue = (
     attributeType: AttributeType,
     dynamic: boolean,
+    mapping: boolean,
     storageSectionType?: StorageSectionType
 ): boolean =>
-    attributeType === AttributeType.Elementary ||
-    (attributeType === AttributeType.UserDefined &&
-        storageSectionType !== StorageSectionType.Struct) ||
-    (attributeType === AttributeType.Array && dynamic)
+    mapping === false &&
+    (attributeType === AttributeType.Elementary ||
+        (attributeType === AttributeType.UserDefined &&
+            storageSectionType !== StorageSectionType.Struct) ||
+        (attributeType === AttributeType.Array && dynamic))
 
 // recursively adds variables for dynamic string, bytes or arrays
 export const addDynamicVariables = async (
@@ -806,6 +836,7 @@ export const addDynamicVariables = async (
                     arrayDynamic: true,
                     arrayLength: size,
                     variables,
+                    mapping: false,
                 }
                 variable.referenceSectionId = newStorageSection.id
 

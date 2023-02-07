@@ -39,3 +39,5 @@ export declare const getSlotValue: (url: string, contractAddress: string, slotKe
  * @return bytes the number of bytes of the dynamic slot. If static, zero is return.
  */
 export declare const dynamicSlotSize: (slotValue: string) => number;
+export declare const convert2String: (bytes: string) => string;
+export declare const escapeString: (text: string) => string;

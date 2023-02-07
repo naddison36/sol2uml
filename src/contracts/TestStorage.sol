@@ -41,6 +41,26 @@ struct ContractLevelStruct11 {
     ContractLevelStruct1 param1;
 }
 
+struct DynamicStruct {
+    bool flag;
+    address token;
+    IERC20 asset;
+    Severity severity;
+    Severity[3] staticSeverities;
+    Severity[] dynamicSeverities;
+    address[] dynamicAddressArray;
+    address[2] staticAddressArray;
+    int64[] dynamicIntArray;
+    int64[5] staticIntArray;
+    string shortString;
+    string longString;
+    ContractLevelStruct1 struct1;
+    ContractLevelStruct1[2] staticStruct1;
+    ContractLevelStruct1[] dynamicStruct1;
+    mapping(address => uint256) balance;
+    mapping(address => ContractLevelStruct1) mappedStruct1;
+}
+
 enum Severity {
     Low,
     Medium,
@@ -214,6 +234,7 @@ contract TestStorage is Parent, Parent2 {
     ];
     bool public flag11 = true;
     uint32[FileConstant] public timestamps = [1060001, 1160111, 1260223, 1360333, 1660445];
+
     TwoSlots[2] public twoSlots2x;
     TwoSlots[3][4] public twoSlots3x4;
     TwoSlots[4][3] public twoSlots4x3;
@@ -222,8 +243,13 @@ contract TestStorage is Parent, Parent2 {
     TwoSlots[][] public twoSlotsDynxDyn;
     TwoSlots[][4][3] public twoSlotsDynx4x3;
     TwoSlots[3][4][] public twoSlotsDynx3x4xDyn;
+
+    // enums
     Status public status = Status.Open;
+    Status[] public dynamicStatuses = [Status.Open, Status.Resolved, Status.Open];
     Severity public severity = Severity.High;
+    Severity[4] public staticSeverities = [Severity.High, Severity.Low, Severity.Medium, Severity.High];
+
     SubOneSlot public subSlot = SubOneSlot(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5, true, -121);
     uint8 public oneByteNumber = 253;
     OneSlot public oneSlot = OneSlot(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5, 1234567890, 253);
@@ -249,11 +275,18 @@ contract TestStorage is Parent, Parent2 {
     uint256[3] public fixedIntArray = [1000, 2000, 3000];
     uint256[][] public dynamicDynIntArray;
     uint256[][][] public dynamicDynDynIntArray;
+
     mapping(address => bool) public blacklist;
     mapping(address => uint256) public balance;
     mapping(address => ContractLevelStruct2) public mapStruct;
     mapping(address => mapping(address => ContractLevelStruct2)) public mapOfMapStruct;
     mapping(address => IERC20) public mapInterface;
+
+    DynamicStruct public dynamicStruct;
+    DynamicStruct[] public dynDynamicStruct;
+    DynamicStruct[2] public staticDynamicStruct;
+    mapping(address => DynamicStruct) public mapppedDynamicStruct;
+
     IERC20[2] public interfaceFixedArray = [
         IERC20(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5),
         IERC20(0x30647a72Dc82d7Fbb1123EA74716aB8A317Eac19)];
@@ -261,6 +294,7 @@ contract TestStorage is Parent, Parent2 {
         IERC20(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5),
         IERC20(0x30647a72Dc82d7Fbb1123EA74716aB8A317Eac19),
         IERC20(0x78BefCa7de27d07DC6e71da295Cc2946681A6c7B)];
+    
     string public uninitialisedString;
     string public emptyString = "";
     string public name = "TestStorage contract";
@@ -356,6 +390,88 @@ contract TestStorage is Parent, Parent2 {
         blacklist[0x2f2Db75C5276481E2B018Ac03e968af7763Ed118] = true;
         blacklist[0xdb2C46Ed8E850668b942d9Bd6D2ae8803c6789DF] = false;
         balance[0x2f2Db75C5276481E2B018Ac03e968af7763Ed118] = 0x1234566789ABCDEF;
+
+        dynamicStruct.flag = true;
+        dynamicStruct.token = 0x9ff58f4fFB29fA2266Ab25e75e2A8b3503311656;
+        dynamicStruct.asset = IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599);
+        dynamicStruct.severity = Severity.High;
+        dynamicStruct.staticSeverities = [Severity.High, Severity.Low, Severity.Medium];
+        dynamicStruct.dynamicSeverities = [Severity.High, Severity.Medium];
+        dynamicStruct.dynamicAddressArray = [0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D, 0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6, 0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF];
+        dynamicStruct.staticAddressArray = [0x853d955aCEf822Db058eb8505911ED77F175b99e, 0x104592a158490a9228070E0A8e5343B499e125D0];
+        dynamicStruct.dynamicIntArray.push(1);
+        dynamicStruct.dynamicIntArray.push(-1);
+        dynamicStruct.dynamicIntArray.push(1023);
+        dynamicStruct.staticIntArray = [int64(1), 2, 3, 4, 5];
+        dynamicStruct.shortString = "exactly 31 chars so uses 1 slot";
+        dynamicStruct.longString = "over 31 charaters so is dynamic length using two slots";
+        dynamicStruct.struct1 = ContractLevelStruct1({
+            param1: 1e18,
+            param2: 0x6243d8CEA23066d098a15582d81a598b4e8391F4,
+            param3: 127,
+            param4: bytes1(0xFF)
+        });
+        dynamicStruct.staticStruct1[0] = ContractLevelStruct1({
+            param1: 2e18,
+            param2: 0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919,
+            param3: 6,
+            param4: bytes1(0xFF)
+        });
+
+        dynDynamicStruct.push();
+        dynDynamicStruct[0].flag = true;
+        dynDynamicStruct[0].token = 0x9ff58f4fFB29fA2266Ab25e75e2A8b3503311656;
+        dynDynamicStruct[0].asset = IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599);
+        dynDynamicStruct[0].severity = Severity.High;
+        dynDynamicStruct[0].staticSeverities = [Severity.Low, Severity.Medium, Severity.High];
+        dynDynamicStruct[0].dynamicSeverities = [Severity.Medium, Severity.Medium];
+        dynDynamicStruct[0].dynamicAddressArray = [0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF];
+        dynDynamicStruct[0].staticAddressArray = [0x853d955aCEf822Db058eb8505911ED77F175b99e, 0x104592a158490a9228070E0A8e5343B499e125D0];
+        dynDynamicStruct[0].dynamicIntArray.push(200);
+        dynDynamicStruct[0].dynamicIntArray.push(-200);
+        dynDynamicStruct[0].dynamicIntArray.push(32000);
+        dynDynamicStruct[0].staticIntArray = [int64(1000), 2000, 3000, 4000, 5000];
+        dynDynamicStruct[0].shortString = "string < 31 chars";
+        dynDynamicStruct[0].longString = "a string that is over 31 characters in length";
+        dynDynamicStruct[0].struct1 = ContractLevelStruct1({
+            param1: 3e18,
+            param2: 0x36F944B7312EAc89381BD78326Df9C84691D8A5B,
+            param3: 2,
+            param4: bytes1(0x89)
+        });
+        dynDynamicStruct[0].staticStruct1[0] = ContractLevelStruct1({
+            param1: 4e18,
+            param2: 0x4fB30C5A3aC8e85bC32785518633303C4590752d,
+            param3: 255,
+            param4: bytes1(0x91)
+        });
+
+        staticDynamicStruct[1].flag = true;
+        staticDynamicStruct[1].token = 0xD37EE7e4f452C6638c96536e68090De8cBcdb583;
+        staticDynamicStruct[1].asset = IERC20(0x4fB30C5A3aC8e85bC32785518633303C4590752d);
+        staticDynamicStruct[1].severity = Severity.Medium;
+        staticDynamicStruct[1].staticSeverities = [Severity.Medium, Severity.Low, Severity.High];
+        staticDynamicStruct[1].dynamicSeverities = [Severity.Medium, Severity.High, Severity.Low, Severity.High];
+        staticDynamicStruct[1].dynamicAddressArray = [0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF];
+        staticDynamicStruct[1].staticAddressArray = [0x853d955aCEf822Db058eb8505911ED77F175b99e, 0x104592a158490a9228070E0A8e5343B499e125D0];
+        staticDynamicStruct[1].dynamicIntArray.push(10000);
+        staticDynamicStruct[1].dynamicIntArray.push(-10000);
+        staticDynamicStruct[1].dynamicIntArray.push(64000);
+        staticDynamicStruct[1].staticIntArray = [int64(100), 200, 300, 400, 500];
+        staticDynamicStruct[1].shortString = "string < 31 characters";
+        staticDynamicStruct[1].longString = "a string that is over 31 characters long";
+        staticDynamicStruct[1].struct1 = ContractLevelStruct1({
+            param1: 5e18,
+            param2: 0x6B175474E89094C44Da98b954EedeAC495271d0F,
+            param3: 2,
+            param4: bytes1(0x89)
+        });
+        staticDynamicStruct[1].staticStruct1[1] = ContractLevelStruct1({
+            param1: 6e18,
+            param2: 0xdAC17F958D2ee523a2206206994597C13D831ec7,
+            param3: 129,
+            param4: bytes1(0x99)
+        });
 
         twoSlots2x[0] = TwoSlots(
             0xFFFF00000F000000000000000000000000000000000000000000000000FFFFFF,

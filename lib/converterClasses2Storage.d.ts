@@ -31,6 +31,7 @@ export interface StorageSection {
     type: StorageSectionType;
     arrayLength?: number;
     arrayDynamic?: boolean;
+    mapping: boolean;
     variables: Variable[];
 }
 /**
@@ -41,7 +42,16 @@ export interface StorageSection {
  * @return storageSections array of storageSection objects
  */
 export declare const convertClasses2StorageSections: (contractName: string, umlClasses: UmlClass[], contractFilename?: string) => StorageSection[];
-export declare const parseStorageSectionFromAttribute: (attribute: Attribute, umlClass: UmlClass, otherClasses: UmlClass[], storageSections: StorageSection[]) => StorageSection | undefined;
+/**
+ * Recursively adds new storage sections under a class attribute.
+ * @param attribute the attribute that is referencing a storage section
+ * @param umlClass contract or file level struct
+ * @param otherClasses array of all the UML Classes
+ * @param storageSections mutable array of storageSection objects
+ * @param mapping flags that the storage section is under a mapping
+ * @return storageSection new storage section that was added or undefined if none was added.
+ */
+export declare const parseStorageSectionFromAttribute: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[], storageSections: StorageSection[], mapping: boolean) => StorageSection | undefined;
 export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[]) => {
     size: number;
     dynamic: boolean;

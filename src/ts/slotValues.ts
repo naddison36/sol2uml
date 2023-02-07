@@ -103,10 +103,10 @@ export const parseValue = (variable: Variable): string => {
 
                 const hexValue = '0x' + variableValue.slice(0, size)
                 if (variable.type === 'bytes') return hexValue
-                return `\\"${toUtf8String(hexValue)}\\"`
+                return `\\"${convert2String(hexValue)}\\"`
             }
             if (variable.type === 'bytes') return '0x' + variableValue
-            return `\\"${toUtf8String('0x' + variableValue)}\\"`
+            return `\\"${convert2String('0x' + variableValue)}\\"`
         }
         if (variable.type === 'address') {
             return '0x' + variableValue
@@ -264,4 +264,13 @@ export const dynamicSlotSize = (slotValue: string): number => {
     const sizeRaw = BigNumber.from(slotValue).toNumber()
     // Adjust the size to bytes
     return (sizeRaw - 1) / 2
+}
+
+export const convert2String = (bytes: string): string => {
+    const rawString = toUtf8String(bytes)
+    return escapeString(rawString)
+}
+
+export const escapeString = (text: string): string => {
+    return text.replace(/(?=[<>&"])/g, '\\')
 }

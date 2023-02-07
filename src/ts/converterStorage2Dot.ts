@@ -67,9 +67,10 @@ export function convertStorage2Dot(
 
     // write slot numbers
     const dataLine = options.data ? linePad : ''
-    dotString += storageSection.offset
-        ? `{ offset${dataLine}`
-        : `{ slot${dataLine}`
+    dotString +=
+        storageSection.offset || storageSection.mapping
+            ? `{ offset${dataLine}`
+            : `{ slot${dataLine}`
     startingVariables.forEach((variable, i) => {
         const dataLine = options.data && displayData[i] ? linePad : ''
         if (variable.fromSlot === variable.toSlot) {

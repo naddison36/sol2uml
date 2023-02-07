@@ -1,5 +1,6 @@
 import {
     dynamicSlotSize,
+    escapeString,
     getSlotValue,
     getSlotValues,
     parseValue,
@@ -187,5 +188,18 @@ describe('Slot Values', () => {
                 ).toEqual(expected)
             }
         )
+    })
+    describe('escape string', () => {
+        test.each`
+            text               | expected
+            ${'"Some string"'} | ${'\\"Some string\\"'}
+            ${'size < 31'}     | ${'size \\< 31'}
+            ${'size >= 31'}    | ${'size \\>= 31'}
+            ${'1 & 2'}         | ${'1 \\& 2'}
+            ${'"<&>'}          | ${'\\"\\<\\&\\>'}
+            ${'""<<&&>>>'}     | ${'\\"\\"\\<\\<\\&\\&\\>\\>\\>'}
+        `('text $text', ({ text, expected }) => {
+            expect(escapeString(text)).toEqual(expected)
+        })
     })
 })
