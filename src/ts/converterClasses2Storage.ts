@@ -4,7 +4,7 @@ import { hexZeroPad, keccak256 } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
 import path from 'path'
 import { BigNumberish } from '@ethersproject/bignumber'
-import { addSlotValues, dynamicSlotSize } from './slotValues'
+import { addSlotValues, dynamicSlotSize, parseValue } from './slotValues'
 
 const debug = require('debug')('sol2uml')
 
@@ -258,7 +258,10 @@ const adjustSlots = (
                 )
             } else if (variable.attributeType === AttributeType.Array) {
                 // attribute is a dynamic array
-                referenceStorageSection.offset = calcSectionOffset(variable)
+                referenceStorageSection.offset = calcSectionOffset(
+                    variable,
+                    storageSection.offset
+                )
 
                 adjustSlots(referenceStorageSection, 0, storageSections)
             }
@@ -696,15 +699,18 @@ export const isElementary = (type: string): boolean => {
     }
 }
 
-export const calcSectionOffset = (variable: Variable): string | undefined => {
+export const calcSectionOffset = (
+    variable: Variable,
+    sectionOffset: string = '0'
+): string | undefined => {
     if (variable.dynamic) {
         const hexStringOf32Bytes = hexZeroPad(
-            BigNumber.from(variable.fromSlot).toHexString(),
+            BigNumber.from(variable.fromSlot).add(sectionOffset).toHexString(),
             32
         )
         return keccak256(hexStringOf32Bytes)
     }
-    return BigNumber.from(variable.fromSlot).toHexString()
+    return BigNumber.from(variable.fromSlot).add(sectionOffset).toHexString()
 }
 
 export const findDimensionLength = (
@@ -858,7 +864,7 @@ export const addDynamicVariables = async (
                 const newStorageSection: StorageSection = {
                     id: storageId++,
                     name: `${variable.type}: ${variable.name}`,
-                    offset: calcSectionOffset(variable),
+                    offset: calcSectionOffset(variable, storageSection.offset),
                     type:
                         variable.type === 'string'
                             ? StorageSectionType.String
@@ -921,8 +927,8 @@ export const addDynamicVariables = async (
                     ? referenceStorageSection.variables[0].slotValue
                     : undefined
 
-            // add extra variables
-            referenceStorageSection.variables.push({
+            // add extra variable
+            const newVariable: Variable = {
                 ...referenceStorageSection.variables[0],
                 id: variableId++,
                 fromSlot,
@@ -931,15 +937,17 @@ export const addDynamicVariables = async (
                 slotValue: value,
                 referenceSectionId: undefined,
                 dynamic: false,
-            })
-
-            // Get missing slot values
-            await addSlotValues(
-                url,
-                contractAddress,
-                referenceStorageSection,
-                blockTag
-            )
+                parsedValue: undefined,
+            }
+            newVariable.parsedValue = parseValue(newVariable)
+            referenceStorageSection.variables.push(newVariable)
         }
+        // Get missing slot values
+        await addSlotValues(
+            url,
+            contractAddress,
+            referenceStorageSection,
+            blockTag
+        )
     }
 }

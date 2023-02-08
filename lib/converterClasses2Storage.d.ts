@@ -58,7 +58,7 @@ export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlCl
     dynamic: boolean;
 };
 export declare const isElementary: (type: string) => boolean;
-export declare const calcSectionOffset: (variable: Variable) => string | undefined;
+export declare const calcSectionOffset: (variable: Variable, sectionOffset?: string) => string | undefined;
 export declare const findDimensionLength: (umlClass: UmlClass, dimension: string, otherClasses: readonly UmlClass[]) => number;
 /**
  * Recursively adds variables for dynamic string, bytes or arrays
