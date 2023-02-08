@@ -19,6 +19,7 @@ import { basename } from 'path'
 import { squashUmlClasses } from './squashClasses'
 import { diffCode } from './diff'
 import { addSlotValues } from './slotValues'
+import { ethers } from 'ethers'
 
 const clc = require('cli-color')
 const program = new Command()
@@ -309,13 +310,24 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                     storageAddress = fileFolderAddress
                 }
 
+                let block = combinedOptions.block
+                if (block === 'latest') {
+                    const provider = new ethers.providers.JsonRpcProvider(
+                        combinedOptions.url
+                    )
+                    block = await provider.getBlockNumber()
+                    debug(
+                        `Latest block is ${block}. All storage slot values will be from this block.`
+                    )
+                }
+
                 // Get slot values for each storage section
                 for (const storageSection of storageSections) {
                     await addSlotValues(
                         combinedOptions.url,
                         storageAddress,
                         storageSection,
-                        combinedOptions.block
+                        block
                     )
                 }
 
@@ -325,7 +337,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                     storageSections,
                     combinedOptions.url,
                     storageAddress,
-                    combinedOptions.block
+                    block
                 )
             }
 

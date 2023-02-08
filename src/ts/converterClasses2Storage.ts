@@ -777,23 +777,28 @@ const calcDisplayValue = (
  * Array types should return true.
  * UserDefined should return true.
  *
- * @param attributeType
- * @param dynamic flags if the variable is of dynamic size
+ * @param attributeType the type of attribute the storage variable is for.
  * @param mapping flags if the storage section is referenced by a mapping
- * @param storageSectionType
- * @return displayValue true if the slot value should be displayed.
+ * @return getValue true if the slot value should be retrieved.
  */
 const calcGetValue = (
     attributeType: AttributeType,
     mapping: boolean
 ): boolean => mapping === false && attributeType !== AttributeType.Mapping
 
-// recursively adds variables for dynamic string, bytes or arrays
+/**
+ * Recursively adds variables for dynamic string, bytes or arrays
+ * @param storageSection
+ * @param storageSections
+ * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
+ * @param contractAddress Contract address to get the storage slot values from.
+ * @param blockTag block number or `latest`
+ */
 export const addDynamicVariables = async (
     storageSection: StorageSection,
     storageSections: StorageSection[],
     url: string,
-    storageAddress: string,
+    contractAddress: string,
     blockTag?: BigNumberish | 'latest'
 ) => {
     for (const variable of storageSection.variables) {
@@ -868,7 +873,7 @@ export const addDynamicVariables = async (
                 // get slot values for dynamic the string or byte storage
                 await addSlotValues(
                     url,
-                    storageAddress,
+                    contractAddress,
                     newStorageSection,
                     blockTag
                 )
@@ -893,7 +898,7 @@ export const addDynamicVariables = async (
             referenceStorageSection,
             storageSections,
             url,
-            storageAddress,
+            contractAddress,
             blockTag
         )
 
@@ -931,7 +936,7 @@ export const addDynamicVariables = async (
             // Get missing slot values
             await addSlotValues(
                 url,
-                storageAddress,
+                contractAddress,
                 referenceStorageSection,
                 blockTag
             )

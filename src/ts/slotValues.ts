@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import axios from 'axios'
 import { StorageSection, Variable } from './converterClasses2Storage'
 import { AttributeType } from './umlClass'
-import { commify, formatUnits, toUtf8String } from 'ethers/lib/utils'
+import { commify, formatUnits, hexValue, toUtf8String } from 'ethers/lib/utils'
 import { SlotValueCache } from './SlotValueCache'
 
 const debug = require('debug')('sol2uml')
@@ -125,9 +125,9 @@ export const parseValue = (variable: Variable): string => {
                         .toString()
                 }
 
-                const hexValue = '0x' + variableValue.slice(0, size)
-                if (variable.type === 'bytes') return hexValue
-                return `\\"${convert2String(hexValue)}\\"`
+                const valueHex = '0x' + variableValue.slice(0, size)
+                if (variable.type === 'bytes') return valueHex
+                return `\\"${convert2String(valueHex)}\\"`
             }
             if (variable.type === 'bytes') return '0x' + variableValue
             return `\\"${convert2String('0x' + variableValue)}\\"`
@@ -204,7 +204,7 @@ export const getSlotValues = async (
         const block =
             blockTag === 'latest'
                 ? blockTag
-                : BigNumber.from(blockTag).toHexString()
+                : hexValue(BigNumber.from(blockTag))
 
         // get cached values and missing slot keys from from cache
         const { cachedValues, missingKeys } =

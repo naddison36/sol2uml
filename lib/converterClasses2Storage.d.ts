@@ -60,4 +60,12 @@ export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlCl
 export declare const isElementary: (type: string) => boolean;
 export declare const calcSectionOffset: (variable: Variable) => string | undefined;
 export declare const findDimensionLength: (umlClass: UmlClass, dimension: string, otherClasses: readonly UmlClass[]) => number;
-export declare const addDynamicVariables: (storageSection: StorageSection, storageSections: StorageSection[], url: string, storageAddress: string, blockTag?: BigNumberish | 'latest') => Promise<void>;
+/**
+ * Recursively adds variables for dynamic string, bytes or arrays
+ * @param storageSection
+ * @param storageSections
+ * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
+ * @param contractAddress Contract address to get the storage slot values from.
+ * @param blockTag block number or `latest`
+ */
+export declare const addDynamicVariables: (storageSection: StorageSection, storageSections: StorageSection[], url: string, contractAddress: string, blockTag?: BigNumberish | 'latest') => Promise<void>;
