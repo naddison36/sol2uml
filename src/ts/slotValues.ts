@@ -76,11 +76,28 @@ export const addSlotValues = async (
 }
 
 export const parseValue = (variable: Variable): string => {
-    if (variable.attributeType !== AttributeType.Elementary) return undefined
-
+    if (!variable.slotValue) return undefined
     const start = 66 - (variable.byteOffset + variable.byteSize) * 2
     const end = 66 - variable.byteOffset * 2
     const variableValue = variable.slotValue.substring(start, end)
+
+    if (variable.attributeType === AttributeType.UserDefined) {
+        // TODO need to handle User Defined Value Types introduced in Solidity v0.8.8
+        // https://docs.soliditylang.org/en/v0.8.18/types.html#user-defined-value-types
+        // https://blog.soliditylang.org/2021/09/27/user-defined-value-types/
+
+        // using byteSize is crude and will be incorrect for aliases types like int160 or uint160
+        if (variable.byteSize === 20) {
+            return '0x' + variableValue
+        }
+        // this will also be wrong if the alias is to a 1 byte type. eg bytes1, int8 or uint8
+        if (variable.byteSize === 1) {
+            // TODO find enum from associations.
+        }
+        // we don't parse if a struct which has a size of 32 bytes
+        return undefined
+    }
+    if (variable.attributeType !== AttributeType.Elementary) return undefined
 
     try {
         // TODO dynamic arrays

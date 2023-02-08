@@ -370,6 +370,7 @@ export const parseStorageSectionFromAttribute = (
                     type: baseType,
                     attributeType: baseAttributeType,
                     dynamic: dynamicBase,
+                    getValue,
                     displayValue,
                     // only the first variable links to a referenced storage section
                     referenceSectionId: undefined,
@@ -423,7 +424,7 @@ export const parseStorageSectionFromAttribute = (
         const result = attribute.type.match(/=\\>((?!mapping)\w*)[\\[]/)
         // If mapping of user defined type
         if (result !== null && result[1] && !isElementary(result[1])) {
-            // Find UserDefined type
+            // Find UserDefined type can be a contract, struct or enum
             const typeClass = findTypeClass(result[1], attribute, otherClasses)
 
             if (typeClass.stereotype === ClassStereotype.Struct) {
@@ -746,7 +747,7 @@ export const findDimensionLength = (
  * Dynamic Array types should return true.
  * Static Array types should return false.
  * UserDefined types that are Structs should return false.
- * UserDefined types that are Enums or alias to Elementary type should return true.
+ * UserDefined types that are Enums or alias to Elementary type or contract should return true.
  *
  * @param attributeType
  * @param dynamic flags if the variable is of dynamic size
