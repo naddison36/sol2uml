@@ -14,6 +14,37 @@ import { formatBytes32String, parseBytes32String } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
 
 describe('storage parser', () => {
+    describe('is elementary type?', () => {
+        test.each`
+            type                                        | expected
+            ${'address'}                                | ${true}
+            ${'bool'}                                   | ${true}
+            ${'int'}                                    | ${true}
+            ${'uint'}                                   | ${true}
+            ${'int256'}                                 | ${true}
+            ${'uint256'}                                | ${true}
+            ${'uint8'}                                  | ${true}
+            ${'int8'}                                   | ${true}
+            ${'uint32'}                                 | ${true}
+            ${'int32'}                                  | ${true}
+            ${'bytes'}                                  | ${true}
+            ${'bytes32'}                                | ${true}
+            ${'bytes1'}                                 | ${true}
+            ${'bytes31'}                                | ${true}
+            ${'string'}                                 | ${true}
+            ${'address[]'}                              | ${false}
+            ${'address[2]'}                             | ${false}
+            ${'bool[]'}                                 | ${false}
+            ${'bool[MAX]'}                              | ${false}
+            ${'int8[]'}                                 | ${false}
+            ${'int8[10]'}                               | ${false}
+            ${'mapping(address=>uint256)'}              | ${false}
+            ${'mapping(address=>ContractLevelStruct2)'} | ${false}
+            ${'IERC20'}                                 | ${false}
+        `('$type', ({ type, expected }) => {
+            expect(isElementary(type)).toEqual(expected)
+        })
+    })
     describe('calc storage bytes size of', () => {
         const defaultClassProperties: ClassProperties = {
             name: 'test',

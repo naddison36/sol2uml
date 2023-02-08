@@ -307,7 +307,7 @@ export const parseStorageSectionFromAttribute = (
 
         const baseAttribute: Attribute = {
             visibility: attribute.visibility,
-            name: baseType,
+            name: attribute.name,
             type: baseType,
             attributeType: baseAttributeType,
         }
@@ -464,7 +464,7 @@ const findTypeClass = (
     attribute: Attribute,
     otherClasses: readonly UmlClass[]
 ): UmlClass => {
-    // Find UserDefined type
+    // Find associated UserDefined type
     // TODO this just matches on name and doesn't take into account imports
     const typeClass = otherClasses.find(
         ({ name }) => name === userType || name === userType.split('.')[1]
@@ -572,7 +572,8 @@ export const calcStorageByteSize = (
             dynamic: false,
         }
     }
-    // If a Struct or Enum
+    // If a Struct, Enum or Contract reference
+    // TODO need to handle User Defined Value Types when they are added to Solidity
     if (attribute.attributeType === AttributeType.UserDefined) {
         // Is the user defined type linked to another Contract, Struct or Enum?
         const attributeTypeClass = findTypeClass(
@@ -690,7 +691,7 @@ export const isElementary = (type: string): boolean => {
         case 'fixed':
             return true
         default:
-            const result = type.match(/[u]?(int|fixed|bytes)([0-9]+)/)
+            const result = type.match(/^[u]?(int|fixed|bytes)([0-9]+)$/)
             return result !== null
     }
 }
