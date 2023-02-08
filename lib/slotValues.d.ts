@@ -33,6 +33,7 @@ export declare const getSlotValues: (url: string, contractAddress: string, slotK
  */
 export declare const getSlotValue: (url: string, contractAddress: string, slotKey: BigNumberish, blockTag?: BigNumberish | 'latest') => Promise<string>;
 /**
+ * Calculates the number of string characters or bytes of a string or bytes type.
  * See the following for how string and bytes are stored in storage slots
  * https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#bytes-and-string
  * @param slotValue the slot value in hexadecimal format

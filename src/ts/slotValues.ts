@@ -3,6 +3,7 @@ import axios from 'axios'
 import { StorageSection, Variable } from './converterClasses2Storage'
 import { AttributeType } from './umlClass'
 import { commify, formatUnits, toUtf8String } from 'ethers/lib/utils'
+import { SlotValueCache } from './SlotValueCache'
 
 const debug = require('debug')('sol2uml')
 
@@ -186,33 +187,36 @@ export const getSlotValues = async (
             blockTag === 'latest'
                 ? blockTag
                 : BigNumber.from(blockTag).toHexString()
-        const payload = slotKeys.map((slot) => ({
+
+        // get missing slot keys from from cache so we can get their values
+        const missingKeys = SlotValueCache.missingSlotKeys(slotKeys)
+
+        const payload = missingKeys.map((key) => ({
             id: (jsonRpcId++).toString(),
             jsonrpc: '2.0',
             method: 'eth_getStorageAt',
-            params: [
-                contractAddress,
-                BigNumber.from(slot).toHexString(),
-                block,
-            ],
+            params: [contractAddress, key, block],
         }))
         const response = await axios.post(url, payload)
         console.log(response.data)
         if (response.data?.error?.message) {
             throw new Error(response.data.error.message)
         }
-        if (response.data.length !== slotKeys.length) {
+        if (response.data.length !== missingKeys.length) {
             throw new Error(
-                `Requested ${slotKeys.length} storage slot values but only got ${response.data.length}`
+                `Requested ${missingKeys.length} storage slot values but only got ${response.data.length}`
             )
         }
         const responseData = response.data as StorageAtResponse[]
         const sortedResponses = responseData.sort((a, b) =>
             BigNumber.from(a.id).gt(b.id) ? 1 : -1
         )
-        return sortedResponses.map(
+        const missingValues = sortedResponses.map(
             (data) => '0x' + data.result.toUpperCase().slice(2)
         )
+
+        // add new values to the cache and return the merged slot values
+        return SlotValueCache.addCache(slotKeys, missingKeys, missingValues)
     } catch (err) {
         throw new Error(
             `Failed to get ${slotKeys.length} storage values for contract ${contractAddress} from ${url}`,
@@ -250,6 +254,7 @@ export const getSlotValue = async (
 }
 
 /**
+ * Calculates the number of string characters or bytes of a string or bytes type.
  * See the following for how string and bytes are stored in storage slots
  * https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#bytes-and-string
  * @param slotValue the slot value in hexadecimal format
