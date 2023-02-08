@@ -34,9 +34,15 @@ export const addSlotValues = async (
     )
     if (valueVariables.length === 0) return
 
-    const fromSlots = valueVariables.map((variable) => variable.fromSlot)
+    // for each variable, add all the slots used by the variable.
+    const slots: BigNumberish[] = []
+    valueVariables.forEach((variable) => {
+        for (let i = 0; variable.fromSlot + i <= variable.toSlot; i++) {
+            slots.push(variable.fromSlot + i)
+        }
+    })
     // remove duplicate slot numbers
-    const uniqueFromSlots = [...new Set(fromSlots)]
+    const uniqueFromSlots = [...new Set(slots)]
 
     // Convert slot numbers to BigNumbers and offset dynamic arrays
     let slotKeys = uniqueFromSlots.map((fromSlot) => {
@@ -56,7 +62,7 @@ export const addSlotValues = async (
 
         // For each variable in the storage section
         for (const variable of storageSection.variables) {
-            if (variable.fromSlot === fromSlot) {
+            if (variable.displayValue && variable.fromSlot === fromSlot) {
                 variable.slotValue = value
                 // parse variable value from slot data
                 variable.parsedValue = parseValue(variable)
@@ -178,19 +184,26 @@ export const getSlotValues = async (
         if (slotKeys.length === 0) {
             return []
         }
-        debug(
-            `About to get ${
-                slotKeys.length
-            } storage values for ${contractAddress} at block ${blockTag} starting at slot ${slotKeys[0].toString()}`
-        )
         const block =
             blockTag === 'latest'
                 ? blockTag
                 : BigNumber.from(blockTag).toHexString()
 
-        // get missing slot keys from from cache so we can get their values
-        const missingKeys = SlotValueCache.missingSlotKeys(slotKeys)
+        // get cached values and missing slot keys from from cache
+        const { cachedValues, missingKeys } =
+            SlotValueCache.readSlotValues(slotKeys)
 
+        // If all values are in the cache then just return the cached values
+        if (missingKeys.length === 0) {
+            return cachedValues
+        }
+
+        debug(
+            `About to get ${
+                slotKeys.length
+            } storage values for ${contractAddress} at block ${blockTag} from slot ${slotKeys[0].toString()}`
+        )
+        // Get the values for the missing slot keys
         const payload = missingKeys.map((key) => ({
             id: (jsonRpcId++).toString(),
             jsonrpc: '2.0',
@@ -214,9 +227,12 @@ export const getSlotValues = async (
         const missingValues = sortedResponses.map(
             (data) => '0x' + data.result.toUpperCase().slice(2)
         )
-
         // add new values to the cache and return the merged slot values
-        return SlotValueCache.addCache(slotKeys, missingKeys, missingValues)
+        return SlotValueCache.addSlotValues(
+            slotKeys,
+            missingKeys,
+            missingValues
+        )
     } catch (err) {
         throw new Error(
             `Failed to get ${slotKeys.length} storage values for contract ${contractAddress} from ${url}`,

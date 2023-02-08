@@ -7,6 +7,7 @@ import {
 } from '../slotValues'
 import { BigNumber } from 'ethers'
 import { AttributeType } from '../umlClass'
+import { SlotValueCache } from '../SlotValueCache'
 
 const emissionController = '0xBa69e6FC7Df49a3b75b565068Fb91ff2d9d91780'
 const usdc = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
@@ -16,6 +17,9 @@ if (!process.env.NODE_URL) throw Error('Must export env var NODE_URL')
 const url = process.env.NODE_URL
 
 describe('Slot Values', () => {
+    beforeEach(() => {
+        SlotValueCache.clear()
+    })
     test('Emissions controller first slot latest', async () => {
         expect(
             await getSlotValue(url, emissionController, 1, '15272562')
@@ -132,6 +136,7 @@ describe('Slot Values', () => {
             toSlot: 0,
             attributeType: AttributeType.Elementary,
             getValue: true,
+            displayValue: true,
             dynamic: false,
         }
         test.each`

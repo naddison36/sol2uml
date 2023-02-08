@@ -383,6 +383,7 @@ describe('storage parser', () => {
             attributeType: AttributeType.Array,
             dynamic: true,
             getValue: false,
+            displayValue: false,
         }
         test.each`
             slot                 | expected

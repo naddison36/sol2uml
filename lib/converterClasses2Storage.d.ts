@@ -18,7 +18,8 @@ export interface Variable {
     dynamic: boolean;
     name?: string;
     contractName?: string;
-    getValue: boolean;
+    displayValue: boolean;
+    getValue?: boolean;
     slotValue?: string;
     parsedValue?: string;
     referenceSectionId?: number;

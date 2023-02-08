@@ -114,6 +114,7 @@ export function convertStorage2Dot(
                 type: 'unallocated',
                 attributeType: AttributeType.UserDefined,
                 dynamic: false,
+                displayValue: false,
                 getValue: false,
                 contractName: variable.contractName,
                 name: '',

@@ -27,7 +27,8 @@ export interface Variable {
     dynamic: boolean
     name?: string
     contractName?: string
-    getValue: boolean
+    displayValue: boolean
+    getValue?: boolean
     slotValue?: string
     parsedValue?: string
     referenceSectionId?: number
@@ -176,12 +177,13 @@ const parseVariables = (
         )
 
         // should this new variable get the slot value
-        const getValue = calcGetValue(
+        const displayValue = calcDisplayValue(
             attribute.attributeType,
             dynamic,
             mapping,
             referenceStorageSection?.type
         )
+        const getValue = calcGetValue(attribute.attributeType, mapping)
 
         // Get the toSlot of the last storage item
         const lastVariable = variables[variables.length - 1]
@@ -212,6 +214,7 @@ const parseVariables = (
             attributeType: attribute.attributeType,
             dynamic,
             getValue,
+            displayValue,
             name: attribute.name,
             contractName: umlClass.name,
             referenceSectionId: referenceStorageSection?.id,
@@ -330,12 +333,13 @@ export const parseStorageSectionFromAttribute = (
             )
         }
 
-        const getValue = calcGetValue(
+        const displayValue = calcDisplayValue(
             baseAttribute.attributeType,
             dynamicBase,
             mapping,
             referenceStorageSection?.type
         )
+        const getValue = calcGetValue(attribute.attributeType, mapping)
 
         const variables: Variable[] = []
         variables[0] = {
@@ -348,6 +352,7 @@ export const parseStorageSectionFromAttribute = (
             attributeType: baseAttributeType,
             dynamic: dynamicBase,
             getValue,
+            displayValue,
             referenceSectionId: referenceStorageSection?.id,
         }
 
@@ -365,7 +370,7 @@ export const parseStorageSectionFromAttribute = (
                     type: baseType,
                     attributeType: baseAttributeType,
                     dynamic: dynamicBase,
-                    getValue,
+                    displayValue,
                     // only the first variable links to a referenced storage section
                     referenceSectionId: undefined,
                 })
@@ -430,11 +435,6 @@ export const parseStorageSectionFromAttribute = (
                     [],
                     true
                 )
-                // set getValue to false as Struct is in a mapping
-                variables = variables.map((v) => ({
-                    ...v,
-                    getValue: false,
-                }))
                 const newStorageSection = {
                     id: storageId++,
                     name: typeClass.name,
@@ -738,9 +738,10 @@ export const findDimensionLength = (
 }
 
 /**
- * Calculate if the storage slot value should be retrieved for the attribute.
+ * Calculate if the storage slot value for the attribute should be displayed in the storage section.
  *
  * Storage sections with true mapping should return false.
+ * Mapping types should return false.
  * Elementary types should return true.
  * Dynamic Array types should return true.
  * Static Array types should return false.
@@ -751,9 +752,9 @@ export const findDimensionLength = (
  * @param dynamic flags if the variable is of dynamic size
  * @param mapping flags if the storage section is referenced by a mapping
  * @param storageSectionType
- * @return getValue true if the slot value should be retrieved.
+ * @return displayValue true if the slot value should be displayed.
  */
-const calcGetValue = (
+const calcDisplayValue = (
     attributeType: AttributeType,
     dynamic: boolean,
     mapping: boolean,
@@ -764,6 +765,26 @@ const calcGetValue = (
         (attributeType === AttributeType.UserDefined &&
             storageSectionType !== StorageSectionType.Struct) ||
         (attributeType === AttributeType.Array && dynamic))
+
+/**
+ * Calculate if the storage slot value for the attribute should be retrieved from the chain.
+ *
+ * Storage sections with true mapping should return false.
+ * Mapping types should return false.
+ * Elementary types should return true.
+ * Array types should return true.
+ * UserDefined should return true.
+ *
+ * @param attributeType
+ * @param dynamic flags if the variable is of dynamic size
+ * @param mapping flags if the storage section is referenced by a mapping
+ * @param storageSectionType
+ * @return displayValue true if the slot value should be displayed.
+ */
+const calcGetValue = (
+    attributeType: AttributeType,
+    mapping: boolean
+): boolean => mapping === false && attributeType !== AttributeType.Mapping
 
 // recursively adds variables for dynamic string, bytes or arrays
 export const addDynamicVariables = async (
@@ -798,6 +819,7 @@ export const addDynamicVariables = async (
                         attributeType: AttributeType.Elementary,
                         dynamic: false,
                         getValue: true,
+                        displayValue: true,
                     })
                 }
 
@@ -822,6 +844,7 @@ export const addDynamicVariables = async (
                         name: '',
                         dynamic: false,
                         getValue: false,
+                        displayValue: false,
                     }
                 }
 

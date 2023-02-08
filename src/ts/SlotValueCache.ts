@@ -1,32 +1,37 @@
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 
+// key is the storage slot number in hexadecimal format with a leading 0x. eg 0x0, 0x1...
 type SlotCache = { [key: string]: string }
 
 /**
- * Caches storage slot key values pairs.
+ * Singleton that caches a mapping of slot keys to values.
  * Assumes all data is read from the same block and contract
  */
 export class SlotValueCache {
-    // key is the storage slot number in hexadecimal format with a leading 0x. eg 0x0, 0x1...
+    // Singleton of cached slot keys mapped to values
     private static slotCache: SlotCache = {}
 
     /**
      * @param slotKeys array of slot numbers or slot keys in hexadecimal format
+     * @return cachedValues array of the slot values that are in the cache.
      * @return missingKeys array of the slot keys that are not cached in hexadecimal format.
      */
-    public static missingSlotKeys(slotKeys: readonly BigNumberish[]): string[] {
-        const cachedKeyValueMap: { [key: string]: string } = {}
+    public static readSlotValues(slotKeys: readonly BigNumberish[]): {
+        cachedValues: string[]
+        missingKeys: string[]
+    } {
+        const cachedValues: string[] = []
         const missingKeys: string[] = []
         slotKeys.forEach((slotKey, i) => {
             const key = BigNumber.from(slotKey).toHexString()
             if (this.slotCache[key]) {
-                cachedKeyValueMap[key] = this.slotCache[key]
+                cachedValues.push(this.slotCache[key])
             } else {
                 missingKeys.push(key)
             }
         })
 
-        return missingKeys
+        return { cachedValues, missingKeys }
     }
 
     /**
@@ -35,13 +40,13 @@ export class SlotValueCache {
      * @param slotKeys array of slot numbers or keys in hexadecimal format.
      * @param missingKeys array of the slot keys that are not cached in hexadecimal format.
      * @param missingValues array of slot values in hexadecimal format.
-     * @return mergedValues the slot values from the cache.
+     * @return values array of slot values for each of the `slotKeys`.
      */
-    public static addCache(
+    public static addSlotValues(
         slotKeys: readonly BigNumberish[],
         missingKeys: readonly string[],
         missingValues: readonly string[]
-    ) {
+    ): string[] {
         if (missingKeys?.length !== missingValues?.length) {
             throw Error(
                 `${missingKeys?.length} keys does not match ${missingValues?.length} values`
@@ -52,11 +57,18 @@ export class SlotValueCache {
                 this.slotCache[key] = missingValues[i]
             }
         })
-        const mergedValues: string[] = []
-        slotKeys.forEach((slotKey) => {
+        return slotKeys.map((slotKey) => {
             const key = BigNumber.from(slotKey).toHexString()
-            mergedValues.push(this.slotCache[key])
+            // it should find the slot value in the cache. if not it'll return undefined
+            return this.slotCache[key]
         })
-        return mergedValues
+    }
+
+    /**
+     * Used for testing purposes to clear the cache.
+     * This allows tests to run against different contracts and blockTags
+     */
+    public static clear() {
+        this.slotCache = {}
     }
 }
