@@ -361,7 +361,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                 combinedOptions.outputFileName
             )
         } catch (err) {
-            console.error(err.stack)
+            console.error(err)
             process.exit(2)
         }
     })

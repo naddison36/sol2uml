@@ -122,7 +122,7 @@ export function getSolidityFilesFromFolderOrFile(
                 )
             }
 
-            console.error(error.stack)
+            console.error(error)
             reject(error)
         }
     })

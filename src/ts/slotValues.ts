@@ -235,7 +235,7 @@ export const getSlotValues = async (
             params: [contractAddress, key, block],
         }))
         const response = await axios.post(url, payload)
-        console.log(response.data)
+
         if (response.data?.error?.message) {
             throw new Error(response.data.error.message)
         }

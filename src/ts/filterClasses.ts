@@ -9,6 +9,8 @@ import { ClassStereotype, UmlClass } from './umlClass'
 import { findAssociatedClass } from './associations'
 import { ClassOptions } from './converterClass2Dot'
 
+const debug = require('debug')('sol2uml')
+
 /**
  * Filter out any UML Class types that are to be hidden.
  * @param umlClasses array of UML classes of type `UMLClass`
@@ -128,7 +130,7 @@ function loadWeightedDirectedGraph(
                 continue
             }
             const isTarget = umlClasses.find((u) => u.id === targetUmlClass.id)
-            console.log(
+            debug(
                 `isTarget ${isTarget} Adding edge from ${sourceUmlClass.name} with id ${sourceUmlClass.id} to ${targetUmlClass.name} with id ${targetUmlClass.id} and type ${targetUmlClass.stereotype}`
             )
             weightedDirectedGraph.addEdge(
