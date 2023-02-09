@@ -53,12 +53,14 @@ let variableId = 1
  *
  * @param contractName name of the contract to get storage layout.
  * @param umlClasses array of UML classes of type `UMLClass`
+ * @param arrayItems the number of items to display at the start and end of an array
  * @param contractFilename relative path of the contract in the file system
  * @return storageSections array of storageSection objects
  */
 export const convertClasses2StorageSections = (
     contractName: string,
     umlClasses: UmlClass[],
+    arrayItems: number,
     contractFilename?: string
 ): StorageSection[] => {
     // Find the base UML Class from the base contract name
@@ -90,7 +92,8 @@ export const convertClasses2StorageSections = (
         [],
         storageSections,
         [],
-        false
+        false,
+        arrayItems
     )
 
     // Add new storage section to the beginning of the array
@@ -115,6 +118,7 @@ export const convertClasses2StorageSections = (
  * @param storageSections mutable array of storageSection objects
  * @param inheritedContracts mutable array of contracts that have been inherited already
  * @param mapping flags that the storage section is under a mapping
+ * @param arrayItems the number of items to display at the start and end of an array
  * @return variables array of storage variables in the `umlClass`
  */
 const parseVariables = (
@@ -123,7 +127,8 @@ const parseVariables = (
     variables: Variable[],
     storageSections: StorageSection[],
     inheritedContracts: string[],
-    mapping: boolean
+    mapping: boolean,
+    arrayItems: number
 ): Variable[] => {
     // Add storage slots from inherited contracts first.
     // Get immediate parent contracts that the class inherits from
@@ -152,7 +157,8 @@ const parseVariables = (
             variables,
             storageSections,
             inheritedContracts,
-            mapping
+            mapping,
+            arrayItems
         )
     })
 
@@ -173,7 +179,8 @@ const parseVariables = (
             umlClass,
             umlClasses,
             storageSections,
-            mapping || attribute.attributeType === AttributeType.Mapping
+            mapping || attribute.attributeType === AttributeType.Mapping,
+            arrayItems
         )
 
         // should this new variable get the slot value
@@ -276,6 +283,7 @@ const adjustSlots = (
  * @param otherClasses array of all the UML Classes
  * @param storageSections mutable array of storageSection objects
  * @param mapping flags that the storage section is under a mapping
+ * @param arrayItems the number of items to display at the start and end of an array
  * @return storageSection new storage section that was added or undefined if none was added.
  */
 export const parseStorageSectionFromAttribute = (
@@ -283,7 +291,8 @@ export const parseStorageSectionFromAttribute = (
     umlClass: UmlClass,
     otherClasses: readonly UmlClass[],
     storageSections: StorageSection[],
-    mapping: boolean
+    mapping: boolean,
+    arrayItems: number
 ): StorageSection | undefined => {
     if (attribute.attributeType === AttributeType.Array) {
         // storage is dynamic if the attribute type ends in []
@@ -332,7 +341,8 @@ export const parseStorageSectionFromAttribute = (
                 umlClass,
                 otherClasses,
                 storageSections,
-                mapping
+                mapping,
+                arrayItems
             )
         }
 
@@ -362,22 +372,53 @@ export const parseStorageSectionFromAttribute = (
         // If a fixed size array.
         // Note dynamic arrays will have undefined arrayLength
         if (arrayLength > 1) {
+            let fillerFromSlot
+            let fillerToSlot
+            let filler = false
             // Add a variable to the new storage section for each item in the fixed size array
             for (let i = 1; i < arrayLength; i++) {
-                variables.push({
-                    id: variableId++,
-                    fromSlot: Math.floor((i * arraySlotSize) / 32),
-                    toSlot: Math.floor(((i + 1) * arraySlotSize - 1) / 32),
-                    byteSize: arrayItemSize,
-                    byteOffset: (i * arraySlotSize) % 32,
-                    type: baseType,
-                    attributeType: baseAttributeType,
-                    dynamic: dynamicBase,
-                    getValue,
-                    displayValue,
-                    // only the first variable links to a referenced storage section
-                    referenceSectionId: undefined,
-                })
+                const fromSlot = Math.floor((i * arraySlotSize) / 32)
+                const toSlot = Math.floor(((i + 1) * arraySlotSize - 1) / 32)
+                // Add variables for the first arrayItems and last arrayItems
+                if (i < arrayItems || i >= arrayLength - arrayItems) {
+                    // add filler variable before adding the first of the last items of the array
+                    if (!filler && fillerToSlot) {
+                        // add filler variable
+                        variables.push({
+                            id: variableId++,
+                            attributeType: AttributeType.UserDefined,
+                            type: '----',
+                            fromSlot: fillerFromSlot,
+                            toSlot: fillerToSlot,
+                            byteOffset: 0,
+                            byteSize: (fillerToSlot - fillerFromSlot) * 32,
+                            getValue: false,
+                            displayValue: false,
+                            dynamic: false,
+                        })
+                        filler = true
+                    }
+
+                    // add static variable
+                    variables.push({
+                        id: variableId++,
+                        fromSlot,
+                        toSlot,
+                        byteSize: arrayItemSize,
+                        byteOffset: (i * arraySlotSize) % 32,
+                        type: baseType,
+                        attributeType: baseAttributeType,
+                        dynamic: dynamicBase,
+                        getValue,
+                        displayValue,
+                        // only the first variable links to a referenced storage section
+                        referenceSectionId: undefined,
+                    })
+                } else if (!fillerFromSlot) {
+                    fillerFromSlot = fromSlot
+                } else {
+                    fillerToSlot = toSlot
+                }
             }
         }
 
@@ -405,7 +446,8 @@ export const parseStorageSectionFromAttribute = (
                 [],
                 storageSections,
                 [],
-                mapping
+                mapping,
+                arrayItems
             )
             const newStorageSection = {
                 id: storageId++,
@@ -437,7 +479,8 @@ export const parseStorageSectionFromAttribute = (
                     [],
                     storageSections,
                     [],
-                    true
+                    true,
+                    arrayItems
                 )
                 const newStorageSection = {
                     id: storageId++,
@@ -701,8 +744,8 @@ export const isElementary = (type: string): boolean => {
 
 export const calcSectionOffset = (
     variable: Variable,
-    sectionOffset: string = '0'
-): string | undefined => {
+    sectionOffset = '0'
+): string => {
     if (variable.dynamic) {
         const hexStringOf32Bytes = hexZeroPad(
             BigNumber.from(variable.fromSlot).add(sectionOffset).toHexString(),
@@ -798,6 +841,7 @@ const calcGetValue = (
  * @param storageSections
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
  * @param contractAddress Contract address to get the storage slot values from.
+ * @param arrayItems the number of items to display at the start and end of an array
  * @param blockTag block number or `latest`
  */
 export const addDynamicVariables = async (
@@ -805,6 +849,7 @@ export const addDynamicVariables = async (
     storageSections: StorageSection[],
     url: string,
     contractAddress: string,
+    arrayItems: number,
     blockTag?: BigNumberish | 'latest'
 ) => {
     for (const variable of storageSection.variables) {
@@ -881,6 +926,7 @@ export const addDynamicVariables = async (
                     url,
                     contractAddress,
                     newStorageSection,
+                    arrayItems,
                     blockTag
                 )
 
@@ -905,6 +951,7 @@ export const addDynamicVariables = async (
             storageSections,
             url,
             contractAddress,
+            arrayItems,
             blockTag
         )
 
@@ -918,35 +965,64 @@ export const addDynamicVariables = async (
                 : arrayItemSize
 
         const arrayLength = BigNumber.from(variable.slotValue).toNumber()
+        let fillerFromSlot
+        let fillerToSlot
+        let filler = false
         for (let i = 1; i < arrayLength; i++) {
             const fromSlot = Math.floor((i * arraySlotSize) / 32)
             const toSlot = Math.floor(((i + 1) * arraySlotSize - 1) / 32)
-            const byteOffset = (i * arraySlotSize) % 32
-            const value =
-                fromSlot === 0
-                    ? referenceStorageSection.variables[0].slotValue
-                    : undefined
+            // Add variables for the first arrayItems and last arrayItems
+            if (i < arrayItems || i >= arrayLength - arrayItems) {
+                // add filler variable before adding the first of the last items of the array
+                if (!filler && fillerToSlot) {
+                    // add filler variable
+                    referenceStorageSection.variables.push({
+                        id: variableId++,
+                        attributeType: AttributeType.UserDefined,
+                        type: '----',
+                        fromSlot: fillerFromSlot,
+                        toSlot: fillerToSlot,
+                        byteOffset: 0,
+                        byteSize: (fillerToSlot - fillerFromSlot) * 32,
+                        getValue: false,
+                        displayValue: false,
+                        dynamic: false,
+                    })
+                    filler = true
+                }
 
-            // add extra variable
-            const newVariable: Variable = {
-                ...referenceStorageSection.variables[0],
-                id: variableId++,
-                fromSlot,
-                toSlot,
-                byteOffset,
-                slotValue: value,
-                referenceSectionId: undefined,
-                dynamic: false,
-                parsedValue: undefined,
+                const byteOffset = (i * arraySlotSize) % 32
+                const value =
+                    fromSlot === 0
+                        ? referenceStorageSection.variables[0].slotValue
+                        : undefined
+
+                // add dynamic variable
+                const newVariable: Variable = {
+                    ...referenceStorageSection.variables[0],
+                    id: variableId++,
+                    fromSlot,
+                    toSlot,
+                    byteOffset,
+                    slotValue: value,
+                    referenceSectionId: undefined,
+                    dynamic: false,
+                    parsedValue: undefined,
+                }
+                newVariable.parsedValue = parseValue(newVariable)
+                referenceStorageSection.variables.push(newVariable)
+            } else if (!fillerFromSlot) {
+                fillerFromSlot = fromSlot
+            } else {
+                fillerToSlot = toSlot
             }
-            newVariable.parsedValue = parseValue(newVariable)
-            referenceStorageSection.variables.push(newVariable)
         }
         // Get missing slot values
         await addSlotValues(
             url,
             contractAddress,
             referenceStorageSection,
+            arrayItems,
             blockTag
         )
     }

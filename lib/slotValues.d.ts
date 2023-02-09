@@ -10,7 +10,7 @@ import { StorageSection, Variable } from './converterClasses2Storage';
  * @param storageSection is mutated with the slot values added to the variables
  * @param blockTag block number or `latest`
  */
-export declare const addSlotValues: (url: string, contractAddress: string, storageSection: StorageSection, blockTag?: BigNumberish | 'latest') => Promise<void>;
+export declare const addSlotValues: (url: string, contractAddress: string, storageSection: StorageSection, arrayItems: number, blockTag?: BigNumberish | 'latest') => Promise<void>;
 export declare const parseValue: (variable: Variable) => string;
 /**
  * Get storage slot values from JSON-RPC API provider.

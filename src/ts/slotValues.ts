@@ -27,6 +27,7 @@ export const addSlotValues = async (
     url: string,
     contractAddress: string,
     storageSection: StorageSection,
+    arrayItems: number,
     blockTag?: BigNumberish | 'latest'
 ) => {
     const valueVariables = storageSection.variables.filter(
@@ -38,6 +39,12 @@ export const addSlotValues = async (
     const slots: BigNumberish[] = []
     valueVariables.forEach((variable) => {
         for (let i = 0; variable.fromSlot + i <= variable.toSlot; i++) {
+            if (
+                variable.attributeType === AttributeType.Array &&
+                (i >= arrayItems || i < valueVariables.length - arrayItems)
+            ) {
+                continue
+            }
             slots.push(variable.fromSlot + i)
         }
     })

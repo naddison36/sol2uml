@@ -262,6 +262,11 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
         'Block number to get the contract storage values from.',
         'latest'
     )
+    .option(
+        '-a, --array <number>',
+        'Number of slots to display at the start and end of arrays.',
+        '3'
+    )
     .action(async (fileFolderAddress, options, command) => {
         try {
             const combinedOptions = {
@@ -282,9 +287,11 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
             )
 
             contractName = combinedOptions.contract || contractName
+            const arrayItems = combinedOptions.array
             const storageSections = convertClasses2StorageSections(
                 contractName,
                 umlClasses,
+                arrayItems,
                 combinedOptions.contractFile
             )
 
@@ -337,6 +344,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                     storageSections,
                     combinedOptions.url,
                     storageAddress,
+                    arrayItems,
                     block
                 )
             }

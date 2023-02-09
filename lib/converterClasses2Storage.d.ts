@@ -39,10 +39,11 @@ export interface StorageSection {
  *
  * @param contractName name of the contract to get storage layout.
  * @param umlClasses array of UML classes of type `UMLClass`
+ * @param arrayItems the number of items to display at the start and end of an array
  * @param contractFilename relative path of the contract in the file system
  * @return storageSections array of storageSection objects
  */
-export declare const convertClasses2StorageSections: (contractName: string, umlClasses: UmlClass[], contractFilename?: string) => StorageSection[];
+export declare const convertClasses2StorageSections: (contractName: string, umlClasses: UmlClass[], arrayItems: number, contractFilename?: string) => StorageSection[];
 /**
  * Recursively adds new storage sections under a class attribute.
  * @param attribute the attribute that is referencing a storage section
@@ -50,15 +51,16 @@ export declare const convertClasses2StorageSections: (contractName: string, umlC
  * @param otherClasses array of all the UML Classes
  * @param storageSections mutable array of storageSection objects
  * @param mapping flags that the storage section is under a mapping
+ * @param arrayItems the number of items to display at the start and end of an array
  * @return storageSection new storage section that was added or undefined if none was added.
  */
-export declare const parseStorageSectionFromAttribute: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[], storageSections: StorageSection[], mapping: boolean) => StorageSection | undefined;
+export declare const parseStorageSectionFromAttribute: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[], storageSections: StorageSection[], mapping: boolean, arrayItems: number) => StorageSection | undefined;
 export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[]) => {
     size: number;
     dynamic: boolean;
 };
 export declare const isElementary: (type: string) => boolean;
-export declare const calcSectionOffset: (variable: Variable, sectionOffset?: string) => string | undefined;
+export declare const calcSectionOffset: (variable: Variable, sectionOffset?: string) => string;
 export declare const findDimensionLength: (umlClass: UmlClass, dimension: string, otherClasses: readonly UmlClass[]) => number;
 /**
  * Recursively adds variables for dynamic string, bytes or arrays
@@ -66,6 +68,7 @@ export declare const findDimensionLength: (umlClass: UmlClass, dimension: string
  * @param storageSections
  * @param url of Ethereum JSON-RPC API provider. eg Infura or Alchemy
  * @param contractAddress Contract address to get the storage slot values from.
+ * @param arrayItems the number of items to display at the start and end of an array
  * @param blockTag block number or `latest`
  */
-export declare const addDynamicVariables: (storageSection: StorageSection, storageSections: StorageSection[], url: string, contractAddress: string, blockTag?: BigNumberish | 'latest') => Promise<void>;
+export declare const addDynamicVariables: (storageSection: StorageSection, storageSections: StorageSection[], url: string, contractAddress: string, arrayItems: number, blockTag?: BigNumberish | 'latest') => Promise<void>;

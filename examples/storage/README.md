@@ -30,10 +30,10 @@ sol2uml storage 0xebfd9cD78510c591eDa8735D0F8a87414eF27A83 -d -s 0xBa69e6FC7Df49
 The `-f --format` option is used to output in svg, png or dot formats.
 
 ```
-sol2uml storage 0xc63a48d85CCE7C3bD4d18db9c0972a4D223e4193 -d -s 0xeFbe22085D9f29863Cfb77EEd16d3cC0D927b011 -f png -o examples/storage/StakedTokenBPT.png
+sol2uml storage 0xc63a48d85CCE7C3bD4d18db9c0972a4D223e4193 -d -s 0xeFbe22085D9f29863Cfb77EEd16d3cC0D927b011 -f svg -o examples/storage/StakedTokenBPT.svg
 ```
 
-![Staking Tokens BPT](./StakedTokenBPTData.png)
+![Staking Tokens BPT](./StakedTokenBPTData.svg)
 
 
 ## Local Test Contract
