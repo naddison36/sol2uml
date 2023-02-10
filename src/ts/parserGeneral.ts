@@ -20,8 +20,14 @@ export interface ParserOptions {
 export const parserUmlClasses = async (
     fileFolderAddress: string,
     options: ParserOptions
-): Promise<{ umlClasses: UmlClass[]; contractName?: string }> => {
-    let result: { umlClasses: UmlClass[]; contractName?: string } = {
+): Promise<{
+    umlClasses: UmlClass[]
+    contractName?: string
+}> => {
+    let result: {
+        umlClasses: UmlClass[]
+        contractName?: string
+    } = {
         umlClasses: [],
     }
     if (isAddress(fileFolderAddress)) {

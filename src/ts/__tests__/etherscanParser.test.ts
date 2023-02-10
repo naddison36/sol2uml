@@ -1,4 +1,4 @@
-import { EtherscanParser } from '../index'
+import { EtherscanParser, parseRemapping, renameFile } from '../index'
 
 jest.setTimeout(20000) // timeout for each test in milliseconds
 
@@ -44,5 +44,21 @@ describe('Etherscan', () => {
                 /Failed to get verified source code for address 0x0000000000000000000000000000000000000001 from Etherscan API/
             )
         }
+    })
+    describe('remapping filename ', () => {
+        test.each`
+            fileName                                                                      | mapping                                         | expected
+            ${'@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol'}                 | ${'@openzeppelin/=lib/openzeppelin-contracts/'} | ${'lib/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol'}
+            ${'@openzeppelin/IERC20.sol'}                                                 | ${'@openzeppelin/=lib/openzeppelin-contracts/'} | ${'lib/openzeppelin-contracts/IERC20.sol'}
+            ${'@openzeppelin/lib/openzeppelin-contracts/IERC20.sol'}                      | ${'@openzeppelin/=lib/openzeppelin-contracts/'} | ${'lib/openzeppelin-contracts/lib/openzeppelin-contracts/IERC20.sol'}
+            ${'node_modules/@openzeppelin/contracts-upgradeable/proxy/Initializable.sol'} | ${'node_modules/='}                             | ${'@openzeppelin/contracts-upgradeable/proxy/Initializable.sol'}
+            ${'Interface.sol'}                                                            | ${'face=xxx'}                                   | ${'Interface.sol'}
+            ${'./contracts/Interface.sol'}                                                | ${'node_modules/='}                             | ${'./contracts/Interface.sol'}
+            ${'Interface.sol'}                                                            | ${'I=III'}                                      | ${'IIInterface.sol'}
+            ${'Interface.sol'}                                                            | ${'i=xxx'}                                      | ${'Interface.sol'}
+        `('$mapping ', ({ fileName, mapping, expected }) => {
+            const remapping = parseRemapping(mapping)
+            expect(renameFile(fileName, [remapping])).toEqual(expected)
+        })
     })
 })

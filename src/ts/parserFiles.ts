@@ -27,7 +27,7 @@ export const parseUmlClassesFromFiles = async (
 
         const relativePath = relative(process.cwd(), file)
 
-        const umlClass = convertAST2UmlClasses(node, relativePath, true)
+        const umlClass = convertAST2UmlClasses(node, relativePath, [], true)
         umlClasses = umlClasses.concat(umlClass)
     }
 

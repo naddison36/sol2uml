@@ -34,6 +34,7 @@ import {
     isStructDefinition,
     isUsingForDeclaration,
 } from './typeGuards'
+import { Remapping } from './parserEtherscan'
 
 const debug = require('debug')('sol2uml')
 
@@ -43,12 +44,14 @@ let umlClasses: UmlClass[]
  * Convert solidity parser output of type `ASTNode` to UML classes of type `UMLClass`
  * @param node output of Solidity parser of type `ASTNode`
  * @param relativePath relative path from the working directory to the Solidity source file
+ * @param remappings used to rename relative paths
  * @param filesystem flag if Solidity source code was parsed from the filesystem or Etherscan
  * @return umlClasses array of UML class definitions of type `UmlClass`
  */
 export function convertAST2UmlClasses(
     node: ASTNode,
     relativePath: string,
+    remappings: Remapping[],
     filesystem: boolean = false
 ): UmlClass[] {
     const imports: Import[] = []
@@ -134,13 +137,14 @@ export function convertAST2UmlClasses(
                     }
                 } else {
                     // this has come from Etherscan
+                    const remappedFile = renameFile(childNode.path, remappings)
                     const importPath =
-                        childNode.path[0] === '.'
+                        remappedFile[0] === '.'
                             ? // Use Linux paths, not Windows paths, to resolve Etherscan files
-                              posix.join(codeFolder.toString(), childNode.path)
-                            : childNode.path
+                              posix.join(codeFolder.toString(), remappedFile)
+                            : remappedFile
                     debug(
-                        `codeFolder ${codeFolder} childNode.path ${childNode.path}`
+                        `codeFolder ${codeFolder} childNode.path ${childNode.path} remapped to ${remappedFile}`
                     )
                     const newImport = {
                         absolutePath: importPath,
@@ -154,8 +158,13 @@ export function convertAST2UmlClasses(
                             : [],
                     }
                     debug(
-                        `Added Etherscan import ${newImport.absolutePath} with class names: ${newImport.classNames}`
+                        `Added Etherscan import ${newImport.absolutePath} with:`
                     )
+                    newImport.classNames.forEach((className) => {
+                        debug(
+                            `\t alias ${className.className}, name ${className.className}`
+                        )
+                    })
                     imports.push(newImport)
                 }
             } else if (childNode.type === 'FileLevelConstant') {
@@ -748,4 +757,25 @@ function parseContractKind(kind: string): ClassStereotype {
         default:
             throw Error(`Invalid kind ${kind}`)
     }
+}
+
+/**
+ * Used to rename import file names. For example
+ * @openzeppelin/contracts/token/ERC721/IERC721Receiver.sol
+ * to
+ * lib/openzeppelin-contracts/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol
+ * @param fileName file name in the Solidity code
+ * @param mappings an array of remappings from Etherscan's settings
+ */
+export const renameFile = (fileName: string, mappings: Remapping[]): string => {
+    let renamedFile = fileName
+    for (const mapping of mappings) {
+        if (renamedFile.match(mapping.from)) {
+            const beforeFileName = renamedFile
+            renamedFile = renamedFile.replace(mapping.from, mapping.to)
+            debug(`remapping ${beforeFileName} to ${renamedFile}`)
+            break
+        }
+    }
+    return renamedFile
 }

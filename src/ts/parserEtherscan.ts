@@ -10,6 +10,11 @@ import { parseSolidityVersion } from './utils/regEx'
 require('axios-debug-log')
 const debug = require('debug')('sol2uml')
 
+export interface Remapping {
+    from: RegExp
+    to: string
+}
+
 export const networks = <const>[
     'mainnet',
     'ropsten',
@@ -100,10 +105,11 @@ export class EtherscanParser {
      * @param contractAddress Ethereum contract address with a 0x prefix
      * @return Promise with an array of UmlClass objects
      */
-    async getUmlClasses(
-        contractAddress: string
-    ): Promise<{ umlClasses: UmlClass[]; contractName: string }> {
-        const { files, contractName } = await this.getSourceCode(
+    async getUmlClasses(contractAddress: string): Promise<{
+        umlClasses: UmlClass[]
+        contractName: string
+    }> {
+        const { files, contractName, remappings } = await this.getSourceCode(
             contractAddress
         )
 
@@ -112,7 +118,11 @@ export class EtherscanParser {
         for (const file of files) {
             debug(`Parsing source file ${file.filename}`)
             const node = await this.parseSourceCode(file.code)
-            const umlClass = convertAST2UmlClasses(node, file.filename)
+            const umlClass = convertAST2UmlClasses(
+                node,
+                file.filename,
+                remappings
+            )
             umlClasses = umlClasses.concat(umlClass)
         }
 
@@ -131,14 +141,18 @@ export class EtherscanParser {
     async getSolidityCode(
         contractAddress: string
     ): Promise<{ solidityCode: string; contractName: string }> {
-        const { files, contractName, compilerVersion } =
+        const { files, contractName, compilerVersion, remappings } =
             await this.getSourceCode(contractAddress)
 
         // Parse the UmlClasses from the Solidity code in each file
         let umlClasses: UmlClass[] = []
         for (const file of files) {
             const node = await this.parseSourceCode(file.code)
-            const umlClass = convertAST2UmlClasses(node, file.filename)
+            const umlClass = convertAST2UmlClasses(
+                node,
+                file.filename,
+                remappings
+            )
             umlClasses = umlClasses.concat(umlClass)
         }
 
@@ -225,6 +239,7 @@ export class EtherscanParser {
         files: readonly { code: string; filename: string }[]
         contractName: string
         compilerVersion: string
+        remappings: Remapping[]
     }> {
         const description = `get verified source code for address ${contractAddress} from Etherscan API.`
 
@@ -249,6 +264,7 @@ export class EtherscanParser {
                 )
             }
 
+            let remappings: Remapping[]
             const results = response.data.result.map((result: any) => {
                 if (!result.SourceCode) {
                     throw new Error(
@@ -265,6 +281,12 @@ export class EtherscanParser {
                             parableResultString = result.SourceCode.slice(1, -1)
                         }
                         const sourceCodeObject = JSON.parse(parableResultString)
+
+                        // Get any remapping of filenames from the settings
+                        remappings = parseRemappings(
+                            sourceCodeObject.settings?.remappings
+                        )
+
                         // The getsource response from Etherscan is inconsistent so we need to handle both shapes
                         const sourceFiles = sourceCodeObject.sources
                             ? Object.entries(sourceCodeObject.sources)
@@ -288,6 +310,10 @@ export class EtherscanParser {
                 // if multiple Solidity source files with no Etherscan bug in the SourceCode field
                 if (result?.SourceCode?.sources) {
                     const sourceFiles = Object.values(result.SourceCode.sources)
+                    // Get any remapping of filenames from the settings
+                    remappings = parseRemappings(
+                        result.SourceCode.settings?.remappings
+                    )
                     return sourceFiles.map(
                         ([filename, code]: [string, { content: string }]) => ({
                             code: code.content,
@@ -305,6 +331,7 @@ export class EtherscanParser {
                 files: results.flat(1),
                 contractName: response.data.result[0].ContractName,
                 compilerVersion: response.data.result[0].CompilerVersion,
+                remappings,
             }
         } catch (err) {
             if (err.message) {
@@ -318,5 +345,31 @@ export class EtherscanParser {
                 { cause: err }
             )
         }
+    }
+}
+
+/**
+ * Parses Ethersan's remappings config in its API response
+ * @param rawMappings
+ */
+export const parseRemappings = (rawMappings: string[]): Remapping[] => {
+    if (!rawMappings) return []
+    return rawMappings.map((mapping: string) => parseRemapping(mapping))
+}
+
+/**
+ * Parses a single mapping. For example
+ * "@openzeppelin/=lib/openzeppelin-contracts/"
+ * This is from Uniswap's UniversalRouter in the Settings section after the source files
+ * https://etherscan.io/address/0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B#code
+ * @param mapping
+ */
+export const parseRemapping = (mapping: string): Remapping => {
+    const equalIndex = mapping.indexOf('=')
+    const from = mapping.slice(0, equalIndex)
+    const to = mapping.slice(equalIndex + 1)
+    return {
+        from: new RegExp('^' + from),
+        to,
     }
 }

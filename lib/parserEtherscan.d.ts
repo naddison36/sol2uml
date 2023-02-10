@@ -1,5 +1,9 @@
 import { ASTNode } from '@solidity-parser/parser/dist/src/ast-types';
 import { UmlClass } from './umlClass';
+export interface Remapping {
+    from: RegExp;
+    to: string;
+}
 export declare const networks: readonly ["mainnet", "ropsten", "kovan", "rinkeby", "goerli", "sepolia", "polygon", "testnet.polygon", "arbitrum", "testnet.arbitrum", "avalanche", "testnet.avalanche", "bsc", "testnet.bsc", "crono", "fantom", "testnet.fantom", "moonbeam", "optimistic", "kovan-optimistic", "gnosisscan"];
 export type Network = (typeof networks)[number];
 export declare class EtherscanParser {
@@ -43,5 +47,19 @@ export declare class EtherscanParser {
         }[];
         contractName: string;
         compilerVersion: string;
+        remappings: Remapping[];
     }>;
 }
+/**
+ * Parses Ethersan's remappings config in its API response
+ * @param rawMappings
+ */
+export declare const parseRemappings: (rawMappings: string[]) => Remapping[];
+/**
+ * Parses a single mapping. For example
+ * "@openzeppelin/=lib/openzeppelin-contracts/"
+ * This is from Uniswap's UniversalRouter in the Settings section after the source files
+ * https://etherscan.io/address/0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B#code
+ * @param mapping
+ */
+export declare const parseRemapping: (mapping: string) => Remapping;
