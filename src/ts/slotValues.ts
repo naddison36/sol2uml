@@ -10,7 +10,8 @@ const debug = require('debug')('sol2uml')
 interface StorageAtResponse {
     jsonrpc: '2.0'
     id: string
-    result: string
+    result?: string
+    error?: string
 }
 
 /**
@@ -88,104 +89,117 @@ export const parseValue = (variable: Variable): string => {
     const end = 66 - variable.byteOffset * 2
     const variableValue = variable.slotValue.substring(start, end)
 
-    if (variable.attributeType === AttributeType.UserDefined) {
-        // TODO need to handle User Defined Value Types introduced in Solidity v0.8.8
-        // https://docs.soliditylang.org/en/v0.8.18/types.html#user-defined-value-types
-        // https://blog.soliditylang.org/2021/09/27/user-defined-value-types/
-
-        // using byteSize is crude and will be incorrect for aliases types like int160 or uint160
-        if (variable.byteSize === 20) {
-            return '0x' + variableValue
-        }
-        // this will also be wrong if the alias is to a 1 byte type. eg bytes1, int8 or uint8
-        if (variable.byteSize === 1) {
-            // TODO find enum from associations.
-        }
-        // we don't parse if a struct which has a size of 32 bytes
-        return undefined
-    }
-    if (variable.attributeType !== AttributeType.Elementary) return undefined
-
     try {
-        // TODO dynamic arrays
+        // Contracts, structs and enums
+        if (variable.attributeType === AttributeType.UserDefined) {
+            return parseUserDefinedValue(variable, variableValue)
+        }
 
-        if (variable.type === 'bool') {
-            if (variableValue === '00') return 'false'
-            if (variableValue === '01') return 'true'
-            debug(
-                `Failed to parse bool variable ${variable.name} with value "${variableValue}"`
-            )
-            return undefined
-            // TODO throw rather than log once testing has finished
-            // throw Error(`Failed to parse bool variable ${variable.name} with value "${variableValue}"`)
-        }
-        if (variable.type === 'string' || variable.type === 'bytes') {
-            if (variable.dynamic) {
-                const lastByte = variable.slotValue.slice(-2)
-                const size = BigNumber.from('0x' + lastByte).toNumber()
-                if (size <= 0) return ''
-                if (size > 62) {
-                    // Return the number of chars or bytes
-                    return BigNumber.from(variable.slotValue)
-                        .sub(1)
-                        .div(2)
-                        .toString()
-                }
+        if (variable.attributeType === AttributeType.Elementary)
+            return parseElementaryValue(variable, variableValue)
 
-                const valueHex = '0x' + variableValue.slice(0, size)
-                if (variable.type === 'bytes') return valueHex
-                return `\\"${convert2String(valueHex)}\\"`
-            }
-            if (variable.type === 'bytes') return '0x' + variableValue
-            return `\\"${convert2String('0x' + variableValue)}\\"`
+        // dynamic arrays
+        if (
+            variable.attributeType === AttributeType.Array &&
+            variable.dynamic
+        ) {
+            return formatUnits('0x' + variableValue, 0)
         }
-        if (variable.type === 'address') {
-            return '0x' + variableValue
-        }
-        if (variable.type.match(/^uint([0-9]*)$/)) {
-            const parsedValue = formatUnits('0x' + variableValue, 0)
-            return commify(parsedValue)
-        }
-        if (variable.type.match(/^bytes([0-9]+)$/)) {
-            return '0x' + variableValue
-        }
-        if (variable.type.match(/^int([0-9]*)/)) {
-            // parse variable value as an unsigned number
-            let rawValue = BigNumber.from('0x' + variableValue)
 
-            // parse the number of bits
-            const result = variable.type.match(/^int([0-9]*$)/)
-            const bitSize = result[1] ? result[1] : 256
-            // Convert the number of bits to the number of hex characters
-            const hexSize = BigNumber.from(bitSize).div(4).toNumber()
-            // bit mask has a leading 1 and the rest 0. 0x8 = 1000 binary
-            const mask = '0x80' + '0'.repeat(hexSize - 2)
-            // is the first bit a 1?
-            const negative = rawValue.and(mask)
-            if (negative.gt(0)) {
-                // Convert unsigned number to a signed negative
-                const negativeOne = '0xFF' + 'F'.repeat(hexSize - 2)
-                rawValue = BigNumber.from(negativeOne)
-                    .sub(rawValue)
-                    .add(1)
-                    .mul(-1)
-            }
-            const parsedValue = formatUnits(rawValue, 0)
-            return commify(parsedValue)
-        }
-        // add fixed point numbers when they are supported by Solidity
         return undefined
     } catch (err) {
-        // TODO throw rather than log once testing has finished
-        debug(
-            `Failed to parse variable ${variable.name} of type ${variable.type}, value "${variableValue}"`
+        throw Error(
+            `Failed to parse variable ${variable.name} of type ${variable.type}, value "${variableValue}"`,
+            { cause: err }
         )
-        // throw Error(
-        //     `Failed to parse variable ${variable.name} of type ${variable.type}, value "${variableValue}"`,
-        //     { cause: err }
-        // )
-        return undefined
     }
+}
+
+const parseUserDefinedValue = (
+    variable: Variable,
+    variableValue: string
+): string => {
+    // TODO need to handle User Defined Value Types introduced in Solidity v0.8.8
+    // https://docs.soliditylang.org/en/v0.8.18/types.html#user-defined-value-types
+    // https://blog.soliditylang.org/2021/09/27/user-defined-value-types/
+
+    // using byteSize is crude and will be incorrect for aliases types like int160 or uint160
+    if (variable.byteSize === 20) {
+        return '0x' + variableValue
+    }
+    // this will also be wrong if the alias is to a 1 byte type. eg bytes1, int8 or uint8
+    if (variable.byteSize === 1) {
+        // TODO find enum from associations.
+    }
+    // we don't parse if a struct which has a size of 32 bytes
+    return undefined
+}
+
+const parseElementaryValue = (
+    variable: Variable,
+    variableValue: string
+): string => {
+    // Elementary types
+    if (variable.type === 'bool') {
+        if (variableValue === '00') return 'false'
+        if (variableValue === '01') return 'true'
+        throw Error(
+            `Failed to parse bool variable ${variable.name} with value "${variableValue}"`
+        )
+    }
+    if (variable.type === 'string' || variable.type === 'bytes') {
+        if (variable.dynamic) {
+            const lastByte = variable.slotValue.slice(-2)
+            const size = BigNumber.from('0x' + lastByte).toNumber()
+            if (size <= 0) return ''
+            if (size > 62) {
+                // Return the number of chars or bytes
+                return BigNumber.from(variable.slotValue)
+                    .sub(1)
+                    .div(2)
+                    .toString()
+            }
+
+            const valueHex = '0x' + variableValue.slice(0, size)
+            if (variable.type === 'bytes') return valueHex
+            return `\\"${convert2String(valueHex)}\\"`
+        }
+        if (variable.type === 'bytes') return '0x' + variableValue
+        return `\\"${convert2String('0x' + variableValue)}\\"`
+    }
+    if (variable.type === 'address') {
+        return '0x' + variableValue
+    }
+    if (variable.type.match(/^uint([0-9]*)$/)) {
+        const parsedValue = formatUnits('0x' + variableValue, 0)
+        return commify(parsedValue)
+    }
+    if (variable.type.match(/^bytes([0-9]+)$/)) {
+        return '0x' + variableValue
+    }
+    if (variable.type.match(/^int([0-9]*)/)) {
+        // parse variable value as an unsigned number
+        let rawValue = BigNumber.from('0x' + variableValue)
+
+        // parse the number of bits
+        const result = variable.type.match(/^int([0-9]*$)/)
+        const bitSize = result[1] ? result[1] : 256
+        // Convert the number of bits to the number of hex characters
+        const hexSize = BigNumber.from(bitSize).div(4).toNumber()
+        // bit mask has a leading 1 and the rest 0. 0x8 = 1000 binary
+        const mask = '0x80' + '0'.repeat(hexSize - 2)
+        // is the first bit a 1?
+        const negative = rawValue.and(mask)
+        if (negative.gt(0)) {
+            // Convert unsigned number to a signed negative
+            const negativeOne = '0xFF' + 'F'.repeat(hexSize - 2)
+            rawValue = BigNumber.from(negativeOne).sub(rawValue).add(1).mul(-1)
+        }
+        const parsedValue = formatUnits(rawValue, 0)
+        return commify(parsedValue)
+    }
+    // add fixed point numbers when they are supported by Solidity
+    return undefined
 }
 
 let jsonRpcId = 0
@@ -237,10 +251,10 @@ export const getSlotValues = async (
         const response = await axios.post(url, payload)
 
         if (response.data?.error?.message) {
-            throw new Error(response.data.error.message)
+            throw Error(response.data.error.message)
         }
         if (response.data.length !== missingKeys.length) {
-            throw new Error(
+            throw Error(
                 `Requested ${missingKeys.length} storage slot values but only got ${response.data.length}`
             )
         }
@@ -248,9 +262,10 @@ export const getSlotValues = async (
         const sortedResponses = responseData.sort((a, b) =>
             BigNumber.from(a.id).gt(b.id) ? 1 : -1
         )
-        const missingValues = sortedResponses.map(
-            (data) => '0x' + data.result.toUpperCase().slice(2)
-        )
+        const missingValues = sortedResponses.map((data) => {
+            if (data.error) throw Error(data.error)
+            return '0x' + data.result.toUpperCase().slice(2)
+        })
         // add new values to the cache and return the merged slot values
         return SlotValueCache.addSlotValues(
             slotKeys,
@@ -258,7 +273,7 @@ export const getSlotValues = async (
             missingValues
         )
     } catch (err) {
-        throw new Error(
+        throw Error(
             `Failed to get ${slotKeys.length} storage values for contract ${contractAddress} from ${url}`,
             { cause: err }
         )
