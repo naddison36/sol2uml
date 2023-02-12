@@ -13,5 +13,9 @@ export interface ClassOptions {
     hideAbstracts?: boolean;
     hideFilename?: boolean;
     hideSourceContract?: boolean;
+    backColor?: string;
+    shapeColor?: string;
+    fillColor?: string;
+    textColor?: string;
 }
 export declare const convertClass2Dot: (umlClass: UmlClass, options?: ClassOptions) => string;

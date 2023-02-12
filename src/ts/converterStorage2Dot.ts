@@ -9,14 +9,21 @@ const debug = require('debug')('sol2uml')
 
 export const convertStorages2Dot = (
     storageSections: readonly StorageSection[],
-    options: { data: boolean }
+    options: {
+        data: boolean
+        backColor: string
+        shapeColor: string
+        fillColor: string
+        textColor: string
+    }
 ): string => {
     let dotString: string = `
 digraph StorageDiagram {
 rankdir=LR
-color=black
 arrowhead=open
-node [shape=record, style=filled, fillcolor=gray95 fontname="Courier New"]`
+bgcolor="${options.backColor}"
+edge [color="${options.shapeColor}"]
+node [shape=record, style=filled, color="${options.shapeColor}", fillcolor="${options.fillColor}", fontcolor="${options.textColor}", fontname="Courier New"]`
 
     // process contract and the struct storages
     storageSections.forEach((storage) => {

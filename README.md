@@ -54,14 +54,19 @@ The three subcommands:
 The Solidity code can be pulled from verified source code on Blockchain explorers like Etherscan or from local Solidity files.
 
 Options:
-  -V, --version                                output the version number
   -sf, --subfolders <value>                    number of subfolders that will be recursively searched for Solidity files. (default: all)
   -f, --outputFormat <value>                   output file format. (choices: "svg", "png", "dot", "all", default: "svg")
   -o, --outputFileName <value>                 output file name
   -i, --ignoreFilesOrFolders <filesOrFolders>  comma separated list of files or folders to ignore
-  -n, --network <network>                      Ethereum network (choices: "mainnet", "ropsten", "kovan", "rinkeby", "goerli", "sepolia", "polygon", "testnet.polygon", "arbitrum", "testnet.arbitrum", "avalanche", "testnet.avalanche", "bsc", "testnet.bsc", "crono", "fantom", "testnet.fantom", "moonbeam", "optimistic", "kovan-optimistic", "gnosisscan", default: "mainnet", env: ETH_NETWORK)
-  -k, --apiKey <key>                           Blockchain explorer API key. eg Etherscan, Arbiscan, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key (env: SCAN_API_KEY)
+  -n, --network <network>                      Ethereum network (choices: "mainnet", "ropsten", "kovan", "rinkeby", "goerli", "sepolia", "polygon", "testnet.polygon", "arbitrum", "testnet.arbitrum", "avalanche", "testnet.avalanche", "bsc", "testnet.bsc", "crono", "fantom",
+                                               "testnet.fantom", "moonbeam", "optimistic", "kovan-optimistic", "gnosisscan", default: "mainnet", env: ETH_NETWORK)
+  -k, --apiKey <key>                           Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key (env: SCAN_API_KEY)
+  -bc, --backColor <color>                     Canvas background color (default: "none")
+  -sc, --shapeColor <color>                    Basic drawing color for graphics, not text (default: "black")
+  -fc, --fillColor <color>                     Color used to fill the background of a node (default: "gray95")
+  -tc, --textColor <color>                     Color used for text (default: "black")
   -v, --verbose                                run with debugging statements (default: false)
+  -V, --version                                output the version number
   -h, --help                                   display help for command
 
 Commands:
@@ -272,6 +277,20 @@ Heads/Tails:
 ![FileLevel-storage](./examples/storage/FileLevel-storage.png)
 
 See more storage slot diagrams [here](./examples/storage/README.md).
+
+# Styling Colors
+
+The colors use by the diagrams can be configured using the `backColor`, `shapeColor`, `fillColor` and `textColor` options.
+sol2uml uses the [X11 color scheme](https://graphviz.org/doc/info/colors.html#x11) for named colors.
+Other color formats like Red-Green-Blue (RGB) can also be used. For example, #ffffff for white and #000000 for black.
+See [Graphviz color](https://graphviz.org/docs/attr-types/color/) documentation for more details.
+
+Here's an example using the color options
+```
+sol2uml storage -sc deeppink -tc #ffffff -fc dimgrey -bc black 0xfCc00A1e250644d89AF0df661bC6f04891E21585
+```
+
+![Aave V3 Pool](./examples/storage/AaveV3PoolStorageColor.svg )
 
 # Version 2.x changes
 

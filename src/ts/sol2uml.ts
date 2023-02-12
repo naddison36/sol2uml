@@ -24,12 +24,6 @@ import { ethers } from 'ethers'
 const clc = require('cli-color')
 const program = new Command()
 
-const version =
-    basename(__dirname) === 'lib'
-        ? require('../package.json').version // used when run from compile js in /lib
-        : require('../../package.json').version // used when run from TypeScript source files under src/ts via ts-node
-program.version(version)
-
 const debugControl = require('debug')
 const debug = require('debug')('sol2uml')
 
@@ -73,7 +67,25 @@ The Solidity code can be pulled from verified source code on Blockchain explorer
             'Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key'
         ).env('SCAN_API_KEY')
     )
+    .option('-bc, --backColor <color>', 'Canvas background color', 'none')
+    .option(
+        '-sc, --shapeColor <color>',
+        'Basic drawing color for graphics, not text',
+        'black'
+    )
+    .option(
+        '-fc, --fillColor <color>',
+        'Color used to fill the background of a node',
+        'gray95'
+    )
+    .option('-tc, --textColor <color>', 'Color used for text', 'black')
     .option('-v, --verbose', 'run with debugging statements', false)
+
+const version =
+    basename(__dirname) === 'lib'
+        ? require('../package.json').version // used when run from compile js in /lib
+        : require('../../package.json').version // used when run from TypeScript source files under src/ts via ts-node
+program.version(version)
 
 program
     .command('class', { isDefault: true })

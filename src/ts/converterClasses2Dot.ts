@@ -26,9 +26,10 @@ export function convertUmlClasses2Dot(
     let dotString: string = `
 digraph UmlClassDiagram {
 rankdir=BT
-color=black
 arrowhead=open
-node [shape=record, style=filled, fillcolor=gray95]`
+bgcolor="${classOptions.backColor}"
+edge [color="${classOptions.shapeColor}"]
+node [shape=record, style=filled, color="${classOptions.shapeColor}", fillcolor="${classOptions.fillColor}", fontcolor="${classOptions.textColor}"]`
 
     // Sort UML Classes by folder of source file
     const umlClassesSortedByCodePath = sortUmlClassesByCodePath(umlClasses)
