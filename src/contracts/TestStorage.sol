@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-struct SubOneSlot {
-    address account; // 20 bytes
-    bool flag; // 1 byte
-    int8 count; // 1 byte
-}
+contract Structs {
+    struct SubOneSlot {
+        address account; // 20 bytes
+        bool flag; // 1 byte
+        int8 count; // 1 byte
+    }
 
-struct OneSlot {
-    address account; // 20 bytes
-    uint88 sum; // 11 bytes
-    uint8 count; // 1 bytes
-}
+    struct OneSlot {
+        address account; // 20 bytes
+        uint88 sum; // 11 bytes
+        uint8 count; // 1 bytes
+    }
 
-struct SubTwoSlots {
-    address account1;
-    address account2;
-    bool flag1;
-    bool flag2;
+    struct SubTwoSlots {
+        address account1;
+        address account2;
+        bool flag1;
+        bool flag2;
+    }
 }
 
 struct ContractLevelStruct0 {
@@ -25,7 +27,7 @@ struct ContractLevelStruct0 {
     bool param2;
 }
 
-struct ContractLevelStruct1 {
+struct ContractLevelStruct$_1 {
     uint256 param1;
     address param2;
     uint8 param3;
@@ -34,11 +36,11 @@ struct ContractLevelStruct1 {
 
 struct ContractLevelStruct2 {
     ContractLevelStruct0 param1;
-    ContractLevelStruct1 param2;
+    ContractLevelStruct$_1 param2;
 }
 
 struct ContractLevelStruct11 {
-    ContractLevelStruct1 param1;
+    ContractLevelStruct$_1 param1;
 }
 
 struct DynamicStruct {
@@ -54,11 +56,11 @@ struct DynamicStruct {
     int64[5] staticIntArray;
     string shortString;
     string longString;
-    ContractLevelStruct1 struct1;
-    ContractLevelStruct1[2] staticStruct1;
-    ContractLevelStruct1[] dynamicStruct1;
+    ContractLevelStruct$_1 struct1;
+    ContractLevelStruct$_1[2] staticStruct1;
+    ContractLevelStruct$_1[] dynamicStruct1;
     mapping(address => uint256) balance;
-    mapping(address => ContractLevelStruct1) mappedStruct1;
+    mapping(address => ContractLevelStruct$_1) mappedStruct1;
 }
 
 enum Severity {
@@ -243,6 +245,7 @@ contract TestStorage is Parent, Parent2 {
     TwoSlots[][] public twoSlotsDynxDyn;
     TwoSlots[][4][3] public twoSlotsDynx4x3;
     TwoSlots[3][4][] public twoSlotsDynx3x4xDyn;
+    Structs.SubTwoSlots[] public twoContractStruct;
 
     // enums
     Status public status = Status.Open;
@@ -250,11 +253,11 @@ contract TestStorage is Parent, Parent2 {
     Severity public severity = Severity.High;
     Severity[4] public staticSeverities = [Severity.High, Severity.Low, Severity.Medium, Severity.High];
 
-    SubOneSlot public subSlot = SubOneSlot(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5, true, -121);
+    Structs.SubOneSlot public subSlot = Structs.SubOneSlot(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5, true, -121);
     uint8 public oneByteNumber = 253;
-    OneSlot public oneSlot = OneSlot(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5, 1234567890, 253);
-    SubTwoSlots public subTwoSlot =
-        SubTwoSlots(
+    Structs.OneSlot public oneSlot = Structs.OneSlot(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5, 1234567890, 253);
+    Structs.SubTwoSlots public subTwoSlot =
+        Structs.SubTwoSlots(
             0xF4dDc5FF5AbA6E8739E5E056340827c573d191Ec,
             0xe63dfF84aa562dE11B28894f0391702b814f812D,
             true,
@@ -280,6 +283,7 @@ contract TestStorage is Parent, Parent2 {
     mapping(address => uint256) public balance;
     mapping(address => ContractLevelStruct2) public mapStruct;
     mapping(address => mapping(address => ContractLevelStruct2)) public mapOfMapStruct;
+    mapping(address => Structs.SubTwoSlots) public mapContractStruct;
     mapping(address => IERC20) public mapInterface;
 
     DynamicStruct public dynamicStruct;
@@ -294,7 +298,7 @@ contract TestStorage is Parent, Parent2 {
         IERC20(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5),
         IERC20(0x30647a72Dc82d7Fbb1123EA74716aB8A317Eac19),
         IERC20(0x78BefCa7de27d07DC6e71da295Cc2946681A6c7B)];
-    
+
     string public uninitialisedString;
     string public emptyString = "";
     string public name = "TestStorage contract";
@@ -317,6 +321,8 @@ contract TestStorage is Parent, Parent2 {
     uint256 public testUint256 = 0xFEDCBA9876543210;
     int256 public testInt256 = -1023;
     address public testAddress;
+    uint public $some_number = 254;
+    uint[] public $some_numbers = [0, 1, 2, 3, 4];
 
     constructor(address _superUser) {
         superUser = _superUser;
@@ -377,6 +383,16 @@ contract TestStorage is Parent, Parent2 {
 
         dynamicDynIntArray.push([11111, 11122]);
         dynamicDynIntArray.push([222111, 222222, 222333]);
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push();
+        dynamicDynIntArray.push([12, 1212, 121212, 12121212]);
 
         dynamicDynDynIntArray.push();
         dynamicDynDynIntArray[0].push([111111, 111122]);
@@ -405,13 +421,13 @@ contract TestStorage is Parent, Parent2 {
         dynamicStruct.staticIntArray = [int64(1), 2, 3, 4, 5];
         dynamicStruct.shortString = "exactly 31 chars so uses 1 slot";
         dynamicStruct.longString = "over 31 charaters so is dynamic length using two slots";
-        dynamicStruct.struct1 = ContractLevelStruct1({
+        dynamicStruct.struct1 = ContractLevelStruct$_1({
             param1: 1e18,
             param2: 0x6243d8CEA23066d098a15582d81a598b4e8391F4,
             param3: 127,
             param4: bytes1(0xFF)
         });
-        dynamicStruct.staticStruct1[0] = ContractLevelStruct1({
+        dynamicStruct.staticStruct1[0] = ContractLevelStruct$_1({
             param1: 2e18,
             param2: 0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919,
             param3: 6,
@@ -433,13 +449,13 @@ contract TestStorage is Parent, Parent2 {
         dynDynamicStruct[0].staticIntArray = [int64(1000), 2000, 3000, 4000, 5000];
         dynDynamicStruct[0].shortString = "string < 31 chars";
         dynDynamicStruct[0].longString = "a string that is over 31 characters in length";
-        dynDynamicStruct[0].struct1 = ContractLevelStruct1({
+        dynDynamicStruct[0].struct1 = ContractLevelStruct$_1({
             param1: 3e18,
             param2: 0x36F944B7312EAc89381BD78326Df9C84691D8A5B,
             param3: 2,
             param4: bytes1(0x89)
         });
-        dynDynamicStruct[0].staticStruct1[0] = ContractLevelStruct1({
+        dynDynamicStruct[0].staticStruct1[0] = ContractLevelStruct$_1({
             param1: 4e18,
             param2: 0x4fB30C5A3aC8e85bC32785518633303C4590752d,
             param3: 255,
@@ -460,13 +476,13 @@ contract TestStorage is Parent, Parent2 {
         staticDynamicStruct[1].staticIntArray = [int64(100), 200, 300, 400, 500];
         staticDynamicStruct[1].shortString = "string < 31 characters";
         staticDynamicStruct[1].longString = "a string that is over 31 characters long";
-        staticDynamicStruct[1].struct1 = ContractLevelStruct1({
+        staticDynamicStruct[1].struct1 = ContractLevelStruct$_1({
             param1: 5e18,
             param2: 0x6B175474E89094C44Da98b954EedeAC495271d0F,
             param3: 2,
             param4: bytes1(0x89)
         });
-        staticDynamicStruct[1].staticStruct1[1] = ContractLevelStruct1({
+        staticDynamicStruct[1].staticStruct1[1] = ContractLevelStruct$_1({
             param1: 6e18,
             param2: 0xdAC17F958D2ee523a2206206994597C13D831ec7,
             param3: 129,

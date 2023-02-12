@@ -296,7 +296,7 @@ export const parseStorageSectionFromAttribute = (
 ): StorageSection | undefined => {
     if (attribute.attributeType === AttributeType.Array) {
         // storage is dynamic if the attribute type ends in []
-        const result = attribute.type.match(/\[(\w*)]$/)
+        const result = attribute.type.match(/\[([\w$.]*)]$/)
         const dynamic = result[1] === ''
         const arrayLength = !dynamic
             ? findDimensionLength(umlClass, result[1], otherClasses)
@@ -466,7 +466,7 @@ export const parseStorageSectionFromAttribute = (
         // get the UserDefined type from the mapping
         // note the mapping could be an array of Structs
         // Could also be a mapping of a mapping
-        const result = attribute.type.match(/=\\>((?!mapping)\w*)[\\[]/)
+        const result = attribute.type.match(/=\\>((?!mapping)[\w$.]*)[\\[]/)
         // If mapping of user defined type
         if (result !== null && result[1] && !isElementary(result[1])) {
             // Find UserDefined type can be a contract, struct or enum
@@ -539,7 +539,7 @@ export const calcStorageByteSize = (
         // Fixed sized arrays are read from right to left until there is a dynamic dimension
         // eg address[][3][2] is a fixed size array that uses 6 slots.
         // while address [2][] is a dynamic sized array.
-        const arrayDimensions = attribute.type.match(/\[\w*]/g)
+        const arrayDimensions = attribute.type.match(/\[[\w$.]*]/g)
         // Remove first [ and last ] from each arrayDimensions
         const dimensionsStr = arrayDimensions.map((a) => a.slice(1, -1))
         // fixed-sized arrays are read from right to left so reverse the dimensions
