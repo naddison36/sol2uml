@@ -8,6 +8,7 @@ import { StorageSection, Variable } from './converterClasses2Storage';
  * @param contractAddress Contract address to get the storage slot values from.
  * If contract is proxied, use proxy and not the implementation contract.
  * @param storageSection is mutated with the slot values added to the variables
+ * @param arrayItems the number of items to display at the start and end of an array
  * @param blockTag block number or `latest`
  */
 export declare const addSlotValues: (url: string, contractAddress: string, storageSection: StorageSection, arrayItems: number, blockTag?: BigNumberish | 'latest') => Promise<void>;

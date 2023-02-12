@@ -22,6 +22,7 @@ interface StorageAtResponse {
  * @param contractAddress Contract address to get the storage slot values from.
  * If contract is proxied, use proxy and not the implementation contract.
  * @param storageSection is mutated with the slot values added to the variables
+ * @param arrayItems the number of items to display at the start and end of an array
  * @param blockTag block number or `latest`
  */
 export const addSlotValues = async (
@@ -119,7 +120,7 @@ const parseUserDefinedValue = (
     variable: Variable,
     variableValue: string
 ): string => {
-    // TODO need to handle User Defined Value Types introduced in Solidity v0.8.8
+    // TODO need to handle User Defined Value Types introduced in Solidity
     // https://docs.soliditylang.org/en/v0.8.18/types.html#user-defined-value-types
     // https://blog.soliditylang.org/2021/09/27/user-defined-value-types/
 
@@ -130,6 +131,7 @@ const parseUserDefinedValue = (
     // this will also be wrong if the alias is to a 1 byte type. eg bytes1, int8 or uint8
     if (variable.byteSize === 1) {
         // TODO find enum from associations.
+        return BigNumber.from('0x' + variableValue).toString()
     }
     // we don't parse if a struct which has a size of 32 bytes
     return undefined
