@@ -23,6 +23,7 @@ export interface Variable {
     slotValue?: string;
     parsedValue?: string;
     referenceSectionId?: number;
+    enumValues?: string[];
 }
 export interface StorageSection {
     id: number;
@@ -46,6 +47,7 @@ export interface StorageSection {
 export declare const convertClasses2StorageSections: (contractName: string, umlClasses: UmlClass[], arrayItems: number, contractFilename?: string) => StorageSection[];
 /**
  * Recursively adds new storage sections under a class attribute.
+ * also returns the allowed enum values
  * @param attribute the attribute that is referencing a storage section
  * @param umlClass contract or file level struct
  * @param otherClasses array of all the UML Classes
@@ -53,8 +55,12 @@ export declare const convertClasses2StorageSections: (contractName: string, umlC
  * @param mapping flags that the storage section is under a mapping
  * @param arrayItems the number of items to display at the start and end of an array
  * @return storageSection new storage section that was added or undefined if none was added.
+ * @return enumValues array of allowed enum values. undefined if attribute is not an enum
  */
-export declare const parseStorageSectionFromAttribute: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[], storageSections: StorageSection[], mapping: boolean, arrayItems: number) => StorageSection | undefined;
+export declare const parseStorageSectionFromAttribute: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[], storageSections: StorageSection[], mapping: boolean, arrayItems: number) => {
+    storageSection: StorageSection;
+    enumValues?: string[];
+};
 export declare const calcStorageByteSize: (attribute: Attribute, umlClass: UmlClass, otherClasses: readonly UmlClass[]) => {
     size: number;
     dynamic: boolean;

@@ -32,6 +32,7 @@ export interface Variable {
     slotValue?: string
     parsedValue?: string
     referenceSectionId?: number
+    enumValues?: string[]
 }
 
 export interface StorageSection {
@@ -173,8 +174,8 @@ const parseVariables = (
             umlClasses
         )
 
-        // parse any dependent storage sections
-        const referenceStorageSection = parseStorageSectionFromAttribute(
+        // parse any dependent storage sections or enums
+        const references = parseStorageSectionFromAttribute(
             attribute,
             umlClass,
             umlClasses,
@@ -188,7 +189,7 @@ const parseVariables = (
             attribute.attributeType,
             dynamic,
             mapping,
-            referenceStorageSection?.type
+            references?.storageSection?.type
         )
         const getValue = calcGetValue(attribute.attributeType, mapping)
 
@@ -224,7 +225,8 @@ const parseVariables = (
             displayValue,
             name: attribute.name,
             contractName: umlClass.name,
-            referenceSectionId: referenceStorageSection?.id,
+            referenceSectionId: references?.storageSection?.id,
+            enumValues: references?.enumValues,
         })
     })
 
@@ -278,6 +280,7 @@ const adjustSlots = (
 
 /**
  * Recursively adds new storage sections under a class attribute.
+ * also returns the allowed enum values
  * @param attribute the attribute that is referencing a storage section
  * @param umlClass contract or file level struct
  * @param otherClasses array of all the UML Classes
@@ -285,6 +288,7 @@ const adjustSlots = (
  * @param mapping flags that the storage section is under a mapping
  * @param arrayItems the number of items to display at the start and end of an array
  * @return storageSection new storage section that was added or undefined if none was added.
+ * @return enumValues array of allowed enum values. undefined if attribute is not an enum
  */
 export const parseStorageSectionFromAttribute = (
     attribute: Attribute,
@@ -293,7 +297,10 @@ export const parseStorageSectionFromAttribute = (
     storageSections: StorageSection[],
     mapping: boolean,
     arrayItems: number
-): StorageSection | undefined => {
+): {
+    storageSection: StorageSection
+    enumValues?: string[]
+} => {
     if (attribute.attributeType === AttributeType.Array) {
         // storage is dynamic if the attribute type ends in []
         const result = attribute.type.match(/\[([\w$.]*)]$/)
@@ -333,10 +340,10 @@ export const parseStorageSectionFromAttribute = (
 
         // If base type is not an Elementary type
         // This can only be Array and UserDefined for base types of arrays.
-        let referenceStorageSection
+        let references
         if (baseAttributeType !== AttributeType.Elementary) {
             // recursively add storage section for Array and UserDefined types
-            referenceStorageSection = parseStorageSectionFromAttribute(
+            references = parseStorageSectionFromAttribute(
                 baseAttribute,
                 umlClass,
                 otherClasses,
@@ -350,7 +357,7 @@ export const parseStorageSectionFromAttribute = (
             baseAttribute.attributeType,
             dynamicBase,
             mapping,
-            referenceStorageSection?.type
+            references?.storageSection?.type
         )
         const getValue = calcGetValue(attribute.attributeType, mapping)
 
@@ -366,7 +373,8 @@ export const parseStorageSectionFromAttribute = (
             dynamic: dynamicBase,
             getValue,
             displayValue,
-            referenceSectionId: referenceStorageSection?.id,
+            referenceSectionId: references?.storageSection?.id,
+            enumValues: references?.enumValues,
         }
 
         // If a fixed size array.
@@ -413,6 +421,7 @@ export const parseStorageSectionFromAttribute = (
                         displayValue,
                         // only the first variable links to a referenced storage section
                         referenceSectionId: undefined,
+                        enumValues: references?.enumValues,
                     })
                 } else if (!fillerFromSlot) {
                     fillerFromSlot = fromSlot
@@ -422,7 +431,7 @@ export const parseStorageSectionFromAttribute = (
             }
         }
 
-        const newStorageSection: StorageSection = {
+        const storageSection = {
             id: storageId++,
             name: `${attribute.type}: ${attribute.name}`,
             type: StorageSectionType.Array,
@@ -431,16 +440,16 @@ export const parseStorageSectionFromAttribute = (
             variables,
             mapping,
         }
-        storageSections.push(newStorageSection)
+        storageSections.push(storageSection)
 
-        return newStorageSection
+        return { storageSection }
     }
     if (attribute.attributeType === AttributeType.UserDefined) {
         // Is the user defined type linked to another Contract, Struct or Enum?
         const typeClass = findTypeClass(attribute.type, attribute, otherClasses)
 
         if (typeClass.stereotype === ClassStereotype.Struct) {
-            let variables = parseVariables(
+            const variables = parseVariables(
                 typeClass,
                 otherClasses,
                 [],
@@ -449,16 +458,21 @@ export const parseStorageSectionFromAttribute = (
                 mapping,
                 arrayItems
             )
-            const newStorageSection = {
+            const storageSection = {
                 id: storageId++,
                 name: attribute.type,
                 type: StorageSectionType.Struct,
                 variables,
                 mapping,
             }
-            storageSections.push(newStorageSection)
+            storageSections.push(storageSection)
 
-            return newStorageSection
+            return { storageSection }
+        } else if (typeClass.stereotype === ClassStereotype.Enum) {
+            return {
+                storageSection: undefined,
+                enumValues: typeClass.attributes.map((a) => a.name),
+            }
         }
         return undefined
     }
@@ -482,16 +496,16 @@ export const parseStorageSectionFromAttribute = (
                     true,
                     arrayItems
                 )
-                const newStorageSection = {
+                const storageSection = {
                     id: storageId++,
                     name: typeClass.name,
                     type: StorageSectionType.Struct,
                     mapping: true,
                     variables,
                 }
-                storageSections.push(newStorageSection)
+                storageSections.push(storageSection)
 
-                return newStorageSection
+                return { storageSection }
             }
         }
         return undefined
