@@ -383,9 +383,7 @@ export const parseStorageSectionFromAttribute = (
         // Note dynamic arrays will have undefined arrayLength
         if (arrayLength > 1) {
             const firstFillerItem =
-                itemsPerSlot > 0
-                    ? arrayItems * itemsPerSlot
-                    : slotsPerItem * (arrayLength - arrayItems) - 1
+                itemsPerSlot > 0 ? arrayItems * itemsPerSlot : arrayItems
             const lastFillerItem =
                 itemsPerSlot > 0
                     ? arrayLength -
@@ -424,13 +422,17 @@ export const parseStorageSectionFromAttribute = (
                 }
                 // Add variables for the first arrayItems and last arrayItems
                 if (i < firstFillerItem || i > lastFillerItem) {
+                    const byteOffset =
+                        itemsPerSlot > 0
+                            ? (i % itemsPerSlot) * arraySlotSize
+                            : 0
                     // add static variable
                     variables.push({
                         id: variableId++,
                         fromSlot,
                         toSlot,
                         byteSize: arrayItemSize,
-                        byteOffset: (i % itemsPerSlot) * arraySlotSize,
+                        byteOffset,
                         type: baseType,
                         attributeType: baseAttributeType,
                         dynamic: dynamicBase,
