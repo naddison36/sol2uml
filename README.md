@@ -136,7 +136,7 @@ Options:
   -s, --storage <address>         The address of the contract with the storage values. This will be different from the contract with the code if a proxy contract is used. This is not needed if `fileFolderAddress` is an address and the contract is not proxied.
   -u, --url <url>                 URL of the Ethereum node to get storage values if the `data` option is used. (default: "http://localhost:8545", env: NODE_URL)
   -bn, --block <number>           Block number to get the contract storage values from. (default: "latest")
-  -a, --array <number>            Number of slots to display at the start and end of arrays. (default: "3")
+  -a, --array <number>            Number of slots to display at the start and end of arrays. (default: "2")
   -h, --help                      display help for command
 ```
 

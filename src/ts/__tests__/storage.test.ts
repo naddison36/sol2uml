@@ -195,6 +195,8 @@ describe('storage parser', () => {
             ${'TwoSlots[][]'}              | ${32}             | ${true}
             ${'TwoSlots[][4][3]'}          | ${3 * 4 * 32}     | ${false}
             ${'TwoSlots[4][3][]'}          | ${32}             | ${true}
+            ${'uint56[21]'}                | ${32 * 6}         | ${false}
+            ${'uint72[7]'}                 | ${32 * 3}         | ${false}
         `('array type $type', ({ type, expectedSize, expectedDynamic }) => {
             const umlCLass = new UmlClass(defaultClassProperties)
             const attribute: Attribute = {
@@ -315,14 +317,14 @@ describe('storage parser', () => {
             ]
             test.each`
                 types                                                     | expected
-                ${['address', 'address', 'address']}                      | ${96}
-                ${['address', 'bytes12', 'bytes12', 'address']}           | ${64}
+                ${['address', 'address', 'address']}                      | ${32 + 32 + 32}
+                ${['address', 'bytes12', 'bytes12', 'address']}           | ${32 + 32}
                 ${['IERC20']}                                             | ${32}
-                ${['IERC20', 'IERC20', 'IERC20']}                         | ${96}
-                ${['IERC20[2]']}                                          | ${64}
-                ${['IERC20[3]']}                                          | ${96}
-                ${['IERC20[2]', 'IERC20[]']}                              | ${96}
-                ${['IERC20[2]', 'IERC20[3]']}                             | ${160}
+                ${['IERC20', 'IERC20', 'IERC20']}                         | ${32 * 3}
+                ${['IERC20[2]']}                                          | ${32 * 2}
+                ${['IERC20[3]']}                                          | ${32 * 3}
+                ${['IERC20[2]', 'IERC20[]']}                              | ${32 * 2 + 32}
+                ${['IERC20[2]', 'IERC20[3]']}                             | ${32 * 2 + 32 * 3}
                 ${['IERC20', 'bytes12', 'bytes12', 'IERC20']}             | ${64}
                 ${['bytes31', 'bytes2', 'bytes31']}                       | ${96}
                 ${['uint256', 'bytes32']}                                 | ${64}
@@ -330,26 +332,26 @@ describe('storage parser', () => {
                 ${['bool[12]', 'uint8[12]']}                              | ${64}
                 ${['bytes30', 'bytes30', 'bytes30']}                      | ${96}
                 ${['uint256[]', 'bytes32[2]']}                            | ${96}
-                ${['uint256[2]', 'bytes32[2]']}                           | ${128}
-                ${['bool', 'bool[2]', 'bool']}                            | ${96}
-                ${['bool', 'bool[33]', 'bool']}                           | ${128}
-                ${['uint16', 'bytes30[2]', 'uint16']}                     | ${128}
+                ${['uint256[2]', 'bytes32[2]']}                           | ${32 * 2 + 32 * 2}
+                ${['bool', 'bool[2]', 'bool']}                            | ${32 + 32 + 32}
+                ${['bool', 'bool[33]', 'bool']}                           | ${32 + 64 + 32}
+                ${['uint16', 'bytes30[2]', 'uint16']}                     | ${32 + 64 + 32}
                 ${['ContractLevelStruct0']}                               | ${64}
                 ${['ContractLevelStruct1']}                               | ${64}
-                ${['ContractLevelStruct2']}                               | ${192}
-                ${['ContractLevelStruct2[2]', 'address']}                 | ${416}
-                ${['ContractLevelStruct0', 'ContractLevelStruct1']}       | ${128}
+                ${['ContractLevelStruct2']}                               | ${32 * 6}
+                ${['ContractLevelStruct2[2]', 'address']}                 | ${32 * 6 * 2 + 32}
+                ${['ContractLevelStruct0', 'ContractLevelStruct1']}       | ${64 + 64}
                 ${['ContractLevelStruct0[]', 'address']}                  | ${64}
-                ${['ContractLevelStruct1[2]', 'address']}                 | ${160}
-                ${['ContractLevelStruct1[2]', 'ContractLevelStruct0[3]']} | ${320}
-                ${['ContractLevelStruct2[]', 'address']}                  | ${64}
-                ${['address', 'ContractLevelStruct2[]']}                  | ${64}
-                ${['bool', 'ContractLevelStruct0', 'bool']}               | ${128}
+                ${['ContractLevelStruct1[2]', 'address']}                 | ${64 * 2 + 32}
+                ${['ContractLevelStruct1[2]', 'ContractLevelStruct0[3]']} | ${64 * 2 + 64 * 3}
+                ${['ContractLevelStruct2[]', 'address']}                  | ${32 + 32}
+                ${['address', 'ContractLevelStruct2[]']}                  | ${32 + 32}
+                ${['bool', 'ContractLevelStruct0', 'bool']}               | ${32 + 64 + 32}
                 ${['enum0']}                                              | ${32}
                 ${['enum0', 'enum1']}                                     | ${32}
                 ${['enum0', 'enum1', 'bytes30']}                          | ${32}
                 ${['enum0', 'enum1', 'bytes31']}                          | ${64}
-                ${['enum0', 'enum1', 'bytes30[2]']}                       | ${96}
+                ${['enum0', 'enum1', 'bytes30[2]']}                       | ${32 + 32 * 2}
                 ${['bool', 'enum0', 'bool']}                              | ${32}
             `('struct with types $types', ({ types, expected }) => {
                 const testAttributes: Attribute[] = []

@@ -593,9 +593,9 @@ export const calcStorageByteSize = (
             return { size: 32, dynamic: true }
         }
 
+        // If a fixed sized array
         let elementSize: number
         const type = attribute.type.substring(0, attribute.type.indexOf('['))
-        // If a fixed sized array
         if (isElementary(type)) {
             const elementAttribute: Attribute = {
                 attributeType: AttributeType.Elementary,
@@ -635,7 +635,13 @@ export const calcStorageByteSize = (
             }
         }
         const lastItem = fixedDimensions.length - 1
-        const lastDimensionBytes = elementSize * fixedDimensions[lastItem]
+        const lastArrayLength = fixedDimensions[lastItem]
+        const itemsPerSlot = Math.floor(32 / elementSize)
+        const lastDimensionBytes =
+            itemsPerSlot > 0 // if one or more array items in a slot
+                ? Math.ceil(lastArrayLength / itemsPerSlot) * 32 // round up to include unallocated slot space
+                : elementSize * fixedDimensions[lastItem]
+
         const lastDimensionSlotBytes = Math.ceil(lastDimensionBytes / 32) * 32
         const remainingDimensions = fixedDimensions
             .slice(0, lastItem)
