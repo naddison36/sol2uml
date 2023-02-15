@@ -2,7 +2,13 @@ import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import axios from 'axios'
 import { StorageSection, Variable } from './converterClasses2Storage'
 import { AttributeType } from './umlClass'
-import { commify, formatUnits, hexValue, toUtf8String } from 'ethers/lib/utils'
+import {
+    commify,
+    formatUnits,
+    getAddress,
+    hexValue,
+    toUtf8String,
+} from 'ethers/lib/utils'
 import { SlotValueCache } from './SlotValueCache'
 
 const debug = require('debug')('sol2uml')
@@ -126,7 +132,7 @@ const parseUserDefinedValue = (
 
     // using byteSize is crude and will be incorrect for aliases types like int160 or uint160
     if (variable.byteSize === 20) {
-        return '0x' + variableValue
+        return getAddress('0x' + variableValue)
     }
     // this will also be wrong if the alias is to a 1 byte type. eg bytes1, int8 or uint8
     if (variable.byteSize === 1) {
@@ -172,7 +178,7 @@ const parseElementaryValue = (
         return `\\"${convert2String('0x' + variableValue)}\\"`
     }
     if (variable.type === 'address') {
-        return '0x' + variableValue
+        return getAddress('0x' + variableValue)
     }
     if (variable.type.match(/^uint([0-9]*)$/)) {
         const parsedValue = formatUnits('0x' + variableValue, 0)
