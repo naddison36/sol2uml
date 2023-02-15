@@ -422,6 +422,17 @@ export const parseStorageSectionFromAttribute = (
                 }
                 // Add variables for the first arrayItems and last arrayItems
                 if (i < firstFillerItem || i > lastFillerItem) {
+                    if (baseAttributeType !== AttributeType.Elementary) {
+                        // recursively add storage section for Array and UserDefined types
+                        references = parseStorageSectionFromAttribute(
+                            baseAttribute,
+                            umlClass,
+                            otherClasses,
+                            storageSections,
+                            mapping,
+                            arrayItems
+                        )
+                    }
                     const byteOffset =
                         itemsPerSlot > 0
                             ? (i % itemsPerSlot) * arraySlotSize
@@ -438,8 +449,7 @@ export const parseStorageSectionFromAttribute = (
                         dynamic: dynamicBase,
                         getValue,
                         displayValue,
-                        // only the first variable links to a referenced storage section
-                        referenceSectionId: undefined,
+                        referenceSectionId: references?.storageSection?.id,
                         enumValues: references?.enumValues,
                     })
                 }

@@ -239,6 +239,9 @@ contract TestStorage is Parent, Parent2 {
 
     uint72[5] public five9ByteNumbers = [1, 2**8-1, 2**16-1, 2**32-1, 2**72-1];
     uint72[22] public twentyTwo9ByteNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+
+    uint128[7] public sevenHalfNumbers = [0, 1, 2, 3, 4, 5, 6];
+    uint128[9] public nineHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
     uint128[11] public elevenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     uint128[12] public twelveHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
     uint128[13] public thirteenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];

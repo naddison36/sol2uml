@@ -14,7 +14,7 @@ See more contract diagrams [here](./examples/README.md).
 Storage layout diagram of USDC's [verified source code](https://etherscan.io/address/0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf#code) on Etherscan.
 ![USDC](./examples/storage/usdcData.svg)
 
-See more contract storage diagram examples [here](./examples/storage/README.md).
+See an explanation of how storage diagrams work with lots of examples [here](./examples/storage/README.md).
 
 # Install
 
