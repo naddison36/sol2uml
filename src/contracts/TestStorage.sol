@@ -237,6 +237,15 @@ contract TestStorage is Parent, Parent2 {
     bool public flag11 = true;
     uint32[FileConstant] public timestamps = [1060001, 1160111, 1260223, 1360333, 1660445];
 
+    uint72[5] public five9ByteNumbers = [1, 2^8-1, 2^16-1, 2^32-1, 2^72-1];
+    uint72[22] public twentyTwo9ByteNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+    uint128[11] public elevenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    uint128[12] public twelveHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    uint128[13] public thirteenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    uint128[14] public fourteenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+    uint128[15] public fifteenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+    uint256[50] public gap;
+
     TwoSlots[2] public twoSlots2x;
     TwoSlots[3][4] public twoSlots3x4;
     TwoSlots[4][3] public twoSlots4x3;

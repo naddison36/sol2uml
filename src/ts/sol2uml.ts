@@ -277,7 +277,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
     .option(
         '-a, --array <number>',
         'Number of slots to display at the start and end of arrays.',
-        '3'
+        '2'
     )
     .action(async (fileFolderAddress, options, command) => {
         try {
@@ -299,7 +299,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
             )
 
             contractName = combinedOptions.contract || contractName
-            const arrayItems = combinedOptions.array
+            const arrayItems = parseInt(combinedOptions.array)
             const storageSections = convertClasses2StorageSections(
                 contractName,
                 umlClasses,
