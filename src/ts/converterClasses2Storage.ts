@@ -115,7 +115,7 @@ export const convertClasses2StorageSections = (
  * Recursively parse the storage variables for a given contract or struct.
  * @param umlClass contract or file level struct
  * @param umlClasses other contracts, structs and enums that may be a type of a storage variable.
- * @param variables mutable array of storage slots that is appended to
+ * @param variables mutable array of storage variables that are appended to
  * @param storageSections mutable array of storageSection objects
  * @param inheritedContracts mutable array of contracts that have been inherited already
  * @param mapping flags that the storage section is under a mapping
@@ -487,6 +487,12 @@ export const parseStorageSectionFromAttribute = (
     return undefined
 }
 
+/**
+ * Adds missing storage variables to a fixed-size or dynamic array by cloning them from the first variable.
+ * @param arrayLength the length of the array
+ * @param arrayItems the number of items to display at the start and end of an array
+ * @param variables  mutable array of storage variables that are appended to
+ */
 const addArrayVariables = (
     arrayLength: number,
     arrayItems: number,
@@ -983,7 +989,7 @@ export const addDynamicVariables = async (
                 }
                 variable.referenceSectionId = newStorageSection.id
 
-                // get slot values for dynamic the string or byte storage
+                // get slot values for new referenced dynamic string or bytes
                 await addSlotValues(
                     url,
                     contractAddress,
@@ -1007,7 +1013,8 @@ export const addDynamicVariables = async (
         )
         if (!referenceStorageSection) continue
 
-        // recursively add dynamic array variables
+        // recursively add dynamic variables to referenced array.
+        // this could be a fixed-size or dynamic array
         await addDynamicVariables(
             referenceStorageSection,
             storageSections,
@@ -1022,7 +1029,7 @@ export const addDynamicVariables = async (
         // Add missing dynamic array variables
         const arrayLength = BigNumber.from(variable.slotValue).toNumber()
         if (arrayLength > 1) {
-            // Add missing fixed array variables from index 1
+            // Add missing array variables to the referenced dynamic array
             addArrayVariables(
                 arrayLength,
                 arrayItems,
@@ -1051,7 +1058,7 @@ export const addDynamicVariables = async (
             // })
         }
 
-        // Get missing slot values
+        // Get missing slot values to the referenced dynamic array
         await addSlotValues(
             url,
             contractAddress,

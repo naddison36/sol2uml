@@ -49,7 +49,8 @@ export const addSlotValues = async (
         for (let i = 0; variable.fromSlot + i <= variable.toSlot; i++) {
             if (
                 variable.attributeType === AttributeType.Array &&
-                (i >= arrayItems || i < valueVariables.length - arrayItems)
+                i >= arrayItems &&
+                i < valueVariables.length - arrayItems
             ) {
                 continue
             }

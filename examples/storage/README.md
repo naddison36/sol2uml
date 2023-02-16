@@ -125,10 +125,26 @@ Even though the `empty` variable does not have any array items yet, the location
 
 ## Multidimensional Dynamic Sized Arrays
 
+Below is an example of multidimensional dynamic array storage using the [MultiDynamicArrayStorage.sol](../../src/contracts/storage/MultiDynamicArrayStorage.sol) contract.
+
+```
+sol2uml storage ./src/contracts -c MultiDynamicArrayStorage -o examples/storage
+```
+
+![MultioDynamicArrayStorage](./MultiDynamicArrayStorage.svg)
+
+The following is generated from the `MultiDynamicArrayStorage` contract deployed onto Arbitrum to [0x6f44d1108bB79710C1BBE378661d90876682E027](https://arbiscan.io/address/0x6f44d1108bB79710C1BBE378661d90876682E027#code).
+
+```
+export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
+sol2uml storage -d -n arbitrum 0x6f44d1108bB79710C1BBE378661d90876682E027 -v -o examples/storage/DynamicArrayStorageData.svg
+```
+
+![MultiDynamicArrayStorageData](./MultiDynamicArrayStorageData.svg)
+
 ## Structs
 
 ## Strings
-
 
 Below is an example of string storage using the [StringStorage.sol](../../src/contracts/storage/StringStorage.sol) contract that does not fetch the slot values.
 
