@@ -60,6 +60,7 @@ Strings are converted to [UTF-8](https://en.wikipedia.org/wiki/UTF-8) and any sp
 The below example was generate for the [FixedArrayStorage](../../src/contracts/FixedArrayStorage.sol) contract deployed onto Arbitrum to [0x796c008d8ADDCc33Da3e946Ca457432a35913c85](https://arbiscan.io/address/0x796c008d8ADDCc33Da3e946Ca457432a35913c85#code).
 
 ```
+export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
 sol2uml storage -d -n arbitrum 0x796c008d8ADDCc33Da3e946Ca457432a35913c85 -o examples/storage/FixedArrayStorageData.svg
 ```
 
@@ -82,6 +83,7 @@ Like the `twentyOne7ByteNumbers` variable, the `gap` variable will not display a
 This example was generate for the [MultiFixedArrayStorage](../../src/contracts/MultiFixedArrayStorage.sol) contract deployed onto Arbitrum to [0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea](https://arbiscan.io/address/0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea#code).
 
 ```
+export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
 sol2uml storage -d -n arbitrum 0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea -o examples/storage/MultiFixedArrayStorageData.svg
 ```
 
@@ -92,6 +94,26 @@ The first storage variable `twoByThreeNumbers` is a two by three, fixed size, mu
 Even though the `threeByTwoBool` and `twoByThreeBool` variables only store six boolean values, they use three and two storage slots respectively.
 
 ## Dynamic Sized Arrays
+
+Below is an example of dynamic array storage using the [/src/contracts/DynamicArrayStorage.sol](../../src/contracts/DynamicArrayStorage.sol) contract that does not fetch the slot values.
+
+```
+sol2uml storage ./src/contracts -c DynamicArrayStorage -o examples/storage
+```
+
+![DynamicArrayStorage](./DynamicArrayStorage.svg)
+
+As sol2uml don't know from just looking at the code how many items are in each array, it will just show the location of the first storage slot and its structure.
+
+The 32 byte string in hexidecimal format at the top of each dynamic array is the slot key. For example, the location of the values of `numbers` array starts from slot `0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563` in storage.
+This is the keccak256 hash of slot 0 which has been assigned to the `numbers` array.
+
+0x66535378de7FB9219b637DBE3e3FFad33387f80B
+
+```
+export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
+sol2uml storage -d -n arbitrum 0x66535378de7FB9219b637DBE3e3FFad33387f80B -v -o examples/storage/DynamicArrayStorageData.svg
+```
 
 ## Multidimensional Dynamic Sized Arrays
 
@@ -166,16 +188,4 @@ sol2uml storage 0xc63a48d85CCE7C3bD4d18db9c0972a4D223e4193 -d -s 0xeFbe22085D9f2
 ```
 
 ![Staking Tokens BPT](./StakedTokenBPTData.svg)
-
-## Local Test Contract
-
-The below storage diagram is an example from this repository [TestStorage.sol](../../src/contracts/TestStorage.sol).
-Instead of specifying a contract address, this example uses the folder `./src/contracts`. All solidity contracts under this folder are parsed and can be visualised.
-The `-c --contract` option specifies the contract name the storage should be visualised for.
-
-```
-sol2uml storage ./src/contracts -c TestStorage -o examples/storage
-```
-
-![Test Storage](./TestStorage.svg)
 

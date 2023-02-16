@@ -61,7 +61,7 @@ Options:
   -n, --network <network>                      Ethereum network (choices: "mainnet", "ropsten", "kovan", "rinkeby", "goerli", "sepolia", "polygon", "testnet.polygon", "arbitrum", "testnet.arbitrum", "avalanche", "testnet.avalanche", "bsc", "testnet.bsc", "crono", "fantom",
                                                "testnet.fantom", "moonbeam", "optimistic", "kovan-optimistic", "gnosisscan", default: "mainnet", env: ETH_NETWORK)
   -k, --apiKey <key>                           Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key (env: SCAN_API_KEY)
-  -bc, --backColor <color>                     Canvas background color (default: "none")
+  -bc, --backColor <color>                     Canvas background color. "none" will use a transparent canvas. (default: "white")
   -sc, --shapeColor <color>                    Basic drawing color for graphics, not text (default: "black")
   -fc, --fillColor <color>                     Color used to fill the background of a node (default: "gray95")
   -tc, --textColor <color>                     Color used for text (default: "black")

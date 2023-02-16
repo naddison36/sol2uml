@@ -8,7 +8,7 @@
  viewBox="0.00 0.00 1457.42 765.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 761)">
 <title>StorageDiagram</title>
-<polygon fill="transparent" stroke="transparent" points="-4,4 -4,-761 1453.42,-761 1453.42,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-761 1453.42,-761 1453.42,4 -4,4"/>
 <!-- 1 -->
 <g id="node1" class="node">
 <title>1</title>
@@ -102,7 +102,7 @@
 <polyline fill="none" stroke="black" points="49.61,-290.9 620.1,-290.9 "/>
 <text text-anchor="middle" x="334.85" y="-274.3" font-family="Courier New" font-size="14.00"> </text>
 <polyline fill="none" stroke="black" points="49.61,-266.1 620.1,-266.1 "/>
-<text text-anchor="middle" x="334.85" y="-249.5" font-family="Courier New" font-size="14.00">0x00000000000000000000000000000000000000000000000000882DD6DE43DB8E</text>
+<text text-anchor="middle" x="334.85" y="-249.5" font-family="Courier New" font-size="14.00">0x0000000000000000000000000000000000000000000000000088B685E944694E</text>
 <text text-anchor="middle" x="334.85" y="-232.7" font-family="Courier New" font-size="14.00"> &#160;</text>
 <polyline fill="none" stroke="black" points="49.61,-224.5 620.1,-224.5 "/>
 <text text-anchor="middle" x="334.85" y="-207.9" font-family="Courier New" font-size="14.00"> </text>
@@ -128,7 +128,7 @@
 <text text-anchor="middle" x="768.31" y="-648.3" font-family="Courier New" font-size="14.00">unallocated (12)</text>
 <polyline fill="none" stroke="black" points="916.52,-631.7 916.52,-673.3 "/>
 <text text-anchor="middle" x="1182.85" y="-656.7" font-family="Courier New" font-size="14.00">address: Ownable._owner (20)</text>
-<text text-anchor="middle" x="1182.85" y="-639.9" font-family="Courier New" font-size="14.00"> 0xFCB19E6A322B27C06842A71E8C725399F049AE3A </text>
+<text text-anchor="middle" x="1182.85" y="-639.9" font-family="Courier New" font-size="14.00"> 0xFcb19e6a322b27c06842A71e8c725399f049AE3a </text>
 <polyline fill="none" stroke="black" points="620.1,-631.7 1449.42,-631.7 "/>
 <text text-anchor="middle" x="706.31" y="-606.7" font-family="Courier New" font-size="14.00">unallocated (11)</text>
 <polyline fill="none" stroke="black" points="792.52,-590.1 792.52,-631.7 "/>
@@ -136,12 +136,12 @@
 <text text-anchor="middle" x="916.53" y="-598.3" font-family="Courier New" font-size="14.00"> false &#160;</text>
 <polyline fill="none" stroke="black" points="1040.55,-590.1 1040.55,-631.7 "/>
 <text text-anchor="middle" x="1244.88" y="-615.1" font-family="Courier New" font-size="14.00">address: Pausable.pauser (20)</text>
-<text text-anchor="middle" x="1244.88" y="-598.3" font-family="Courier New" font-size="14.00"> 0xF0D160DEC1749AFAF5A831668093B1431F7C8527 </text>
+<text text-anchor="middle" x="1244.88" y="-598.3" font-family="Courier New" font-size="14.00"> 0xf0d160DEC1749aFaF5A831668093B1431f7C8527 </text>
 <polyline fill="none" stroke="black" points="620.1,-590.1 1449.42,-590.1 "/>
 <text text-anchor="middle" x="768.31" y="-565.1" font-family="Courier New" font-size="14.00">unallocated (12)</text>
 <polyline fill="none" stroke="black" points="916.52,-548.5 916.52,-590.1 "/>
 <text text-anchor="middle" x="1182.85" y="-573.5" font-family="Courier New" font-size="14.00">address: Blacklistable.blacklister (20)</text>
-<text text-anchor="middle" x="1182.85" y="-556.7" font-family="Courier New" font-size="14.00"> 0x5DB0115F3B72D19CEA34DD697CF412FF86DC7E1B </text>
+<text text-anchor="middle" x="1182.85" y="-556.7" font-family="Courier New" font-size="14.00"> 0x5dB0115f3B72d19cEa34dD697cf412Ff86dc7E1b </text>
 <polyline fill="none" stroke="black" points="620.1,-548.5 1449.42,-548.5 "/>
 <text text-anchor="middle" x="1034.43" y="-531.9" font-family="Courier New" font-size="14.00">mapping(address=&gt;bool): Blacklistable.blacklisted (32)</text>
 <polyline fill="none" stroke="black" points="620.1,-523.7 1449.42,-523.7 "/>
@@ -165,14 +165,14 @@
 <text text-anchor="middle" x="917.14" y="-323.9" font-family="Courier New" font-size="14.00"> true &#160;</text>
 <polyline fill="none" stroke="black" points="1063.76,-315.7 1063.76,-357.3 "/>
 <text text-anchor="middle" x="1256.59" y="-340.7" font-family="Courier New" font-size="14.00">address: FiatTokenV1.masterMinter (20)</text>
-<text text-anchor="middle" x="1256.59" y="-323.9" font-family="Courier New" font-size="14.00"> 0xE982615D461DD5CD06575BBEA87624FDA4E3DE17 </text>
+<text text-anchor="middle" x="1256.59" y="-323.9" font-family="Courier New" font-size="14.00"> 0xE982615d461DD5cD06575BbeA87624fda4e3de17 </text>
 <polyline fill="none" stroke="black" points="620.1,-315.7 1449.42,-315.7 "/>
 <text text-anchor="middle" x="1034.53" y="-299.1" font-family="Courier New" font-size="14.00">mapping(address=&gt;uint256): FiatTokenV1.balances (32)</text>
 <polyline fill="none" stroke="black" points="620.1,-290.9 1449.42,-290.9 "/>
 <text text-anchor="middle" x="1034.44" y="-274.3" font-family="Courier New" font-size="14.00">mapping(address=&gt;mapping(address=&gt;uint256)): FiatTokenV1.allowed (32)</text>
 <polyline fill="none" stroke="black" points="620.1,-266.1 1449.42,-266.1 "/>
 <text text-anchor="middle" x="1034.72" y="-249.5" font-family="Courier New" font-size="14.00">uint256: FiatTokenV1.totalSupply_ (32)</text>
-<text text-anchor="middle" x="1034.72" y="-232.7" font-family="Courier New" font-size="14.00"> 38,330,997,707,889,550 </text>
+<text text-anchor="middle" x="1034.72" y="-232.7" font-family="Courier New" font-size="14.00"> 38,481,283,093,129,550 </text>
 <polyline fill="none" stroke="black" points="620.1,-224.5 1449.42,-224.5 "/>
 <text text-anchor="middle" x="1034.73" y="-207.9" font-family="Courier New" font-size="14.00">mapping(address=&gt;bool): FiatTokenV1.minters (32)</text>
 <polyline fill="none" stroke="black" points="620.1,-199.7 1449.42,-199.7 "/>

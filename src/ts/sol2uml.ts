@@ -67,7 +67,11 @@ The Solidity code can be pulled from verified source code on Blockchain explorer
             'Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key'
         ).env('SCAN_API_KEY')
     )
-    .option('-bc, --backColor <color>', 'Canvas background color', 'none')
+    .option(
+        '-bc, --backColor <color>',
+        'Canvas background color. "none" will use a transparent canvas.',
+        'white'
+    )
     .option(
         '-sc, --shapeColor <color>',
         'Basic drawing color for graphics, not text',
