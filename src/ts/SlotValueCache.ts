@@ -1,5 +1,7 @@
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 
+const debug = require('debug')('sol2uml')
+
 // key is the storage slot number in hexadecimal format with a leading 0x. eg 0x0, 0x1...
 type SlotCache = { [key: string]: string }
 
@@ -54,6 +56,7 @@ export class SlotValueCache {
         }
         missingKeys.forEach((key, i) => {
             if (!this.slotCache[key]) {
+                debug(`cached slot ${key} with ${missingValues[i]}`)
                 this.slotCache[key] = missingValues[i]
             }
         })

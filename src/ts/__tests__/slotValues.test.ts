@@ -47,7 +47,7 @@ describe('Slot Values', () => {
         )
     })
     test('USDC second slot', async () => {
-        expect(await getSlotValue(url, usdc, 0)).toEqual(
+        expect(await getSlotValue(url, usdc, 0, 'latest')).toEqual(
             '0x000000000000000000000000FCB19E6A322B27C06842A71E8C725399F049AE3A'
         )
     })
@@ -56,7 +56,8 @@ describe('Slot Values', () => {
             await getSlotValue(
                 url,
                 musd,
-                '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
+                '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103',
+                'latest'
             )
         ).toEqual(
             '0x0000000000000000000000005C8EB57B44C1C6391FC7A8A0CF44D26896F92386'

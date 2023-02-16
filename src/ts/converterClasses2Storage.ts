@@ -918,7 +918,7 @@ export const addDynamicVariables = async (
     url: string,
     contractAddress: string,
     arrayItems: number,
-    blockTag?: BigNumberish | 'latest'
+    blockTag: BigNumberish
 ) => {
     for (const variable of storageSection.variables) {
         // STEP 1 - add slots for dynamic string and bytes
@@ -1036,7 +1036,7 @@ export const addDynamicVariables = async (
                 referenceStorageSection.variables
             )
 
-            // For the newly added variables
+            // // For the newly added variables
             // referenceStorageSection.variables.forEach((variable, i) => {
             //     if (
             //         referenceStorageSection.variables[0].attributeType !==

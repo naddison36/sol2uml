@@ -350,6 +350,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                         combinedOptions.url,
                         storageAddress,
                         storageSection,
+                        arrayItems,
                         block
                     )
                 }

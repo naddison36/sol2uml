@@ -17,7 +17,7 @@ interface StorageAtResponse {
     jsonrpc: '2.0'
     id: string
     result?: string
-    error?: string
+    error?: { code: number; message: string }
 }
 
 /**
@@ -36,7 +36,7 @@ export const addSlotValues = async (
     contractAddress: string,
     storageSection: StorageSection,
     arrayItems: number,
-    blockTag?: BigNumberish | 'latest'
+    blockTag: BigNumberish
 ) => {
     const valueVariables = storageSection.variables.filter(
         (variable) => variable.getValue && !variable.slotValue
@@ -277,7 +277,9 @@ export const getSlotValues = async (
             BigNumber.from(a.id).gt(b.id) ? 1 : -1
         )
         const missingValues = sortedResponses.map((data) => {
-            if (data.error) throw Error(data.error)
+            if (data.error) {
+                throw Error(data.error?.message)
+            }
             return '0x' + data.result.toUpperCase().slice(2)
         })
         // add new values to the cache and return the merged slot values
@@ -307,7 +309,7 @@ export const getSlotValue = async (
     url: string,
     contractAddress: string,
     slotKey: BigNumberish,
-    blockTag: BigNumberish | 'latest' = 'latest'
+    blockTag: BigNumberish | 'latest'
 ) => {
     debug(`About to get storage slot ${slotKey} value for ${contractAddress}`)
 
@@ -318,7 +320,6 @@ export const getSlotValue = async (
         blockTag
     )
 
-    debug(`Got slot ${slotKey} value: ${values[0]}`)
     return values[0]
 }
 

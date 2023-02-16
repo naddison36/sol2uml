@@ -91,8 +91,11 @@ export function convertStorage2Dot(
     if (options.data) {
         dotString += `} | {value${dataLine}`
         startingVariables.forEach((variable, i) => {
-            const varDataLine = displayData[i] ? linePad : ''
-            dotString += ` | ${variable.slotValue || ''}${varDataLine}`
+            if (displayData[i]) {
+                dotString += ` | ${variable.slotValue || ''}${linePad}`
+            } else {
+                dotString += ` | `
+            }
         })
     }
 

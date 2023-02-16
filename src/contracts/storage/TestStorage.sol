@@ -196,16 +196,12 @@ contract TestStorage is Parent, Parent2 {
     bool internal flag3 = true;
     bool public flag4 = false;
     bool[2] public flags = [true, true];
-    bool public flag5 = true;
     bool[2][2] public flags2x2 = [[true, false], [true, true]];
-    bool public flag6 = true;
     bool[2][3] public flags2x3 = [[true, false], [false, true], [true, true]];
-    bool public flag7 = true;
     bool[3][2] public flags3x2 = [[true, false, true], [false, true, false]];
 
     bool[33][2] public flags33x2 = [[true, true, false, true], [true, false, true, true]];
     bool[2][33] public flags2x33 = [[true, true], [true, false], [false, true], [false, false]];
-    bool public flag8 = true;
     bool[] public flagsDyn = [true, true, true, false, true, false, true];
     bool[][] public flagsDynDyn;
     bool[][][] public flagsDynDynDyn;
@@ -217,7 +213,6 @@ contract TestStorage is Parent, Parent2 {
         [false, false],
         [true, true]
     ];
-    bool public flag9 = true;
     bool[][2] public flagsDynx2;
     bool[][16] public flagsDynx16;
     bool[][32] public flagsDynx32;
@@ -227,14 +222,12 @@ contract TestStorage is Parent, Parent2 {
         [[false, false, false], [true, true, true], [false, true, false], [true, false, true]]
     ];
     bool[33][2][2] public bool_33x2x2;
-    bool public flag10 = true;
     bytes30[2][6] public bytes30_2x6;
     bytes30[6][2] public bytes30_6x2;
     bytes32[] public bytes32Dyn = [
         bytes32(0xFF00128251ec233d387a0af31db13f8318b61e40975c27476e1c1a02b79700FF),
         0xEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD
     ];
-    bool public flag11 = true;
     uint32[FileConstant] public timestamps = [1060001, 1160111, 1260223, 1360333, 1660445];
 
     uint72[5] public five9ByteNumbers = [1, 2**8-1, 2**16-1, 2**32-1, 2**72-1];

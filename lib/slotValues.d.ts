@@ -11,7 +11,7 @@ import { StorageSection, Variable } from './converterClasses2Storage';
  * @param arrayItems the number of items to display at the start and end of an array
  * @param blockTag block number or `latest`
  */
-export declare const addSlotValues: (url: string, contractAddress: string, storageSection: StorageSection, arrayItems: number, blockTag?: BigNumberish | 'latest') => Promise<void>;
+export declare const addSlotValues: (url: string, contractAddress: string, storageSection: StorageSection, arrayItems: number, blockTag: BigNumberish) => Promise<void>;
 export declare const parseValue: (variable: Variable) => string;
 /**
  * Get storage slot values from JSON-RPC API provider.
@@ -32,7 +32,7 @@ export declare const getSlotValues: (url: string, contractAddress: string, slotK
  * @param blockTag block number or `latest`
  * @return slotValue 32 byte slot value as hexadecimal string
  */
-export declare const getSlotValue: (url: string, contractAddress: string, slotKey: BigNumberish, blockTag?: BigNumberish | 'latest') => Promise<string>;
+export declare const getSlotValue: (url: string, contractAddress: string, slotKey: BigNumberish, blockTag: BigNumberish | 'latest') => Promise<string>;
 /**
  * Calculates the number of string characters or bytes of a string or bytes type.
  * See the following for how string and bytes are stored in storage slots

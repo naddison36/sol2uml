@@ -27,7 +27,7 @@ The variables are packed from right to left. sol2uml will mark any unused slot s
 
 # Elementary Storage on Arbitrum
 
-In this example, we'll generate a storage diagram for the same [BasicStorage](../../src/contracts/storage/BasicStorage.sol) contract deployed onto Arbitrum to [0x8E2587265C68CD9EE3EcBf22DC229980b47CB960](https://arbiscan.io/address/0x8E2587265C68CD9EE3EcBf22DC229980b47CB960#code).
+In this example, we'll generate a storage diagram for the same [BasicStorage](../../src/contracts/storage/BasicStorage.sol) contract deployed on Arbitrum to [0x8E2587265C68CD9EE3EcBf22DC229980b47CB960](https://arbiscan.io/address/0x8E2587265C68CD9EE3EcBf22DC229980b47CB960#code).
 
 The `-n, --network <network>` option is used to specify the Solidity code is to be sourced from verified files on the Arbitrum blockchain explorer [Arbiscan](https://arbiscan.io).
 
@@ -57,7 +57,7 @@ Strings are converted to [UTF-8](https://en.wikipedia.org/wiki/UTF-8) and any sp
 
 ## Fixed-Sized Arrays
 
-The below example was generated for the [FixedArrayStorage](../../src/contracts/storage/FixedArrayStorage.sol) contract deployed onto Arbitrum to [0x796c008d8ADDCc33Da3e946Ca457432a35913c85](https://arbiscan.io/address/0x796c008d8ADDCc33Da3e946Ca457432a35913c85#code).
+The below example was generated for the [FixedArrayStorage](../../src/contracts/storage/FixedArrayStorage.sol) contract deployed on Arbitrum to [0x796c008d8ADDCc33Da3e946Ca457432a35913c85](https://arbiscan.io/address/0x796c008d8ADDCc33Da3e946Ca457432a35913c85#code).
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
@@ -80,7 +80,7 @@ Like the `twentyOne7ByteNumbers` variable, the `gap` variable will not display a
 
 ## Multidimensional Fixed Arrays
 
-This example was generated for the [MultiFixedArrayStorage](../../src/contracts/storage/MultiFixedArrayStorage.sol) contract deployed onto Arbitrum to [0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea](https://arbiscan.io/address/0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea#code).
+This example was generated for the [MultiFixedArrayStorage](../../src/contracts/storage/MultiFixedArrayStorage.sol) contract deployed on Arbitrum to [0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea](https://arbiscan.io/address/0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea#code).
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
@@ -108,11 +108,11 @@ As sol2uml don't know from just looking at the code how many items are in each a
 The 32 byte string in hexidecimal format at the top of each dynamic array is the slot key. For example, the location of the values of `numbers` array starts from slot `0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563` in storage.
 This is the keccak256 hash of slot 0 which has been assigned to the `numbers` array.
 
-The following is generated from the `DynamicArrayStorage` contract deployed onto Arbitrum to [0x66535378de7FB9219b637DBE3e3FFad33387f80B](https://arbiscan.io/address/0x66535378de7FB9219b637DBE3e3FFad33387f80B#code).
+The following is generated from the `DynamicArrayStorage` contract deployed on Arbitrum to [0x66535378de7FB9219b637DBE3e3FFad33387f80B](https://arbiscan.io/address/0x66535378de7FB9219b637DBE3e3FFad33387f80B#code).
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-sol2uml storage -d -n arbitrum 0x66535378de7FB9219b637DBE3e3FFad33387f80B -v -o examples/storage/DynamicArrayStorageData.svg
+sol2uml storage -d -n arbitrum 0x66535378de7FB9219b637DBE3e3FFad33387f80B -o examples/storage/DynamicArrayStorageData.svg
 ```
 
 ![DynamicArrayStorageData](./DynamicArrayStorageData.svg)
@@ -133,16 +133,39 @@ sol2uml storage ./src/contracts -c MultiDynamicArrayStorage -o examples/storage
 
 ![MultioDynamicArrayStorage](./MultiDynamicArrayStorage.svg)
 
-The following is generated from the `MultiDynamicArrayStorage` contract deployed onto Arbitrum to [0x6f44d1108bB79710C1BBE378661d90876682E027](https://arbiscan.io/address/0x6f44d1108bB79710C1BBE378661d90876682E027#code).
+The following is generated from the `MultiDynamicArrayStorage` contract deployed on Arbitrum to [0x6f44d1108bB79710C1BBE378661d90876682E027](https://arbiscan.io/address/0x6f44d1108bB79710C1BBE378661d90876682E027#code).
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-sol2uml storage -d -n arbitrum 0x6f44d1108bB79710C1BBE378661d90876682E027 -v -o examples/storage/DynamicArrayStorageData.svg
+sol2uml storage -d -n arbitrum 0x6f44d1108bB79710C1BBE378661d90876682E027 -o examples/storage/MultiDynamicArrayStorageData.svg
 ```
 
 ![MultiDynamicArrayStorageData](./MultiDynamicArrayStorageData.svg)
 
 ## Structs
+
+The below example is of storage variables that use structs from the [StructStorage.sol](../../src/contracts/storage/StructStorage.sol) contract.
+
+```
+sol2uml storage ./src/contracts -c StructStorage -o examples/storage
+```
+
+![StructStorage](./StructStorage.svg)
+
+The first `exampleStruct` variables is of `ExampleStruct` type. sol2uml will display how many slots the struct uses and then reference an expanded view of how the struct variables are stored in the slots. 
+If any of the struct variables are arrays, strings, bytes or other structs, they will recursively be referenced until the elementary types are reached.
+
+The second `dynamicStructs` variable is a dynamic array of type `ExampleStruct`. When sol2uml is run without the `-d, --data` option, it does not know how long the array is so will just display what the first array item would look like.
+
+
+The following is generated from the `StructStorage` contract deployed on Arbitrum to [0xB8F98C34e40E0D201CE2F3440cE92d0B5c5CfFe2](https://arbiscan.io/address/0xB8F98C34e40E0D201CE2F3440cE92d0B5c5CfFe2#code).
+
+```
+export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
+sol2uml storage -d -n arbitrum 0xB8F98C34e40E0D201CE2F3440cE92d0B5c5CfFe2 -o examples/storage/StructStorageData.svg
+```
+
+![StructStorageData](./StructStorageData.svg)
 
 ## Strings
 
@@ -155,7 +178,7 @@ sol2uml storage ./src/contracts -c StringStorage -o examples/storage
 ![StringStorage](./StringStorage.svg)
 
 Like the dynamic arrays, sol2uml does not know how long the strings are just by looking at the code. To get the string values, the `-d, --data` option is used.
-The below diagram get the data for the `StringStorage` contract deployed onto Arbitrum to [0xeF2A93be2beD1b577D460c347f82De1Ba8bD9861](https://arbiscan.io/address/0xeF2A93be2beD1b577D460c347f82De1Ba8bD9861#code).
+The below diagram get the data for the `StringStorage` contract deployed on Arbitrum to [0xeF2A93be2beD1b577D460c347f82De1Ba8bD9861](https://arbiscan.io/address/0xeF2A93be2beD1b577D460c347f82De1Ba8bD9861#code).
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key

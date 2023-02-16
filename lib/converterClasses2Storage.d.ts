@@ -77,4 +77,4 @@ export declare const findDimensionLength: (umlClass: UmlClass, dimension: string
  * @param arrayItems the number of items to display at the start and end of an array
  * @param blockTag block number or `latest`
  */
-export declare const addDynamicVariables: (storageSection: StorageSection, storageSections: StorageSection[], url: string, contractAddress: string, arrayItems: number, blockTag?: BigNumberish | 'latest') => Promise<void>;
+export declare const addDynamicVariables: (storageSection: StorageSection, storageSections: StorageSection[], url: string, contractAddress: string, arrayItems: number, blockTag: BigNumberish) => Promise<void>;
