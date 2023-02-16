@@ -963,7 +963,7 @@ export const addDynamicVariables = async (
                         contractName: variable.contractName,
                         name: '',
                         dynamic: false,
-                        getValue: false,
+                        getValue: true,
                         displayValue: false,
                     }
                 }

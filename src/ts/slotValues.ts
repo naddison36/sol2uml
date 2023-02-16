@@ -77,10 +77,12 @@ export const addSlotValues = async (
 
         // For each variable in the storage section
         for (const variable of storageSection.variables) {
-            if (variable.displayValue && variable.fromSlot === fromSlot) {
+            if (variable.getValue && variable.fromSlot === fromSlot) {
                 variable.slotValue = value
                 // parse variable value from slot data
-                variable.parsedValue = parseValue(variable)
+                if (variable.displayValue) {
+                    variable.parsedValue = parseValue(variable)
+                }
             }
             // if variable is past the slot that has the value
             else if (variable.toSlot > fromSlot) {
@@ -160,9 +162,9 @@ const parseElementaryValue = (
     if (variable.type === 'string' || variable.type === 'bytes') {
         if (variable.dynamic) {
             const lastByte = variable.slotValue.slice(-2)
-            const size = BigNumber.from('0x' + lastByte).toNumber()
-            if (size <= 0) return ''
-            if (size > 62) {
+            const size = BigNumber.from('0x' + lastByte)
+            // Check if the last bit is set by AND the size with 0x01
+            if (size.and(1).eq(1)) {
                 // Return the number of chars or bytes
                 return BigNumber.from(variable.slotValue)
                     .sub(1)
@@ -170,7 +172,8 @@ const parseElementaryValue = (
                     .toString()
             }
 
-            const valueHex = '0x' + variableValue.slice(0, size)
+            // The last byte holds the length of the string or bytes in the slot
+            const valueHex = '0x' + variableValue.slice(0, size.toNumber())
             if (variable.type === 'bytes') return valueHex
             return `\\"${convert2String(valueHex)}\\"`
         }
@@ -337,6 +340,12 @@ export const dynamicSlotSize = (slotValue: string): number => {
 }
 
 export const convert2String = (bytes: string): string => {
+    if (
+        bytes ===
+        '0x0000000000000000000000000000000000000000000000000000000000000000'
+    ) {
+        return ''
+    }
     const rawString = toUtf8String(bytes)
     return escapeString(rawString)
 }
