@@ -248,6 +248,7 @@ contract TestStorage is Parent, Parent2 {
     uint128[14] public fourteenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
     uint128[15] public fifteenHalfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
     uint256[50] public gap;
+    uint256[5] public fixedIntArray = [1000, 2000, 3000, 4000, 5000];
 
     TwoSlots[2] public twoSlots2x;
     TwoSlots[3][4] public twoSlots3x4;
@@ -283,11 +284,15 @@ contract TestStorage is Parent, Parent2 {
     FixedArray public fixedArray;
     FlagsStruct public flagStruct = FlagsStruct(true, [true, true], true);
     int16 public arrayCount = -2000;
+
+    uint256[] public numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    uint256[] public empty;
+    uint56[] public sevenByteNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    uint72[] public nineByteNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
     uint64[] public dynamicInt64Array = [2000, 1, 254, 1e19, 254, 2, 256];
     uint128[] public dynamicInt128Array = [1e38, 2e38, 3e38];
-    uint136[] public dynamicInt136Array = [1e40, 2e39];
-    uint256[] public dynamicInt256Array = [1e77, 2e76, 3e76, 4e76];
-    uint256[3] public fixedIntArray = [1000, 2000, 3000];
+    uint136[] public dynamicInt136Array = [1e40, 2e39, 3e39, 4e39];
+    uint256[] public dynamicInt256Array = [1e77, 2e76, 3e76, 4e76, 5e76];
     uint256[][] public dynamicDynIntArray;
     uint256[][][] public dynamicDynDynIntArray;
 

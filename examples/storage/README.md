@@ -108,12 +108,18 @@ As sol2uml don't know from just looking at the code how many items are in each a
 The 32 byte string in hexidecimal format at the top of each dynamic array is the slot key. For example, the location of the values of `numbers` array starts from slot `0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563` in storage.
 This is the keccak256 hash of slot 0 which has been assigned to the `numbers` array.
 
-0x66535378de7FB9219b637DBE3e3FFad33387f80B
+The following is generated from the `DynamicArrayStorage` contract deployed onto Arbitrum to [0x66535378de7FB9219b637DBE3e3FFad33387f80B](https://arbiscan.io/address/0x66535378de7FB9219b637DBE3e3FFad33387f80B#code).
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
 sol2uml storage -d -n arbitrum 0x66535378de7FB9219b637DBE3e3FFad33387f80B -v -o examples/storage/DynamicArrayStorageData.svg
 ```
+
+![DynamicArrayStorageData](./DynamicArrayStorageData.svg)
+
+The values in the first Contract storage section is the lengths of the dynamic arrays. For example, the `numbers` array has 10 items in it.
+
+The array storage sections how the slot offsets from the first item in the array. For example, offset 1 for the `sevenByteNumbers` variable is the next slot after the slot with key `0x405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace`.
 
 ## Multidimensional Dynamic Sized Arrays
 

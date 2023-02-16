@@ -337,8 +337,6 @@ export const parseStorageSectionFromAttribute = (
             arrayItemSize > 16
                 ? 32 * Math.ceil(arrayItemSize / 32)
                 : arrayItemSize
-        const itemsPerSlot = Math.floor(32 / arraySlotSize)
-        const slotsPerItem = Math.ceil(arraySlotSize / 32)
 
         // If base type is not an Elementary type
         // This can only be Array and UserDefined for base types of arrays.
@@ -382,78 +380,29 @@ export const parseStorageSectionFromAttribute = (
         // If a fixed size array.
         // Note dynamic arrays will have undefined arrayLength
         if (arrayLength > 1) {
-            const firstFillerItem =
-                itemsPerSlot > 0 ? arrayItems * itemsPerSlot : arrayItems
-            const lastFillerItem =
-                itemsPerSlot > 0
-                    ? arrayLength -
-                      (arrayItems - 1) * itemsPerSlot - // the number of items in all but the last row
-                      (arrayLength % itemsPerSlot || itemsPerSlot) - // the remaining items in the last row or all the items in a slot
-                      1 // need the items before the last three rows
-                    : arrayLength - arrayItems - 1
+            // Add missing fixed array variables from index 1
+            addArrayVariables(arrayLength, arrayItems, variables)
 
-            // Add a variable to the new storage section for each item in the fixed size array
-            for (let i = 1; i < arrayLength; i++) {
-                const fromSlot =
-                    itemsPerSlot > 0
-                        ? Math.floor(i / itemsPerSlot)
-                        : i * slotsPerItem
-                const toSlot =
-                    itemsPerSlot > 0 ? fromSlot : fromSlot + slotsPerItem
-
-                // add filler variable before adding the first of the last items of the array
-                if (i === lastFillerItem && firstFillerItem < lastFillerItem) {
-                    const fillerFromSlot =
-                        itemsPerSlot > 0
-                            ? Math.floor(firstFillerItem / itemsPerSlot)
-                            : firstFillerItem * slotsPerItem
-                    variables.push({
-                        id: variableId++,
-                        attributeType: AttributeType.UserDefined,
-                        type: '----',
-                        fromSlot: fillerFromSlot,
-                        toSlot: toSlot,
-                        byteOffset: 0,
-                        byteSize: (toSlot - fillerFromSlot + 1) * 32,
-                        getValue: false,
-                        displayValue: false,
-                        dynamic: false,
-                    })
+            // For the newly added variables
+            variables.forEach((variable, i) => {
+                if (
+                    i > 0 &&
+                    baseAttributeType !== AttributeType.Elementary &&
+                    variable.type !== '----' // ignore any filler variables
+                ) {
+                    // recursively add storage section for Array and UserDefined types
+                    references = parseStorageSectionFromAttribute(
+                        baseAttribute,
+                        umlClass,
+                        otherClasses,
+                        storageSections,
+                        mapping,
+                        arrayItems
+                    )
+                    variable.referenceSectionId = references?.storageSection?.id
+                    variable.enumValues = references?.enumValues
                 }
-                // Add variables for the first arrayItems and last arrayItems
-                if (i < firstFillerItem || i > lastFillerItem) {
-                    if (baseAttributeType !== AttributeType.Elementary) {
-                        // recursively add storage section for Array and UserDefined types
-                        references = parseStorageSectionFromAttribute(
-                            baseAttribute,
-                            umlClass,
-                            otherClasses,
-                            storageSections,
-                            mapping,
-                            arrayItems
-                        )
-                    }
-                    const byteOffset =
-                        itemsPerSlot > 0
-                            ? (i % itemsPerSlot) * arraySlotSize
-                            : 0
-                    // add static variable
-                    variables.push({
-                        id: variableId++,
-                        fromSlot,
-                        toSlot,
-                        byteSize: arrayItemSize,
-                        byteOffset,
-                        type: baseType,
-                        attributeType: baseAttributeType,
-                        dynamic: dynamicBase,
-                        getValue,
-                        displayValue,
-                        referenceSectionId: references?.storageSection?.id,
-                        enumValues: references?.enumValues,
-                    })
-                }
-            }
+            })
         }
 
         const storageSection = {
@@ -536,6 +485,74 @@ export const parseStorageSectionFromAttribute = (
         return undefined
     }
     return undefined
+}
+
+const addArrayVariables = (
+    arrayLength: number,
+    arrayItems: number,
+    variables: Variable[]
+) => {
+    const arraySlotSize = variables[0].byteSize
+    const itemsPerSlot = Math.floor(32 / arraySlotSize)
+    const slotsPerItem = Math.ceil(arraySlotSize / 32)
+    const firstFillerItem =
+        itemsPerSlot > 0 ? arrayItems * itemsPerSlot : arrayItems
+    const lastFillerItem =
+        itemsPerSlot > 0
+            ? arrayLength -
+              (arrayItems - 1) * itemsPerSlot - // the number of items in all but the last row
+              (arrayLength % itemsPerSlot || itemsPerSlot) - // the remaining items in the last row or all the items in a slot
+              1 // need the items before the last three rows
+            : arrayLength - arrayItems - 1
+
+    // Add variable from index 1 for each item in the array
+    for (let i = 1; i < arrayLength; i++) {
+        const fromSlot =
+            itemsPerSlot > 0 ? Math.floor(i / itemsPerSlot) : i * slotsPerItem
+        const toSlot = itemsPerSlot > 0 ? fromSlot : fromSlot + slotsPerItem
+
+        // add filler variable before adding the first of the last items of the array
+        if (i === lastFillerItem && firstFillerItem < lastFillerItem) {
+            const fillerFromSlot =
+                itemsPerSlot > 0
+                    ? Math.floor(firstFillerItem / itemsPerSlot)
+                    : firstFillerItem * slotsPerItem
+            variables.push({
+                id: variableId++,
+                attributeType: AttributeType.UserDefined,
+                type: '----',
+                fromSlot: fillerFromSlot,
+                toSlot: toSlot,
+                byteOffset: 0,
+                byteSize: (toSlot - fillerFromSlot + 1) * 32,
+                getValue: false,
+                displayValue: false,
+                dynamic: false,
+            })
+        }
+        // Add variables for the first arrayItems and last arrayItems
+        if (i < firstFillerItem || i > lastFillerItem) {
+            const byteOffset =
+                itemsPerSlot > 0 ? (i % itemsPerSlot) * arraySlotSize : 0
+            const slotValue =
+                fromSlot === 0 ? variables[0].slotValue : undefined
+            // add array variable
+            const newVariable: Variable = {
+                ...variables[0],
+                id: variableId++,
+                fromSlot,
+                toSlot,
+                byteOffset,
+                slotValue,
+                // These will be added in a separate step
+                parsedValue: undefined,
+                referenceSectionId: undefined,
+                enumValues: undefined,
+            }
+            newVariable.parsedValue = parseValue(newVariable)
+            variables.push(newVariable)
+        }
+    }
 }
 
 /**
@@ -1002,66 +1019,38 @@ export const addDynamicVariables = async (
 
         if (!variable.dynamic) continue
 
-        const arrayItemSize = referenceStorageSection.variables[0].byteSize
-        // If more than 16 bytes, then round up in 32 bytes increments
-        const arraySlotSize =
-            arrayItemSize > 16
-                ? 32 * Math.ceil(arrayItemSize / 32)
-                : arrayItemSize
-
+        // Add missing dynamic array variables
         const arrayLength = BigNumber.from(variable.slotValue).toNumber()
-        let fillerFromSlot
-        let fillerToSlot
-        let filler = false
-        for (let i = 1; i < arrayLength; i++) {
-            const fromSlot = Math.floor((i * arraySlotSize) / 32)
-            const toSlot = Math.floor(((i + 1) * arraySlotSize - 1) / 32)
-            // Add variables for the first arrayItems and last arrayItems
-            if (i < arrayItems || i >= arrayLength - arrayItems) {
-                // add filler variable before adding the first of the last items of the array
-                if (!filler && fillerToSlot) {
-                    // add filler variable
-                    referenceStorageSection.variables.push({
-                        id: variableId++,
-                        attributeType: AttributeType.UserDefined,
-                        type: '----',
-                        fromSlot: fillerFromSlot,
-                        toSlot: fillerToSlot,
-                        byteOffset: 0,
-                        byteSize: (fillerToSlot - fillerFromSlot) * 32,
-                        getValue: false,
-                        displayValue: false,
-                        dynamic: false,
-                    })
-                    filler = true
-                }
+        if (arrayLength > 1) {
+            // Add missing fixed array variables from index 1
+            addArrayVariables(
+                arrayLength,
+                arrayItems,
+                referenceStorageSection.variables
+            )
 
-                const byteOffset = (i * arraySlotSize) % 32
-                const value =
-                    fromSlot === 0
-                        ? referenceStorageSection.variables[0].slotValue
-                        : undefined
-
-                // add dynamic variable
-                const newVariable: Variable = {
-                    ...referenceStorageSection.variables[0],
-                    id: variableId++,
-                    fromSlot,
-                    toSlot,
-                    byteOffset,
-                    slotValue: value,
-                    referenceSectionId: undefined,
-                    dynamic: false,
-                    parsedValue: undefined,
-                }
-                newVariable.parsedValue = parseValue(newVariable)
-                referenceStorageSection.variables.push(newVariable)
-            } else if (!fillerFromSlot) {
-                fillerFromSlot = fromSlot
-            } else {
-                fillerToSlot = toSlot
-            }
+            // For the newly added variables
+            // referenceStorageSection.variables.forEach((variable, i) => {
+            //     if (
+            //         referenceStorageSection.variables[0].attributeType !==
+            //             AttributeType.Elementary &&
+            //         i > 0
+            //     ) {
+            //         // recursively add storage section for Array and UserDefined types
+            //         const references = parseStorageSectionFromAttribute(
+            //             baseAttribute,
+            //             umlClass,
+            //             otherClasses,
+            //             storageSections,
+            //             mapping,
+            //             arrayItems
+            //         )
+            //         variable.referenceSectionId = references.storageSection?.id
+            //         variable.enumValues = references?.enumValues
+            //     }
+            // })
         }
+
         // Get missing slot values
         await addSlotValues(
             url,

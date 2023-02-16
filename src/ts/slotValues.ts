@@ -154,7 +154,7 @@ const parseElementaryValue = (
         if (variableValue === '00') return 'false'
         if (variableValue === '01') return 'true'
         throw Error(
-            `Failed to parse bool variable ${variable.name} with value "${variableValue}"`
+            `Failed to parse bool variable "${variable.name}" in slot ${variable.fromSlot}, offset ${variable.byteOffset} and slot value "${variableValue}"`
         )
     }
     if (variable.type === 'string' || variable.type === 'bytes') {
