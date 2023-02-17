@@ -102,7 +102,7 @@
 <polyline fill="none" stroke="black" points="49.61,-290.9 620.1,-290.9 "/>
 <text text-anchor="middle" x="334.85" y="-274.3" font-family="Courier New" font-size="14.00"> </text>
 <polyline fill="none" stroke="black" points="49.61,-266.1 620.1,-266.1 "/>
-<text text-anchor="middle" x="334.85" y="-249.5" font-family="Courier New" font-size="14.00">0x0000000000000000000000000000000000000000000000000088B685E944694E</text>
+<text text-anchor="middle" x="334.85" y="-249.5" font-family="Courier New" font-size="14.00">0x00000000000000000000000000000000000000000000000000897EDBA2ECB5FE</text>
 <text text-anchor="middle" x="334.85" y="-232.7" font-family="Courier New" font-size="14.00"> &#160;</text>
 <polyline fill="none" stroke="black" points="49.61,-224.5 620.1,-224.5 "/>
 <text text-anchor="middle" x="334.85" y="-207.9" font-family="Courier New" font-size="14.00"> </text>
@@ -172,7 +172,7 @@
 <text text-anchor="middle" x="1034.44" y="-274.3" font-family="Courier New" font-size="14.00">mapping(address=&gt;mapping(address=&gt;uint256)): FiatTokenV1.allowed (32)</text>
 <polyline fill="none" stroke="black" points="620.1,-266.1 1449.42,-266.1 "/>
 <text text-anchor="middle" x="1034.72" y="-249.5" font-family="Courier New" font-size="14.00">uint256: FiatTokenV1.totalSupply_ (32)</text>
-<text text-anchor="middle" x="1034.72" y="-232.7" font-family="Courier New" font-size="14.00"> 38,481,283,093,129,550 </text>
+<text text-anchor="middle" x="1034.72" y="-232.7" font-family="Courier New" font-size="14.00"> 38,701,553,605,719,550 </text>
 <polyline fill="none" stroke="black" points="620.1,-224.5 1449.42,-224.5 "/>
 <text text-anchor="middle" x="1034.73" y="-207.9" font-family="Courier New" font-size="14.00">mapping(address=&gt;bool): FiatTokenV1.minters (32)</text>
 <polyline fill="none" stroke="black" points="620.1,-199.7 1449.42,-199.7 "/>

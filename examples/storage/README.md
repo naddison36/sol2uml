@@ -15,7 +15,7 @@ The filename will be the contract name so for the `BasicStorage` contract the fi
 The output option can also specify the folder and file name.
 
 ```
-sol2uml storage ./src/contracts -c BasicStorage -o examples/storage
+sol2uml storage ./src/contracts -c BasicStorage
 ```
 
 ![BasicStorage](./BasicStorage.svg)
@@ -37,7 +37,7 @@ Alternatively, the `NODE_URL` environment variables can be used like in the foll
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-storage -n arbitrum 0x8E2587265C68CD9EE3EcBf22DC229980b47CB960 -d -o examples/storage/BasicStorageData.svg
+sol2uml storage -d -n arbitrum 0x8E2587265C68CD9EE3EcBf22DC229980b47CB960 -o BasicStorageData.svg
 ```
 
 ![BasicStorageData](./BasicStorageData.svg)
@@ -84,7 +84,7 @@ This example was generated for the [MultiFixedArrayStorage](../../src/contracts/
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-sol2uml storage -d -n arbitrum 0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea -o examples/storage/MultiFixedArrayStorageData.svg
+sol2uml storage -d -n arbitrum 0xe147cB7D90B9253844130E2C4A7Ef0ffB641C3ea -o MultiFixedArrayStorageData.svg
 ```
 
 ![MultiFixedArrayStorageData](./MultiFixedArrayStorageData.svg)
@@ -98,7 +98,7 @@ Even though the `threeByTwoBool` and `twoByThreeBool` variables only store six b
 Below is an example of dynamic array storage using the [DynamicArrayStorage.sol](../../src/contracts/storage/DynamicArrayStorage.sol) contract that does not fetch the slot values.
 
 ```
-sol2uml storage ./src/contracts -c DynamicArrayStorage -o examples/storage
+sol2uml storage ./src/contracts -c DynamicArrayStorage
 ```
 
 ![DynamicArrayStorage](./DynamicArrayStorage.svg)
@@ -112,7 +112,7 @@ The following is generated from the `DynamicArrayStorage` contract deployed on A
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-sol2uml storage -d -n arbitrum 0x66535378de7FB9219b637DBE3e3FFad33387f80B -o examples/storage/DynamicArrayStorageData.svg
+sol2uml storage -d -n arbitrum 0x66535378de7FB9219b637DBE3e3FFad33387f80B -o DynamicArrayStorageData.svg
 ```
 
 ![DynamicArrayStorageData](./DynamicArrayStorageData.svg)
@@ -128,7 +128,7 @@ Even though the `empty` variable does not have any array items yet, the location
 Below is an example of multidimensional dynamic array storage using the [MultiDynamicArrayStorage.sol](../../src/contracts/storage/MultiDynamicArrayStorage.sol) contract.
 
 ```
-sol2uml storage ./src/contracts -c MultiDynamicArrayStorage -o examples/storage
+sol2uml storage ./src/contracts -c MultiDynamicArrayStorage
 ```
 
 ![MultioDynamicArrayStorage](./MultiDynamicArrayStorage.svg)
@@ -137,7 +137,7 @@ The following is generated from the `MultiDynamicArrayStorage` contract deployed
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-sol2uml storage -d -n arbitrum 0x6f44d1108bB79710C1BBE378661d90876682E027 -o examples/storage/MultiDynamicArrayStorageData.svg
+sol2uml storage -d -n arbitrum 0x6f44d1108bB79710C1BBE378661d90876682E027 -o MultiDynamicArrayStorageData.svg
 ```
 
 ![MultiDynamicArrayStorageData](./MultiDynamicArrayStorageData.svg)
@@ -147,7 +147,7 @@ sol2uml storage -d -n arbitrum 0x6f44d1108bB79710C1BBE378661d90876682E027 -o exa
 The below example is of storage variables that use structs from the [StructStorage.sol](../../src/contracts/storage/StructStorage.sol) contract.
 
 ```
-sol2uml storage ./src/contracts -c StructStorage -o examples/storage
+sol2uml storage ./src/contracts -c StructStorage
 ```
 
 ![StructStorage](./StructStorage.svg)
@@ -162,7 +162,7 @@ The following is generated from the `StructStorage` contract deployed on Arbitru
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-sol2uml storage -d -n arbitrum 0xB8F98C34e40E0D201CE2F3440cE92d0B5c5CfFe2 -o examples/storage/StructStorageData.svg
+sol2uml storage -d -n arbitrum 0xB8F98C34e40E0D201CE2F3440cE92d0B5c5CfFe2 -o StructStorageData.svg
 ```
 
 ![StructStorageData](./StructStorageData.svg)
@@ -172,7 +172,7 @@ sol2uml storage -d -n arbitrum 0xB8F98C34e40E0D201CE2F3440cE92d0B5c5CfFe2 -o exa
 Below is an example of string storage using the [StringStorage.sol](../../src/contracts/storage/StringStorage.sol) contract that does not fetch the slot values.
 
 ```
-sol2uml storage ./src/contracts -c StringStorage -o examples/storage
+sol2uml storage ./src/contracts -c StringStorage
 ```
 
 ![StringStorage](./StringStorage.svg)
@@ -182,7 +182,7 @@ The below diagram get the data for the `StringStorage` contract deployed on Arbi
 
 ```
 export NODE_URL=https://arb-mainnet.g.alchemy.com/v2/your-api-key
-sol2uml storage -d -n arbitrum 0xeF2A93be2beD1b577D460c347f82De1Ba8bD9861 -v -o examples/storage/StringStorageData.svg
+sol2uml storage -d -n arbitrum 0xeF2A93be2beD1b577D460c347f82De1Ba8bD9861 -o StringStorageData.svg
 ```
 
 ![StringStorageData](./StringStorageData.svg)
@@ -207,6 +207,19 @@ The second slot with offset 1 is the slot with key `0x036b6384b5eca791c62761152d
 
 ## Mappings
 
+Below is an example of mapping storage variables using the [MappingStorage.sol](../../src/contracts/storage/MappingStorage.sol) contract.
+
+```
+sol2uml storage ./src/contracts -c MappingStorage
+```
+
+![MappingStorage](./MappingStorage.svg)
+
+sol2uml does not fetch slot values for mapping types as no data is stored in the variable's slot. The variable's slot along with the mapped key is used to find the location of the mapped values.
+Without looking at past transactions or events, sol2uml does not know what these mapped values are.
+
+sol2uml will show the structure of any mapped struct data types like the `mapToStruct` variable in the above.
+
 ## Contract Inheritance
 
 The following example shows the storage slots with contract inheritance. This includes [diamond inheritance](https://forum.openzeppelin.com/t/solidity-diamond-inheritance/2694), imports from other files, import aliases and duplicate contract names.
@@ -214,7 +227,7 @@ The following example shows the storage slots with contract inheritance. This in
 ![Inheritance Class Diagram](../inheritanceDiamond.png)
 
 ```
-sol2uml class -c -f png -o examples/inheritanceDiamond.png ./src/contracts/inheritance
+sol2uml class ./src/contracts/inheritance -c -f png -o examples/inheritanceDiamond.png
 ```
 
 The storage slots for contract `D` in [inheritance/common.sol](../../src/contracts/inheritance/common.sol).
@@ -222,53 +235,30 @@ The storage slots for contract `D` in [inheritance/common.sol](../../src/contrac
 ![Inheritance](./inheritanceStorage.svg)
 
 ```
-sol2uml storage -c D -o examples/storage/inheritanceStorage.svg ./src/contracts/inheritance
+sol2uml storage ./src/contracts/inheritance -c D -o examples/storage/inheritanceStorage.svg
 ```
 
 ## USDC
 
-USDC storage slots from the [verified source code](https://etherscan.io/address/0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf#code) on Etherscan.
-
-The `-d --data` option is used to get the values of the storage slots from mainnet.
-As this is a proxied contract, the `-s --storage` option is used with the proxy contract address [0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48](https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48).
-The `-u ---url` option is used to tell which Ethereum node to get the storage values.
+The USD Coin (USDC) token deployed to [0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48](https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48#code) on mainnet is a proxied contract.
+For sol2uml to get the slot values, the implementation contract [0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf](https://etherscan.io/address/0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf#code)
+is specified for the Solidity source and the proxy address `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` is passed to the `-s --storage` option.
+The storage option is the contract that the storage state is read from.
 
 ```
-sol2uml storage 0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf -d -s 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 -u https://your-url
+export NODE_URL=https://your-node-url
+sol2uml storage 0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf -d -s 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 -o usdcData.svg
 ```
 
 ![USDC](./usdcData.svg)
 
-## mStable Emissions Controller
-
-The [mStable](https://mstable.org/) Emissions Controller is deployed on mainnet to [0xBa69e6FC7Df49a3b75b565068Fb91ff2d9d91780](https://etherscan.io/address/0xBa69e6FC7Df49a3b75b565068Fb91ff2d9d91780).
-This is a proxy contract so to visualise the storage layout sol2uml needs to be run against the proxy implementation [0xebfd9cD78510c591eDa8735D0F8a87414eF27A83](https://etherscan.io/address/0xebfd9cd78510c591eda8735d0f8a87414ef27a83).
-
-By default, the output file will be saved in the current working directory using the contract name as the filename in svg format. In this case, it'll be `EmissionsController.svg`.
-
-```
-sol2uml storage 0xebfd9cD78510c591eDa8735D0F8a87414eF27A83
-```
-
-![Emissions Controller](./EmissionsController.svg)
-
-To visualise the data in the storage slots, the `-d --data` option is used.
-As this is a proxied contract, the `-s --storage` option is used with the proxy contract address.
-The `-u ---url` option can be used to tell which Ethereum node to get the storage values. Alternatively, the `NODE_URL` environment variable can be set.
-
-```
-export NODE_URL=https://your-node-url
-sol2uml storage 0xebfd9cD78510c591eDa8735D0F8a87414eF27A83 -d -s 0xBa69e6FC7Df49a3b75b565068Fb91ff2d9d91780
-```
-
-![Emissions Controller Data](./EmissionsControllerData.svg)
-
 ## mStable Staking contract for MTA/ETH 80/20 Balancer Pool Token (BPT)
 
-The `-f --format` option is used to output in svg, png or dot formats.
+By default, sol2uml will get the latest block number from the node provider and then all storage calls will use the same block for consistency.
+The `-bn, --block <number>` option can be used to specify which block to get the storage values from.
 
 ```
-sol2uml storage 0xc63a48d85CCE7C3bD4d18db9c0972a4D223e4193 -d -s 0xeFbe22085D9f29863Cfb77EEd16d3cC0D927b011 -f svg -o examples/storage/StakedTokenBPT.svg
+sol2uml storage 0xc63a48d85CCE7C3bD4d18db9c0972a4D223e4193 -bn 16000000 -d -s 0xeFbe22085D9f29863Cfb77EEd16d3cC0D927b011 -o StakedTokenBPTData.svg
 ```
 
 ![Staking Tokens BPT](./StakedTokenBPTData.svg)
