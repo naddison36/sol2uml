@@ -921,150 +921,172 @@ export const addDynamicVariables = async (
     blockTag: BigNumberish
 ) => {
     for (const variable of storageSection.variables) {
-        // STEP 1 - add slots for dynamic string and bytes
-        if (variable.type === 'string' || variable.type === 'bytes') {
-            const size = dynamicSlotSize(variable.slotValue)
-            if (size > 31) {
-                const maxSlotNumber = Math.floor((size - 1) / 32)
-                const variables: Variable[] = []
-
-                // For each dynamic slot
-                for (let i = 0; i <= maxSlotNumber; i++) {
-                    // If the last slot then get the remaining bytes
-                    const byteSize =
-                        i === maxSlotNumber ? size - 32 * maxSlotNumber : 32
-                    // Add variable for the slot
-                    variables.push({
-                        id: variableId++,
-                        fromSlot: i,
-                        toSlot: i,
-                        byteSize,
-                        byteOffset: 0,
-                        type: variable.type,
-                        contractName: variable.contractName,
-                        attributeType: AttributeType.Elementary,
-                        dynamic: false,
-                        getValue: true,
-                        displayValue: true,
-                    })
+        try {
+            if (!variable.dynamic) continue
+            // STEP 1 - add slots for dynamic string and bytes
+            if (variable.type === 'string' || variable.type === 'bytes') {
+                if (!variable.slotValue) {
+                    debug(
+                        `WARNING: Variable "${variable.name}" of type "${variable.type}" has no slot value`
+                    )
+                    continue
                 }
+                const size = dynamicSlotSize(variable)
+                if (size > 31) {
+                    const maxSlotNumber = Math.floor((size - 1) / 32)
+                    const variables: Variable[] = []
 
-                // add unallocated variable
-                const unusedBytes = 32 - (size - 32 * maxSlotNumber)
-                if (unusedBytes > 0) {
-                    const lastVariable = variables[variables.length - 1]
-                    variables.push({
-                        ...lastVariable,
-                        byteOffset: unusedBytes,
-                    })
-
-                    variables[maxSlotNumber] = {
-                        id: variableId++,
-                        fromSlot: maxSlotNumber,
-                        toSlot: maxSlotNumber,
-                        byteSize: unusedBytes,
-                        byteOffset: 0,
-                        type: 'unallocated',
-                        attributeType: AttributeType.UserDefined,
-                        contractName: variable.contractName,
-                        name: '',
-                        dynamic: false,
-                        getValue: true,
-                        displayValue: false,
+                    // For each dynamic slot
+                    for (let i = 0; i <= maxSlotNumber; i++) {
+                        // If the last slot then get the remaining bytes
+                        const byteSize =
+                            i === maxSlotNumber ? size - 32 * maxSlotNumber : 32
+                        // Add variable for the slot
+                        variables.push({
+                            id: variableId++,
+                            fromSlot: i,
+                            toSlot: i,
+                            byteSize,
+                            byteOffset: 0,
+                            type: variable.type,
+                            contractName: variable.contractName,
+                            attributeType: AttributeType.Elementary,
+                            dynamic: false,
+                            getValue: true,
+                            displayValue: true,
+                        })
                     }
+
+                    // add unallocated variable
+                    const unusedBytes = 32 - (size - 32 * maxSlotNumber)
+                    if (unusedBytes > 0) {
+                        const lastVariable = variables[variables.length - 1]
+                        variables.push({
+                            ...lastVariable,
+                            byteOffset: unusedBytes,
+                        })
+
+                        variables[maxSlotNumber] = {
+                            id: variableId++,
+                            fromSlot: maxSlotNumber,
+                            toSlot: maxSlotNumber,
+                            byteSize: unusedBytes,
+                            byteOffset: 0,
+                            type: 'unallocated',
+                            attributeType: AttributeType.UserDefined,
+                            contractName: variable.contractName,
+                            name: '',
+                            dynamic: false,
+                            getValue: true,
+                            displayValue: false,
+                        }
+                    }
+
+                    const newStorageSection: StorageSection = {
+                        id: storageId++,
+                        name: `${variable.type}: ${variable.name}`,
+                        offset: calcSectionOffset(
+                            variable,
+                            storageSection.offset
+                        ),
+                        type:
+                            variable.type === 'string'
+                                ? StorageSectionType.String
+                                : StorageSectionType.Bytes,
+                        arrayDynamic: true,
+                        arrayLength: size,
+                        variables,
+                        mapping: false,
+                    }
+                    variable.referenceSectionId = newStorageSection.id
+
+                    // get slot values for new referenced dynamic string or bytes
+                    await addSlotValues(
+                        url,
+                        contractAddress,
+                        newStorageSection,
+                        arrayItems,
+                        blockTag
+                    )
+
+                    storageSections.push(newStorageSection)
                 }
 
-                const newStorageSection: StorageSection = {
-                    id: storageId++,
-                    name: `${variable.type}: ${variable.name}`,
-                    offset: calcSectionOffset(variable, storageSection.offset),
-                    type:
-                        variable.type === 'string'
-                            ? StorageSectionType.String
-                            : StorageSectionType.Bytes,
-                    arrayDynamic: true,
-                    arrayLength: size,
-                    variables,
-                    mapping: false,
-                }
-                variable.referenceSectionId = newStorageSection.id
-
-                // get slot values for new referenced dynamic string or bytes
-                await addSlotValues(
-                    url,
-                    contractAddress,
-                    newStorageSection,
-                    arrayItems,
-                    blockTag
-                )
-
-                storageSections.push(newStorageSection)
+                continue
             }
+            if (variable.attributeType !== AttributeType.Array) continue
 
-            continue
-        }
-        if (variable.attributeType !== AttributeType.Array) continue
+            // STEP 2 - add slots for dynamic arrays
 
-        // STEP 2 - add slots for dynamic arrays
+            // find storage section that the variable is referencing
+            const referenceStorageSection = storageSections.find(
+                (ss) => ss.id === variable.referenceSectionId
+            )
+            if (!referenceStorageSection) continue
 
-        // find storage section that the variable is referencing
-        const referenceStorageSection = storageSections.find(
-            (ss) => ss.id === variable.referenceSectionId
-        )
-        if (!referenceStorageSection) continue
-
-        // recursively add dynamic variables to referenced array.
-        // this could be a fixed-size or dynamic array
-        await addDynamicVariables(
-            referenceStorageSection,
-            storageSections,
-            url,
-            contractAddress,
-            arrayItems,
-            blockTag
-        )
-
-        if (!variable.dynamic) continue
-
-        // Add missing dynamic array variables
-        const arrayLength = BigNumber.from(variable.slotValue).toNumber()
-        if (arrayLength > 1) {
-            // Add missing array variables to the referenced dynamic array
-            addArrayVariables(
-                arrayLength,
+            // recursively add dynamic variables to referenced array.
+            // this could be a fixed-size or dynamic array
+            await addDynamicVariables(
+                referenceStorageSection,
+                storageSections,
+                url,
+                contractAddress,
                 arrayItems,
-                referenceStorageSection.variables
+                blockTag
             )
 
-            // // For the newly added variables
-            // referenceStorageSection.variables.forEach((variable, i) => {
-            //     if (
-            //         referenceStorageSection.variables[0].attributeType !==
-            //             AttributeType.Elementary &&
-            //         i > 0
-            //     ) {
-            //         // recursively add storage section for Array and UserDefined types
-            //         const references = parseStorageSectionFromAttribute(
-            //             baseAttribute,
-            //             umlClass,
-            //             otherClasses,
-            //             storageSections,
-            //             mapping,
-            //             arrayItems
-            //         )
-            //         variable.referenceSectionId = references.storageSection?.id
-            //         variable.enumValues = references?.enumValues
-            //     }
-            // })
-        }
+            if (!variable.slotValue) {
+                debug(
+                    `WARNING: Dynamic array variable "${variable.name}" of type "${variable.type}" has no slot value`
+                )
+                continue
+            }
 
-        // Get missing slot values to the referenced dynamic array
-        await addSlotValues(
-            url,
-            contractAddress,
-            referenceStorageSection,
-            arrayItems,
-            blockTag
-        )
+            // Add missing dynamic array variables
+            const arrayLength = BigNumber.from(variable.slotValue).toNumber()
+            if (arrayLength > 1) {
+                // Add missing array variables to the referenced dynamic array
+                addArrayVariables(
+                    arrayLength,
+                    arrayItems,
+                    referenceStorageSection.variables
+                )
+
+                // // For the newly added variables
+                // referenceStorageSection.variables.forEach((variable, i) => {
+                //     if (
+                //         referenceStorageSection.variables[0].attributeType !==
+                //             AttributeType.Elementary &&
+                //         i > 0
+                //     ) {
+                //         // recursively add storage section for Array and UserDefined types
+                //         const references = parseStorageSectionFromAttribute(
+                //             baseAttribute,
+                //             umlClass,
+                //             otherClasses,
+                //             storageSections,
+                //             mapping,
+                //             arrayItems
+                //         )
+                //         variable.referenceSectionId = references.storageSection?.id
+                //         variable.enumValues = references?.enumValues
+                //     }
+                // })
+            }
+
+            // Get missing slot values to the referenced dynamic array
+            await addSlotValues(
+                url,
+                contractAddress,
+                referenceStorageSection,
+                arrayItems,
+                blockTag
+            )
+        } catch (err) {
+            throw Error(
+                `Failed to add dynamic vars for section "${storageSection.name}", var type "${variable.type}" with value "${variable.slotValue}" from slot ${variable.fromSlot} and section offset ${storageSection.offset}`,
+                { cause: err }
+            )
+        }
     }
 }

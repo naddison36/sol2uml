@@ -37,9 +37,13 @@ export declare const getSlotValue: (url: string, contractAddress: string, slotKe
  * Calculates the number of string characters or bytes of a string or bytes type.
  * See the following for how string and bytes are stored in storage slots
  * https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#bytes-and-string
- * @param slotValue the slot value in hexadecimal format
+ * @param variable the variable with the slotValue that is being sized
  * @return bytes the number of bytes of the dynamic slot. If static, zero is return.
  */
-export declare const dynamicSlotSize: (slotValue: string) => number;
+export declare const dynamicSlotSize: (variable: {
+    name?: string;
+    type?: string;
+    slotValue?: string;
+}) => number;
 export declare const convert2String: (bytes: string) => string;
 export declare const escapeString: (text: string) => string;

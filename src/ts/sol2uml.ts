@@ -353,17 +353,16 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                         arrayItems,
                         block
                     )
+                    // Add storage variables for dynamic arrays, strings and bytes
+                    await addDynamicVariables(
+                        storageSection,
+                        storageSections,
+                        combinedOptions.url,
+                        storageAddress,
+                        arrayItems,
+                        block
+                    )
                 }
-
-                // Add storage variables for dynamic arrays, strings and bytes
-                await addDynamicVariables(
-                    storageSections[0],
-                    storageSections,
-                    combinedOptions.url,
-                    storageAddress,
-                    arrayItems,
-                    block
-                )
             }
 
             const dotString = convertStorages2Dot(

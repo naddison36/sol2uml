@@ -90,33 +90,26 @@ interface IERC20 {
 }
 
 contract GrandParent {
-    bool initGP;
-    address grandParent;
-
-    constructor() {
-        initGP = true;
-        grandParent = 0xfF1b44f1FCCebc4890B5E00a1EA9259d00a40fEb;
-    }
+    bool initGP = true;
+    address grandParent = 0xfF1b44f1FCCebc4890B5E00a1EA9259d00a40fEb;
+    address[2] assets = [0x690B9A9E9aa1C9dB991C7721a92d351Db4FaC990, 0xe688b84b23f322a994A53dbF8E15FA82CDB71127];
+    uint256[] grandNumbers = [1, 2, 3, 4];
+    string grandParentName = "Grand parent name that takes more than one slot";
+    bytes grandParentData = hex"FFEEDDCCBBAA9988776655443322110011";
 }
 
 contract Parent is GrandParent {
-    bool initP;
-    address parent;
-
-    constructor() {
-        initP = true;
-        parent = 0xeC20607aa654D823DD01BEB8780a44863c57Ed07;
-    }
+    bool initP = true;
+    address parent = 0xeC20607aa654D823DD01BEB8780a44863c57Ed07;
+    string parentName = "Parent";
+    bytes parentData = hex"F0123456789ABCDEFF";
 }
 
 contract Parent2 is GrandParent {
-    bool initP2;
-    address parent2;
-
-    constructor() {
-        initP2 = true;
-        parent2 = 0xb985439AFa9314dCB002E191e230A5936493479B;
-    }
+    bool initP2 = true;
+    address parent2 = 0xb985439AFa9314dCB002E191e230A5936493479B;
+    uint56[21] smallNumbers = [1, 2, 3, 4, 5, 6, 7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15 ,16 ,17 ,18 ,19 ,20 ,21];
+    bytes data;
 }
 
 contract TestStorage is Parent, Parent2 {
@@ -196,7 +189,6 @@ contract TestStorage is Parent, Parent2 {
     bool internal flag3 = true;
     bool public flag4 = false;
     bool[2] public flags = [true, true];
-    bool[2][2] public flags2x2 = [[true, false], [true, true]];
     bool[2][3] public flags2x3 = [[true, false], [false, true], [true, true]];
     bool[3][2] public flags3x2 = [[true, false, true], [false, true, false]];
 
@@ -326,7 +318,7 @@ contract TestStorage is Parent, Parent2 {
     string public emptyBytes = hex"";
     bytes public testBytes = hex"FFEEDDCCBBAA9988770011";
     bytes public exactly31Bytes = hex"ec0b854938343f85eb39a6648b9e449c2e4aee4dc9b4e96ab592f9f497d051";
-    bytes public exactly32Bytes = hex"2619ec68b255542e3da68c054bfe0d7d0f27b7fdbefc8bbccdd23188fc71fe7f";
+    bytes public exactly32Bytes = hex"27f12abfe35860a9a927b465bb3d4a9c23c8428174b83f278fe45ed7b4da2662";
     bytes public long3Bytes = hex"f34d3c319f536deb74ed8f1f3205d9aefef7487c819e77d3351630820dbff1118cc7ee599e5d59fee88c83157bd897847c5911dc7d317b3175e0b085198349973fff";
     uint256 public testUint256 = 0xFEDCBA9876543210;
     int256 public testInt256 = -1023;

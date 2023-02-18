@@ -107,7 +107,7 @@ describe('Slot Values', () => {
     })
     describe('calc dynamic slot size for string value', () => {
         test.each`
-            value                                                                   | expected
+            slotValue                                                               | expected
             ${'0x0000000000000000000000000000000000000000000000000000000000000000'} | ${0}
             ${'0x1000000000000000000000000000000000000000000000000000000000000000'} | ${0}
             ${'0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00'} | ${0}
@@ -126,8 +126,8 @@ describe('Slot Values', () => {
             ${'0x0000000000000000000000000000000000000000000000000000000000000043'} | ${33}
             ${'0x0000000000000000000000000000000000000000000000000000000000000101'} | ${128}
             ${'0x0000000000000000000000000000000000000000000000000000000000100001'} | ${524288}
-        `('$value', ({ value, expected }) => {
-            expect(dynamicSlotSize(value)).toEqual(expected)
+        `('$value', ({ slotValue, expected }) => {
+            expect(dynamicSlotSize({ slotValue })).toEqual(expected)
         })
     })
     describe('parse value from slot data', () => {

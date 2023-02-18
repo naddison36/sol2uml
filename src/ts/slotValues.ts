@@ -50,7 +50,7 @@ export const addSlotValues = async (
             if (
                 variable.attributeType === AttributeType.Array &&
                 i >= arrayItems &&
-                i < valueVariables.length - arrayItems
+                i < variable.toSlot - arrayItems
             ) {
                 continue
             }
@@ -79,6 +79,9 @@ export const addSlotValues = async (
         // For each variable in the storage section
         for (const variable of storageSection.variables) {
             if (variable.getValue && variable.fromSlot === fromSlot) {
+                debug(
+                    `Set slot value ${value} for section "${storageSection.name}", var type ${variable.type}, slot ${variable.fromSlot} offset ${storageSection.offset}`
+                )
                 variable.slotValue = value
                 // parse variable value from slot data
                 if (variable.displayValue) {
@@ -253,7 +256,7 @@ export const getSlotValues = async (
         debug(
             `About to get ${
                 slotKeys.length
-            } storage values for ${contractAddress} at block ${blockTag} from slot ${slotKeys[0].toString()}`
+            } storage values for ${contractAddress} at block ${blockTag} from slot ${missingKeys[0].toString()}`
         )
         // Get the values for the missing slot keys
         const payload = missingKeys.map((key) => ({
@@ -278,7 +281,9 @@ export const getSlotValues = async (
         )
         const missingValues = sortedResponses.map((data) => {
             if (data.error) {
-                throw Error(data.error?.message)
+                throw Error(
+                    `json rpc call with id ${data.id} failed to get storage values: ${data.error?.message}`
+                )
             }
             return '0x' + data.result.toUpperCase().slice(2)
         })
@@ -327,18 +332,30 @@ export const getSlotValue = async (
  * Calculates the number of string characters or bytes of a string or bytes type.
  * See the following for how string and bytes are stored in storage slots
  * https://docs.soliditylang.org/en/v0.8.17/internals/layout_in_storage.html#bytes-and-string
- * @param slotValue the slot value in hexadecimal format
+ * @param variable the variable with the slotValue that is being sized
  * @return bytes the number of bytes of the dynamic slot. If static, zero is return.
  */
-export const dynamicSlotSize = (slotValue: string): number => {
-    const last4bits = '0x' + slotValue.slice(-1)
-    const last4bitsNum = BigNumber.from(last4bits).toNumber()
-    // If the last 4 bits is an even number then it's not a dynamic slot
-    if (last4bitsNum % 2 === 0) return 0
+export const dynamicSlotSize = (variable: {
+    name?: string
+    type?: string
+    slotValue?: string
+}): number => {
+    try {
+        if (!variable?.slotValue) throw Error(`Missing slot value.`)
+        const last4bits = '0x' + variable.slotValue.slice(-1)
+        const last4bitsNum = BigNumber.from(last4bits).toNumber()
+        // If the last 4 bits is an even number then it's not a dynamic slot
+        if (last4bitsNum % 2 === 0) return 0
 
-    const sizeRaw = BigNumber.from(slotValue).toNumber()
-    // Adjust the size to bytes
-    return (sizeRaw - 1) / 2
+        const sizeRaw = BigNumber.from(variable.slotValue).toNumber()
+        // Adjust the size to bytes
+        return (sizeRaw - 1) / 2
+    } catch (err) {
+        throw Error(
+            `Failed to calculate dynamic slot size for variable "${variable?.name}" of type "${variable?.type}" with slot value ${variable?.slotValue}`,
+            { cause: err }
+        )
+    }
 }
 
 export const convert2String = (bytes: string): string => {
