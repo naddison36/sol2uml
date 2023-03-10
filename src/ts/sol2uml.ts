@@ -28,16 +28,10 @@ const debugControl = require('debug')
 const debug = require('debug')('sol2uml')
 
 program
-    .usage(
-        `[subcommand] <options>
-
-sol2uml comes with three subcommands:
-* class:    Generates a UML class diagram from Solidity source code. (default)
-* storage:  Generates a diagram of a contract's storage slots.
-* flatten:  Merges verified Solidity files from a Blockchain explorer into one local file.
-* diff:     Compares the flattened Solidity code from a Blockchain explorer for two contracts.
-
-The Solidity code can be pulled from verified source code on Blockchain explorers like Etherscan or from local Solidity files.`
+    .usage('[command] <options>')
+    .description(
+        `Generate UML class or storage diagrams from local Solidity code or verified Solidity code on Etherscan-like explorers.
+Can also flatten or compare verified source files on Etherscan-like explorers.`
     )
     .addOption(
         new Option(
@@ -91,27 +85,17 @@ const version =
         : require('../../package.json').version // used when run from TypeScript source files under src/ts via ts-node
 program.version(version)
 
+const argumentText = `file name, folder(s) or contract address.
+\t\t\t\t  When a folder is used, all *.sol files in that folder and all sub folders are used.
+\t\t\t\t  A comma-separated list of files and folders can also be used. For example
+\t\t\t\t\tsol2uml contracts,node_modules/openzeppelin-solidity
+\t\t\t\t  If an Ethereum address with a 0x prefix is passed, the verified source code from Etherscan will be used. For example
+\t\t\t\t\tsol2uml 0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9`
 program
     .command('class', { isDefault: true })
+    .usage('[options] <fileFolderAddress>')
     .description('Generates a UML class diagram from Solidity source code.')
-    .usage(
-        `sol2uml [options] <fileFolderAddress>
-
-Generates UML diagrams from Solidity source code.
-
-If no file, folder or address is passed as the first argument, the working folder is used.
-When a folder is used, all *.sol files are found in that folder and all sub folders.
-A comma separated list of files and folders can also be used. For example
-    sol2uml contracts,node_modules/openzeppelin-solidity
-
-If an Ethereum address with a 0x prefix is passed, the verified source code from Etherscan will be used. For example
-    sol2uml 0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9`
-    )
-    .argument(
-        '[fileFolderAddress]',
-        'file name, base folder or contract address',
-        process.cwd()
-    )
+    .argument('fileFolderAddress', argumentText)
     .option(
         '-b, --baseContractNames <value>',
         'only output contracts connected to these comma separated base contract names'
@@ -191,26 +175,28 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
                     'Must specify base contract(s) when using the squash option against local Solidity files.'
                 )
             }
+            const baseContractNames = options.baseContractNames?.split(',')
+            if (baseContractNames) {
+                contractName = baseContractNames[0]
+            }
 
             // Filter out any class stereotypes that are to be hidden
             let filteredUmlClasses = filterHiddenClasses(umlClasses, options)
-
-            const baseContractNames = options.baseContractNames?.split(',')
-            if (baseContractNames) {
-                // Find all the classes connected to the base classes
-                filteredUmlClasses = classesConnectedToBaseContracts(
-                    filteredUmlClasses,
-                    baseContractNames,
-                    options.depth
-                )
-                contractName = baseContractNames[0]
-            }
 
             // squash contracts
             if (options.squash) {
                 filteredUmlClasses = squashUmlClasses(
                     filteredUmlClasses,
                     baseContractNames || [contractName]
+                )
+            }
+
+            if (baseContractNames || options.squash) {
+                // Find all the classes connected to the base classes after they have been squashed
+                filteredUmlClasses = classesConnectedToBaseContracts(
+                    filteredUmlClasses,
+                    baseContractNames || [contractName],
+                    options.depth
                 )
             }
 
@@ -238,16 +224,13 @@ If an Ethereum address with a 0x prefix is passed, the verified source code from
 
 program
     .command('storage')
-    .description("Visually display a contract's storage slots.")
-    .usage(
-        `[options] <fileFolderAddress>
+    .usage('[options] <fileFolderAddress>')
+    .description(
+        `Visually display a contract's storage slots.
 
-WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.`
+WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.\n`
     )
-    .argument(
-        '<fileFolderAddress>',
-        'file name, base folder or contract address'
-    )
+    .argument('fileFolderAddress', argumentText)
     .option(
         '-c, --contract <name>',
         'Contract name in the local Solidity files. Not needed when using an address as the first argument as the contract name can be derived from Etherscan.'
@@ -385,18 +368,16 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
 
 program
     .command('flatten')
+    .usage('<contractAddress>')
     .description(
-        'Merges verified source files for a contract from a Blockchain explorer into one local file.'
-    )
-    .usage(
-        `<contractAddress>
+        `Merges verified source files for a contract from a Blockchain explorer into one local Solidity file.
 
 In order for the merged code to compile, the following is done:
 1. pragma solidity is set using the compiler of the verified contract.
 2. All pragma solidity lines in the source files are commented out.
 3. File imports are commented out.
 4. "SPDX-License-Identifier" is renamed to "SPDX--License-Identifier".
-5. Contract dependencies are analysed so the files are merged in an order that will compile.`
+5. Contract dependencies are analysed so the files are merged in an order that will compile.\n`
     )
     .argument(
         '<contractAddress>',
@@ -431,28 +412,26 @@ In order for the merged code to compile, the following is done:
 
 program
     .command('diff')
+    .usage('[options] <addressA> <addressB>')
     .description(
-        'Compare verified Solidity code differences between two contracts.'
-    )
-    .usage(
-        `[options] <addressA> <addressB>
+        `Compare verified Solidity code differences between two contracts.
 
-The results show the comparison of contracts A to B.
+The results show the comparison of contract A to B.
 The ${clc.green(
             'green'
         )} sections are additions to contract B that are not in contract A.
 The ${clc.red(
             'red'
         )} sections are removals from contract A that are not in contract B.
-The line numbers are from contract B. There are no line numbers for the red sections as they are not in contract B.`
+The line numbers are from contract B. There are no line numbers for the red sections as they are not in contract B.\n`
     )
     .argument(
         '<addressA>',
-        'Contract address in hexadecimal format with a 0x prefix.'
+        'Contract address in hexadecimal format with a 0x prefix of the first contract.'
     )
     .argument(
         '<addressB>',
-        'Contract address in hexadecimal format with a 0x prefix.'
+        'Contract address in hexadecimal format with a 0x prefix of the second contract.'
     )
     .addOption(
         new Option(

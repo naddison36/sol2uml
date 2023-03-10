@@ -4,7 +4,7 @@ export interface Remapping {
     from: RegExp;
     to: string;
 }
-export declare const networks: readonly ["mainnet", "ropsten", "kovan", "rinkeby", "goerli", "sepolia", "polygon", "testnet.polygon", "arbitrum", "testnet.arbitrum", "avalanche", "testnet.avalanche", "bsc", "testnet.bsc", "crono", "fantom", "testnet.fantom", "moonbeam", "optimistic", "kovan-optimistic", "gnosisscan"];
+export declare const networks: readonly ["mainnet", "goerli", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam", "optimism", "gnosis"];
 export type Network = (typeof networks)[number];
 export declare class EtherscanParser {
     protected apikey: string;

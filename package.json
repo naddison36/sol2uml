@@ -1,6 +1,6 @@
 {
   "name": "sol2uml",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "Solidity contract visualisation tool.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -8,9 +8,12 @@
     "buildSol": "cd ./src/contracts && solc **/*.sol",
     "build": "tsc --build ./tsconfig.json",
     "clean": "tsc --build --clean ./tsconfig.json",
+    "package-lock": "npm i --package-lock-only",
+    "permit": " chmod 775 lib/sol2uml.js",
     "prettier": "prettier --write src/**/*.ts **/*.md",
     "prettier:check": "prettier --check src/**/*.ts  **/*.md",
-    "test": "npx jest"
+    "test": "npx jest",
+    "prepublishOnly": "npm run clean && npm run package-lock && npm run build && npm run permit"
   },
   "preferGlobal": true,
   "contributors": [

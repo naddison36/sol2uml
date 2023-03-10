@@ -45,22 +45,17 @@ npm ls sol2uml -g
 ## Command Line Interface (CLI)
 
 ```
-Usage: sol2uml [subcommand] <options>
-The three subcommands:
-* class:    Generates a UML class diagram from Solidity source code. default
-* storage:  Generates a diagram of a contract's storage slots.
-* flatten:  Merges verified source files from a Blockchain explorer into one local file.
-* diff:     Compares the flattened Solidity code from a Blockchain explorer for two contracts.
+Usage: sol2uml [command] <options>
 
-The Solidity code can be pulled from verified source code on Blockchain explorers like Etherscan or from local Solidity files.
+Generate UML class or storage diagrams from local Solidity code or verified Solidity code on Etherscan-like explorers.
+Can also flatten or compare verified source files on Etherscan-like explorers.
 
 Options:
   -sf, --subfolders <value>                    number of subfolders that will be recursively searched for Solidity files. (default: all)
   -f, --outputFormat <value>                   output file format. (choices: "svg", "png", "dot", "all", default: "svg")
   -o, --outputFileName <value>                 output file name
   -i, --ignoreFilesOrFolders <filesOrFolders>  comma separated list of files or folders to ignore
-  -n, --network <network>                      Ethereum network (choices: "mainnet", "ropsten", "kovan", "rinkeby", "goerli", "sepolia", "polygon", "testnet.polygon", "arbitrum", "testnet.arbitrum", "avalanche", "testnet.avalanche", "bsc", "testnet.bsc", "crono", "fantom",
-                                               "testnet.fantom", "moonbeam", "optimistic", "kovan-optimistic", "gnosisscan", default: "mainnet", env: ETH_NETWORK)
+  -n, --network <network>                      Ethereum network (choices: "mainnet", "goerli", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam", "optimism", "gnosis", default: "mainnet", env: ETH_NETWORK)
   -k, --apiKey <key>                           Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key (env: SCAN_API_KEY)
   -bc, --backColor <color>                     Canvas background color. "none" will use a transparent canvas. (default: "white")
   -sc, --shapeColor <color>                    Basic drawing color for graphics, not text (default: "black")
@@ -71,9 +66,24 @@ Options:
   -h, --help                                   display help for command
 
 Commands:
-  class [options] [fileFolderAddress]          Generates a UML class diagram from Solidity source code.
-  storage [options] <fileFolderAddress>        output a contracts storage slots
-  flatten <contractAddress>                    get all verified source code for a contract from the Blockchain explorer into one local file
+  class [options] <fileFolderAddress>          Generates a UML class diagram from Solidity source code.
+  storage [options] <fileFolderAddress>        Visually display a contract's storage slots.
+  
+                                               WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.
+  flatten <contractAddress>                    Merges verified source files for a contract from a Blockchain explorer into one local file.
+  
+                                               In order for the merged code to compile, the following is done:
+                                               1. pragma solidity is set using the compiler of the verified contract.
+                                               2. All pragma solidity lines in the source files are commented out.
+                                               3. File imports are commented out.
+                                               4. "SPDX-License-Identifier" is renamed to "SPDX--License-Identifier".
+                                               5. Contract dependencies are analysed so the files are merged in an order that will compile.
+  diff [options] <addressA> <addressB>         Compare verified Solidity code differences between two contracts.
+  
+                                               The results show the comparison of contract A to B.
+                                               The green sections are additions to contract B that are not in contract A.
+                                               The red sections are removals from contract A that are not in contract B.
+                                               The line numbers are from contract B. There are no line numbers for the red sections as they are not in contract B.
   help [command]                               display help for command
 ```
 
@@ -82,20 +92,15 @@ Commands:
 ```
 Usage: sol2uml class [options] <fileFolderAddress>
 
-Generates UML diagrams from Solidity source code.
-
-If no file, folder or address is passed as the first argument, the working folder is used.
-When a folder is used, all *.sol files are found in that folder and all sub folders.
-A comma separated list of files and folders can also be used. For example
-    sol2uml contracts,node_modules/openzeppelin-solidity
-
-If an Ethereum address with a 0x prefix is passed, the verified source code from Etherscan will be used. For example
-    sol2uml 0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9
-
 Generates a UML class diagram from Solidity source code.
 
 Arguments:
-  fileFolderAddress                file name, base folder or contract address (default: "/Users/nicholasaddison/Documents/workspaces/sol2uml")
+  fileFolderAddress                file name, folder(s) or contract address.
+                                  When a folder is used, all *.sol files in that folder and all sub folders are used.
+                                  A comma-separated list of files and folders can also be used. For example
+                                        sol2uml contracts,node_modules/openzeppelin-solidity
+                                  If an Ethereum address with a 0x prefix is passed, the verified source code from Etherscan will be used. For example
+                                        sol2uml 0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9
 
 Options:
   -b, --baseContractNames <value>  only output contracts connected to these comma separated base contract names
@@ -123,12 +128,17 @@ Options:
 ```
 Usage: sol2uml storage [options] <fileFolderAddress>
 
-WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.
-
 Visually display a contract's storage slots.
 
+WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.
+
 Arguments:
-  fileFolderAddress        file name, base folder or contract address
+  fileFolderAddress               file name, folder(s) or contract address.
+                                  When a folder is used, all *.sol files in that folder and all sub folders are used.
+                                  A comma-separated list of files and folders can also be used. For example
+                                        sol2uml contracts,node_modules/openzeppelin-solidity
+                                  If an Ethereum address with a 0x prefix is passed, the verified source code from Etherscan will be used. For example
+                                        sol2uml 0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9
 
 Options:
   -c, --contract <name>           Contract name in the local Solidity files. Not needed when using an address as the first argument as the contract name can be derived from Etherscan.
@@ -138,7 +148,7 @@ Options:
   -u, --url <url>                 URL of the Ethereum node to get storage values if the `data` option is used. (default: "http://localhost:8545", env: NODE_URL)
   -bn, --block <number>           Block number to get the contract storage values from. (default: "latest")
   -a, --array <number>            Number of slots to display at the start and end of arrays. (default: "2")
-  -hv, --hideValue                Hide storage slot value column.
+  -hv, --hideValue                Hide storage slot value column. (default: false)
   -h, --help                      display help for command
 ```
 
@@ -147,14 +157,14 @@ Options:
 ```
 Usage: sol2uml flatten <contractAddress>
 
+Merges verified source files for a contract from a Blockchain explorer into one local Solidity file.
+
 In order for the merged code to compile, the following is done:
 1. pragma solidity is set using the compiler of the verified contract.
 2. All pragma solidity lines in the source files are commented out.
 3. File imports are commented out.
 4. "SPDX-License-Identifier" is renamed to "SPDX--License-Identifier".
 5. Contract dependencies are analysed so the files are merged in an order that will compile.
-
-Merges verified source files for a contract from a Blockchain explorer into one local file.
 
 Arguments:
   contractAddress  Contract address in hexadecimal format with a 0x prefix.
@@ -168,16 +178,16 @@ Options:
 ```
 Usage: sol2uml diff [options] <addressA> <addressB>
 
-The results show the comparison of contracts A to B.
+Compare verified Solidity code differences between two contracts.
+
+The results show the comparison of contract A to B.
 The green sections are additions to contract B that are not in contract A.
 The red sections are removals from contract A that are not in contract B.
 The line numbers are from contract B. There are no line numbers for the red sections as they are not in contract B.
 
-Compare verified Solidity code differences between two contracts.
-
 Arguments:
-  addressA                  Contract address in hexadecimal format with a 0x prefix.
-  addressB                  Contract address in hexadecimal format with a 0x prefix.
+  addressA                  Contract address in hexadecimal format with a 0x prefix of the first contract.
+  addressB                  Contract address in hexadecimal format with a 0x prefix of the second contract.
 
 Options:
   -l, --lineBuffer <value>  Minimum number of lines before and after changes (default: "4")
