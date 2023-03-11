@@ -137,6 +137,7 @@ program
         false
     )
     .option('-hc, --hideConstants', 'hide file level constants', false)
+    .option('-hx, --hideContracts', 'hide contracts', false)
     .option('-he, --hideEnums', 'hide enum types', false)
     .option('-hs, --hideStructs', 'hide data structures', false)
     .option('-hl, --hideLibraries', 'hide libraries', false)
@@ -169,12 +170,17 @@ program
             if (
                 options.squash &&
                 // Must specify base contract(s) or parse from Etherscan to get contractName
-                !(options.baseContractNames || contractName)
+                !options.baseContractNames &&
+                !contractName
             ) {
                 throw Error(
                     'Must specify base contract(s) when using the squash option against local Solidity files.'
                 )
             }
+            if (options.squash && options.hideContracts) {
+                throw Error('Can not hide contracts when squashing contracts.')
+            }
+
             const baseContractNames = options.baseContractNames?.split(',')
             if (baseContractNames) {
                 contractName = baseContractNames[0]

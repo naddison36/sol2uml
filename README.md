@@ -112,6 +112,7 @@ Options:
   -hm, --hideModifiers             hide modifier functions from contracts (default: false)
   -ht, --hideEvents                hide events from contracts, interfaces and libraries (default: false)
   -hc, --hideConstants             hide file level constants (default: false)
+  -hx, --hideContracts             hide contracts (default: false)
   -he, --hideEnums                 hide enum types (default: false)
   -hs, --hideStructs               hide data structures (default: false)
   -hl, --hideLibraries             hide libraries (default: false)

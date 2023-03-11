@@ -1,6 +1,7 @@
 import { UmlClass } from './umlClass';
 export interface ClassOptions {
     hideConstants?: boolean;
+    hideContracts?: boolean;
     hideVariables?: boolean;
     hideFunctions?: boolean;
     hideModifiers?: boolean;

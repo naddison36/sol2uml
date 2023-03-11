@@ -33,8 +33,9 @@ export const filterHiddenClasses = (
                 !options.hideConstants) ||
             (u.stereotype === ClassStereotype.Library &&
                 !options.hideLibraries) ||
-            u.stereotype === ClassStereotype.None ||
-            u.stereotype === ClassStereotype.Contract
+            ((u.stereotype === ClassStereotype.None ||
+                u.stereotype === ClassStereotype.Contract) &&
+                !options.hideContracts)
     )
 }
 
