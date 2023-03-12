@@ -24,37 +24,54 @@ sol2uml class $AA --baseContractNames IAccount --outputFileName IAccount.svg
 
 ![Account Abstraction Interface](./IAccount.svg)
 
-## Base Account Hierarchy
+## Simple Account Hierarchy
 
 ```sh
-sol2uml class $AA --baseContractNames BaseAccount --hideFunctions --hideVariables --hideEnums --hideStructs --outputFileName BaseAccountHierarchy.svg
+sol2uml class $AA --baseContractNames SimpleAccount --hideFunctions --hideVariables --hideEnums --hideStructs --outputFileName SimpleAccountHierarchy.svg
 ```
 
-![BaseAccount Hierarchy](./BaseAccountHierarchy.svg)
+![Simple Account Hierarchy](./SimpleAccountHierarchy.svg)
 
-## Base Account
+## Simple Account Squashed Public
 
 ```sh
-sol2uml class $AA --baseContractNames BaseAccount --depth 0 --outputFileName BaseAccountDepth0.svg
+sol2uml class $AA --baseContractNames SimpleAccount --squash --depth 0 --hidePrivates --outputFileName SimpleAccountSquashedPub.svg
 ```
 
-![Abstract Basic Account](./BaseAccountDepth0.svg)
+![Simple Account Squashed](./SimpleAccountSquashedPub.svg)
 
-## Base Account Depth 1
+## Simple Account Squashed
 
 ```sh
-sol2uml class $AA --baseContractNames BaseAccount --depth 1 --outputFileName BaseAccountDepth1.svg
+sol2uml class $AA --baseContractNames SimpleAccount --squash --depth 0 --outputFileName SimpleAccountSquashed.svg
 ```
 
-![Abstract Basic Account](./BaseAccountDepth1.svg)
+![Simple Account Squashed](./SimpleAccountSquashed.svg)
 
-## Base Account All Depths
+
+## Simple Account
 
 ```sh
-sol2uml class $AA --baseContractNames BaseAccount --outputFileName BaseAccountLinked.svg
+sol2uml class $AA --baseContractNames SimpleAccount --depth 0 --outputFileName SimpleAccountDepth0.svg
 ```
 
-![Abstract Basic Account](./BaseAccountLinked.svg)
+![Simple Account](./SimpleAccountDepth0.svg)
+
+## Simple Account Depth 1
+
+```sh
+sol2uml class $AA --baseContractNames SimpleAccount --depth 1 --outputFileName SimpleAccountDepth1.svg
+```
+
+![Simple Account](./SimpleAccountDepth1.svg)
+
+## Simple Account All Depths
+
+```sh
+sol2uml class $AA --baseContractNames SimpleAccount --outputFileName SimpleAccountLinked.svg
+```
+
+![Simple Account](./SimpleAccountLinked.svg)
 
 ## EntryPoint Hierarchy
 
