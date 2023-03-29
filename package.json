@@ -36,7 +36,7 @@
     "klaw": "^4.1.0"
   },
   "devDependencies": {
-    "@openzeppelin/contracts": "4.8.0",
+    "@openzeppelin/contracts": "^4.8.2",
     "@types/diff-match-patch": "^1.0.32",
     "@types/jest": "^29.4.0",
     "@types/klaw": "^3.0.3",

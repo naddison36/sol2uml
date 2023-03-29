@@ -176,8 +176,8 @@ export class EtherscanParser {
             // and characters after import up to ;
             // replace all in file and match across multiple lines
             const removedImports = removedPragmaSolidity.replace(
-                /(\s)(import.*;)/gm,
-                '$1/* $2 */'
+                /^\s*?(import.*?;)/gms,
+                '/* $1 */'
             )
             // Rename SPDX-License-Identifier to SPDX--License-Identifier so the merged file will compile
             const removedSPDX = removedImports.replace(/SPDX-/, 'SPDX--')
