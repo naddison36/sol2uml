@@ -56,7 +56,7 @@ Options:
   -o, --outputFileName <value>                 output file name
   -i, --ignoreFilesOrFolders <filesOrFolders>  comma separated list of files or folders to ignore
   -n, --network <network>                      Ethereum network (choices: "mainnet", "goerli", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam",
-                                               "optimism", "gnosis", "celo", default: "mainnet", env: ETH_NETWORK)
+                                               "optimism", "gnosis", "celo", "mumbai, "alfajores", default: "mainnet", env: ETH_NETWORK)
   -k, --apiKey <key>                           Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key (env: SCAN_API_KEY)
   -bc, --backColor <color>                     Canvas background color. "none" will use a transparent canvas. (default: "white")
   -sc, --shapeColor <color>                    Basic drawing color for graphics, not text (default: "black")

@@ -30,6 +30,8 @@ export const networks = <const>[
     'optimism',
     'gnosis',
     'celo',
+    'mumbai',
+    'alfajores',
 ]
 export type Network = (typeof networks)[number]
 
@@ -48,6 +50,9 @@ export class EtherscanParser {
             this.url = 'https://api.etherscan.io/api'
         } else if (network === 'polygon') {
             this.url = 'https://api.polygonscan.com/api'
+            this.apikey = 'AMHGNTV5A7XYGX2M781JB3RC1DZFVRWQEB'
+        } else if (network === 'mumbai') {
+            this.url = 'https://api-testnet.polygonscan.com/api'
             this.apikey = 'AMHGNTV5A7XYGX2M781JB3RC1DZFVRWQEB'
         } else if (network === 'arbitrum') {
             this.url = 'https://api.arbiscan.io/api'
@@ -75,6 +80,9 @@ export class EtherscanParser {
             this.apikey = '2RWGXIWK538EJ8XSP9DE2JUINSCG7UCSJB'
         } else if (network === 'celo') {
             this.url = 'https://api.celoscan.io/api'
+            this.apikey = 'JBV78T5KP15W7WKKKD6KC4J8RX2F4PK8AF'
+        } else if (network === 'alfajores') {
+            this.url = 'https://api-alfajores.celoscan.io/api'
             this.apikey = 'JBV78T5KP15W7WKKKD6KC4J8RX2F4PK8AF'
         } else {
             this.url = `https://api-${network}.etherscan.io/api`
