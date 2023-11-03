@@ -14,7 +14,7 @@ UML class diagram of Open Zeppelin's ERC20 token contracts generated from [versi
 
 See more contract diagrams [here](./examples/README.md).
 
-Storage layout diagram of USDC's [verified source code](https://etherscan.io/address/0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf#code) on Etherscan.
+Storage layout diagram of USDC's [verified source code](https://etherscan.io/address/f#code) on Etherscan.
 ![USDC](./examples/storage/usdcData.svg)
 
 See an explanation of how storage diagrams work with lots of examples [here](./examples/storage/README.md#example-storage-diagrams).
