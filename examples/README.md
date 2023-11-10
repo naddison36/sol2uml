@@ -8,10 +8,10 @@ See [Account Abstraction](./accountAbstraction/README.md) for example diagrams a
 Generated from running
 
 ```
-sol2uml 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D
+sol2uml 0x564ef37e0104426e829d66dc916a30376ae1239c
 ```
 
-This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d#code
+This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0x564ef37e0104426e829d66dc916a30376ae1239c#code
 
 ## Open Zeppelin ERC20 Tokens
 
@@ -24,7 +24,7 @@ Generated from version [4.7.3 contracts/token/ERC20](https://github.com/OpenZepp
 Generated from running
 
 ```
-sol2uml -n polygon 0xcA9cf48aD534f1efA2B0f6923457F2953df86e0b
+sol2uml -n polygon 0x564ef37e0104426e829d66dc916a30376ae1239c
 ```
 
 ## Crypto Blades on BSC
@@ -33,7 +33,7 @@ sol2uml -n polygon 0xcA9cf48aD534f1efA2B0f6923457F2953df86e0b
 Generated from running
 
 ```
-sol2uml -n bsc 0xB07c1C479b2Fdeb9f9B2d02300C13b328BF86d65
+sol2uml -n bsc 0x564ef37e0104426e829d66dc916a30376ae1239c
 ```
 
 ## Open Zeppelin All
@@ -52,10 +52,10 @@ Generated from version [4.7.3 contracts](https://github.com/OpenZeppelin/openzep
 Generated from running
 
 ```
-sol2uml -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+sol2uml -hp -hi -hl -hs -he 0x564ef37e0104426e829d66dc916a30376ae1239c
 ```
 
-This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45#code
+This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0x564ef37e0104426e829d66dc916a30376ae1239c#code
 
 ## Uniswap V3 Router Squashed
 
@@ -68,7 +68,7 @@ The last stereotype is the contract the variable or function is implemented in. 
 Generated from running
 
 ```
-sol2uml -s -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+sol2uml -s -hp -hi -hl -hs -he 0x564ef37e0104426e829d66dc916a30376ae1239c
 ```
 
 ## Uniswap V3 Router Squashed No Source
@@ -80,7 +80,7 @@ Adding the `-hsc, --hideSourceContract` option to the previous diagram removes t
 Generated from running
 
 ```
-sol2uml -s -hsc -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+sol2uml -s -hsc -hp -hi -hl -hs -he 0x564ef37e0104426e829d66dc916a30376ae1239c
 ```
 
 ## Tether
@@ -89,10 +89,10 @@ sol2uml -s -hsc -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
 Generated from running
 
 ```
-sol2uml 0xdAC17F958D2ee523a2206206994597C13D831ec7
-```
+sol2uml 0x564ef37e0104426e829d66dc916a30376ae1239c
+``
 
-This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0xdac17f958d2ee523a2206206994597c13d831ec7#code
+This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0x564ef37e0104426e829d66dc916a30376ae1239c#code
 
 ## Compound Finance's cDAI
 
@@ -100,10 +100,10 @@ This uses the verified Solidity code loaded to Etherscan https://etherscan.io/ad
 Generated from running
 
 ```
-sol2uml 0xf5dce57282a584d2746faf1593d3121fcac444dc
+sol2uml 0x564ef37e0104426e829d66dc916a30376ae1239c
 ```
 
-This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0xf5dce57282a584d2746faf1593d3121fcac444dc#code
+This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0x564ef37e0104426e829d66dc916a30376ae1239cbb#code
 
 ## Compound Finance's cDAI Hide
 
@@ -114,5 +114,5 @@ Also, only classes linked to the base `CErc20` contract are included.
 Generated from running
 
 ```
-sol2uml -b CErc20 -he -hs -hi 0xf5dce57282a584d2746faf1593d3121fcac444dc
-```
+sol2uml -b CErc20 -he -hs -hi 
+```0x564ef37e0104426e829d66dc916a30376ae1239c
