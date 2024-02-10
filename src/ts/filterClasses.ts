@@ -5,9 +5,10 @@ import {
     TopologicalSort,
     WeightedDiGraph,
 } from 'js-graph-algorithms'
-import { ClassStereotype, UmlClass } from './umlClass'
+
 import { findAssociatedClass } from './associations'
 import { ClassOptions } from './converterClass2Dot'
+import { ClassStereotype, UmlClass } from './umlClass'
 
 const debug = require('debug')('sol2uml')
 

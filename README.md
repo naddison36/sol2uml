@@ -4,6 +4,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/naddison?style=social)](https://twitter.com/naddison)
 
 A visualisation tool for [Solidity](https://solidity.readthedocs.io/) contracts featuring:
+
 1. [Unified Modeling Language (UML)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) [class diagram](https://en.wikipedia.org/wiki/Class_diagram) generator for Solidity contracts.
 2. Contract storage layout diagrams.
 3. Flatten Solidity files on Etherscan-like explorers to a local file.
@@ -71,10 +72,10 @@ Options:
 Commands:
   class [options] <fileFolderAddress>             Generates a UML class diagram from Solidity source code.
   storage [options] <fileFolderAddress>           Visually display a contract's storage slots.
-  
+
                                                   WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A known example is fixed-sized arrays declared with an expression will fail to be sized.
   flatten <contractAddress>                       Merges verified source files for a contract from a Blockchain explorer into one local Solidity file.
-  
+
                                                   In order for the merged code to compile, the following is done:
                                                   1. pragma solidity is set using the compiler of the verified contract.
                                                   2. All pragma solidity lines in the source files are commented out.
@@ -82,7 +83,7 @@ Commands:
                                                   4. "SPDX-License-Identifier" is renamed to "SPDX--License-Identifier".
                                                   5. Contract dependencies are analysed so the files are merged in an order that will compile.
   diff [options] <addressA> <fileFoldersAddress>  Compare verified Solidity code to another verified contract, a local file or local source files.
-  
+
                                                   The results show the comparison of contract A to B.
                                                   The green sections are additions to contract B that are not in contract A.
                                                   The red sections are removals from contract A that are not in contract B.
@@ -315,11 +316,12 @@ Other color formats like Red-Green-Blue (RGB) can also be used. For example, #ff
 See [Graphviz color](https://graphviz.org/docs/attr-types/color/) documentation for more details.
 
 Here's an example using the color options
+
 ```
 sol2uml storage -sc deeppink -tc #ffffff -fc dimgrey -bc black 0xfCc00A1e250644d89AF0df661bC6f04891E21585
 ```
 
-![Aave V3 Pool](./examples/storage/AaveV3PoolStorageColor.svg )
+![Aave V3 Pool](./examples/storage/AaveV3PoolStorageColor.svg)
 
 # Version 2.x changes
 
@@ -355,7 +357,7 @@ npm run clean
 npm run package-lock
 npm run build
 npm run permit
-# make tx2uml globally available for local testing
+# make sol2uml globally available for local testing
 npm link
 # check all the files are included in the npm package
 npm pack --dry-run

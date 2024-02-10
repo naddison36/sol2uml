@@ -1,8 +1,8 @@
-import { lstatSync, readFileSync } from 'fs'
-import { basename, extname, relative } from 'path'
-import klaw from 'klaw'
-import { ASTNode } from '@solidity-parser/parser/dist/src/ast-types'
 import { parse } from '@solidity-parser/parser'
+import { ASTNode } from '@solidity-parser/parser/dist/src/ast-types'
+import { lstatSync, readFileSync } from 'fs'
+import klaw from 'klaw'
+import { basename, extname, relative } from 'path'
 
 import { convertAST2UmlClasses } from './converterAST2Classes'
 import { UmlClass } from './umlClass'

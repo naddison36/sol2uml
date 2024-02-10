@@ -1,7 +1,8 @@
-import { bytes32, commaSeparatedList, ethereumAddress } from './regEx'
 import { InvalidArgumentError, InvalidOptionArgumentError } from 'commander'
-import { getAddress, keccak256, toUtf8Bytes } from 'ethers/lib/utils'
+import { getAddress, keccak256, toUtf8Bytes } from 'ethers'
+
 import { isElementary } from '../converterClasses2Storage'
+import { bytes32, commaSeparatedList, ethereumAddress } from './regEx'
 
 const debug = require('debug')('sol2uml')
 

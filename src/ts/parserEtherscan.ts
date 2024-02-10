@@ -1,12 +1,13 @@
 import axios from 'axios'
+import path from 'path'
+
 import { ASTNode } from '@solidity-parser/parser/dist/src/ast-types'
 import { parse } from '@solidity-parser/parser'
 
 import { convertAST2UmlClasses } from './converterAST2Classes'
-import { UmlClass } from './umlClass'
 import { topologicalSortClasses } from './filterClasses'
+import { UmlClass } from './umlClass'
 import { parseSolidityVersion } from './utils/regEx'
-import path from 'path'
 
 require('axios-debug-log')
 const debug = require('debug')('sol2uml')
