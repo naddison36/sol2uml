@@ -1,3 +1,6 @@
+import * as path from 'path'
+import { posix } from 'path'
+
 import {
     ASTNode,
     ContractDefinition,
@@ -12,9 +15,17 @@ import {
     UsingForDeclaration,
     VariableDeclaration,
 } from '@solidity-parser/parser/dist/src/ast-types'
-import * as path from 'path'
-import { posix } from 'path'
 
+import { Remapping } from './parserEtherscan'
+import {
+    isEnumDefinition,
+    isEventDefinition,
+    isFunctionDefinition,
+    isModifierDefinition,
+    isStateVariableDeclaration,
+    isStructDefinition,
+    isUsingForDeclaration,
+} from './typeGuards'
 import {
     AttributeType,
     ClassStereotype,
@@ -25,16 +36,6 @@ import {
     UmlClass,
     Visibility,
 } from './umlClass'
-import {
-    isEnumDefinition,
-    isEventDefinition,
-    isFunctionDefinition,
-    isModifierDefinition,
-    isStateVariableDeclaration,
-    isStructDefinition,
-    isUsingForDeclaration,
-} from './typeGuards'
-import { Remapping } from './parserEtherscan'
 
 const debug = require('debug')('sol2uml')
 

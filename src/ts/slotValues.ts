@@ -1,16 +1,17 @@
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import axios from 'axios'
-import { StorageSection, Variable } from './converterClasses2Storage'
-import { AttributeType } from './umlClass'
 import {
-    commify,
+    ethers,
     formatUnits,
     getAddress,
-    hexValue,
+    toQuantity,
     toUtf8String,
-} from 'ethers/lib/utils'
+} from 'ethers'
+
 import { SlotValueCache } from './SlotValueCache'
-import { ethers } from 'ethers'
+import { StorageSection, Variable } from './converterClasses2Storage'
+import { AttributeType } from './umlClass'
+import { commify } from './utils/formatters'
 
 const debug = require('debug')('sol2uml')
 
@@ -233,7 +234,7 @@ const parseElementaryValue = (
             const negativeOne = '0xFF' + 'F'.repeat(hexSize - 2)
             rawValue = BigNumber.from(negativeOne).sub(rawValue).add(1).mul(-1)
         }
-        const parsedValue = formatUnits(rawValue, 0)
+        const parsedValue = formatUnits(rawValue.toString(), 0)
         return commify(parsedValue)
     }
     // add fixed point numbers when they are supported by Solidity
@@ -263,7 +264,7 @@ export const getSlotValues = async (
         const block =
             blockTag === 'latest'
                 ? blockTag
-                : hexValue(BigNumber.from(blockTag))
+                : toQuantity(BigNumber.from(blockTag).toString())
 
         // get cached values and missing slot keys from the cache
         const { cachedValues, missingKeys } =
@@ -275,12 +276,13 @@ export const getSlotValues = async (
         }
 
         // Check we are pointing to the correct chain by checking the contract has code
-        const provider = new ethers.providers.JsonRpcProvider(url)
+        const provider = new ethers.JsonRpcProvider(url)
 
         const code = await provider.getCode(contractAddress, block)
         if (!code || code === '0x') {
             const msg = `Address ${contractAddress} has no code. Check your "-u, --url" option or "NODE_URL" environment variable is pointing to the correct node.\nurl: ${url}`
             console.error(msg)
+            console.error(`code: ${typeof code}`)
             throw Error(msg)
         }
 

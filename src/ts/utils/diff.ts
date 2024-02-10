@@ -1,9 +1,10 @@
 import diff_match_patch, {
     DIFF_DELETE,
-    DIFF_INSERT,
     DIFF_EQUAL,
+    DIFF_INSERT,
     Diff,
 } from 'diff-match-patch'
+
 const clc = require('cli-color')
 
 const SkippedLinesMarker = `\n---`

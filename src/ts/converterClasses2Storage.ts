@@ -1,3 +1,9 @@
+import { BigNumberish } from '@ethersproject/bignumber'
+import { keccak256, toBeHex, zeroPadValue } from 'ethers'
+import path from 'path'
+
+import { findAssociatedClass } from './associations'
+import { addSlotValues, dynamicSlotSize, parseValue } from './slotValues'
 import {
     Attribute,
     AttributeType,
@@ -5,12 +11,6 @@ import {
     ReferenceType,
     UmlClass,
 } from './umlClass'
-import { findAssociatedClass } from './associations'
-import { hexZeroPad, keccak256 } from 'ethers/lib/utils'
-import { BigNumber } from 'ethers'
-import path from 'path'
-import { BigNumberish } from '@ethersproject/bignumber'
-import { addSlotValues, dynamicSlotSize, parseValue } from './slotValues'
 
 const debug = require('debug')('sol2uml')
 
@@ -339,7 +339,7 @@ const adjustSlots = (
                 // attribute is a dynamic array
                 referenceStorageSection.offset = calcSectionOffset(
                     variable,
-                    storageSection.offset,
+                    BigInt(storageSection.offset),
                 )
 
                 adjustSlots(referenceStorageSection, 0, storageSections)
@@ -906,16 +906,16 @@ export const isElementary = (type: string): boolean => {
 
 export const calcSectionOffset = (
     variable: Variable,
-    sectionOffset = '0',
+    sectionOffset = 0n,
 ): string => {
     if (variable.dynamic) {
-        const hexStringOf32Bytes = hexZeroPad(
-            BigNumber.from(variable.fromSlot).add(sectionOffset).toHexString(),
+        const hexStringOf32Bytes = zeroPadValue(
+            toBeHex(BigInt(variable.fromSlot) + sectionOffset),
             32,
         )
         return keccak256(hexStringOf32Bytes)
     }
-    return BigNumber.from(variable.fromSlot).add(sectionOffset).toHexString()
+    return toBeHex(BigInt(variable.fromSlot) + sectionOffset)
 }
 
 export const findDimensionLength = (
@@ -1081,7 +1081,7 @@ export const addDynamicVariables = async (
                         name: `${variable.type}: ${variable.name}`,
                         offset: calcSectionOffset(
                             variable,
-                            storageSection.offset,
+                            BigInt(storageSection.offset),
                         ),
                         type:
                             variable.type === 'string'
@@ -1137,7 +1137,7 @@ export const addDynamicVariables = async (
             }
 
             // Add missing dynamic array variables
-            const arrayLength = BigNumber.from(variable.slotValue).toNumber()
+            const arrayLength = Number(BigInt(variable.slotValue))
             if (arrayLength > 1) {
                 // Add missing array variables to the referenced dynamic array
                 addArrayVariables(

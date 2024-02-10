@@ -1,4 +1,3 @@
-const clc = require('cli-color')
 import { resolve } from 'path'
 
 import { EtherscanParser } from './parserEtherscan'
@@ -7,9 +6,11 @@ import {
     isFolder,
     readFile,
 } from './parserFiles'
-import { writeSourceCode } from './writerFiles'
-import { isAddress } from './utils/regEx'
 import { diffCode } from './utils/diff'
+import { isAddress } from './utils/regEx'
+import { writeSourceCode } from './writerFiles'
+
+const clc = require('cli-color')
 
 const debug = require('debug')('sol2uml')
 

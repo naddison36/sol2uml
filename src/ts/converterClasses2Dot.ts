@@ -1,4 +1,6 @@
 import { dirname } from 'path'
+
+import { findAssociatedClass } from './associations'
 import { ClassOptions, convertClass2Dot } from './converterClass2Dot'
 import {
     Association,
@@ -6,7 +8,6 @@ import {
     ReferenceType,
     UmlClass,
 } from './umlClass'
-import { findAssociatedClass } from './associations'
 
 const debug = require('debug')('sol2uml')
 

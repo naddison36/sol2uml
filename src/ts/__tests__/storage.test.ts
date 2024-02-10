@@ -10,8 +10,7 @@ import {
     calcStorageByteSize,
     isElementary,
 } from '../converterClasses2Storage'
-import { formatBytes32String, parseBytes32String } from 'ethers/lib/utils'
-import { BigNumber } from 'ethers'
+import { encodeBytes32String, decodeBytes32String } from 'ethers'
 
 describe('storage parser', () => {
     describe('is elementary type?', () => {
@@ -110,11 +109,11 @@ describe('storage parser', () => {
                 const { size, dynamic } = calcStorageByteSize(
                     attribute,
                     umlClass,
-                    []
+                    [],
                 )
                 expect(size).toEqual(expectedSize)
                 expect(dynamic).toEqual(expectedDynamic)
-            }
+            },
         )
 
         // TODO implement support for sizing expressions. eg
@@ -207,7 +206,7 @@ describe('storage parser', () => {
             const { size, dynamic } = calcStorageByteSize(
                 attribute,
                 umlCLass,
-                otherClasses
+                otherClasses,
             )
             expect(size).toEqual(expectedSize)
             expect(dynamic).toEqual(expectedDynamic)
@@ -385,7 +384,7 @@ describe('storage parser', () => {
                 const { size, dynamic } = calcStorageByteSize(
                     attribute,
                     umlCLass,
-                    [...otherClasses, testStruct]
+                    [...otherClasses, testStruct],
                 )
                 expect(size).toEqual(expected)
                 expect(dynamic).toEqual(false)
@@ -395,14 +394,14 @@ describe('storage parser', () => {
     describe('strings', () => {
         it('bytes to string', () => {
             expect(
-                parseBytes32String(
-                    '0x5465737453746f7261676520636f6e7472616374000000000000000000000000'
-                )
+                decodeBytes32String(
+                    '0x5465737453746f7261676520636f6e7472616374000000000000000000000000',
+                ),
             ).toEqual('TestStorage contract')
         })
         it('string to bytes', () => {
-            expect(formatBytes32String('Less than 31 bytes')).toEqual(
-                '0x4c657373207468616e2033312062797465730000000000000000000000000000'
+            expect(encodeBytes32String('Less than 31 bytes')).toEqual(
+                '0x4c657373207468616e2033312062797465730000000000000000000000000000',
             )
         })
     })
@@ -419,14 +418,14 @@ describe('storage parser', () => {
             displayValue: false,
         }
         test.each`
-            slot                 | expected
-            ${1}                 | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
-            ${BigNumber.from(1)} | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
-            ${'1'}               | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
-            ${'0x01'}            | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+            slot         | expected
+            ${1}         | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+            ${BigInt(1)} | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+            ${'1'}       | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
+            ${'0x01'}    | ${'0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6'}
         `('slot $slot', ({ slot, expected }) => {
             expect(calcSectionOffset({ ...variable, fromSlot: slot })).toEqual(
-                expected
+                expected,
             )
         })
     })

@@ -1,37 +1,37 @@
 {
-  "compilerOptions": {
-    "composite": true,
+    "compilerOptions": {
+        "composite": true,
 
-    "esModuleInterop": true,
-    "lib": [ "ES2022" ],
-    "module": "commonjs",
-    "target": "ES2020",
-    "moduleResolution": "node",
+        "esModuleInterop": true,
+        "lib": ["ES2022"],
+        "module": "commonjs",
+        "target": "ES2020",
+        "moduleResolution": "node",
 
-    "declaration": true,
+        "declaration": true,
 
-    "preserveSymlinks": true,
+        "preserveSymlinks": true,
 
-    "preserveWatchOutput": true,
-    "pretty": false,
+        "preserveWatchOutput": true,
+        "pretty": false,
 
-    "forceConsistentCasingInFileNames": true,
+        "forceConsistentCasingInFileNames": true,
 
-    "noEmitOnError": true,
+        "noEmitOnError": true,
 
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
 
-    "resolveJsonModule": true,
+        "resolveJsonModule": true,
 
-    "sourceMap": true,
+        "sourceMap": true,
 
-    "outDir": "lib",
-    "rootDir": "./src/ts"
-  },
-  "exclude": [
-    "**/lib/*"
-  ]
+        "outDir": "lib",
+        "rootDir": "./src/ts",
+
+        "skipLibCheck": true
+    },
+    "exclude": ["**/lib/*"]
 }

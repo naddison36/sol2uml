@@ -5,7 +5,6 @@ import {
     getSlotValues,
     parseValue,
 } from '../slotValues'
-import { BigNumber } from 'ethers'
 import { AttributeType } from '../umlClass'
 import { SlotValueCache } from '../SlotValueCache'
 
@@ -29,12 +28,7 @@ describe('Slot Values', () => {
     })
     test('Emissions controller first slot on deployment', async () => {
         expect(
-            await getSlotValue(
-                url,
-                emissionController,
-                BigNumber.from(1),
-                13761579,
-            ),
+            await getSlotValue(url, emissionController, BigInt(1), 13761579),
         ).toEqual(
             '0x00000000000000000000000000000000000000000000000000000A9600000A96',
         )
