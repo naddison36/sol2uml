@@ -1,0 +1,1 @@
+day,user_id,device_id,gaid,api_level,is_tablet,user_agent,supported_abis,time_zone_offset,free_storage,total_storage,low_memory_threshold,low_memory_status,brand,model,ip,client_ts,event_name
