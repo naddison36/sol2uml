@@ -252,6 +252,7 @@ abstract contract Associations is
     ITAS
 {
     uint256 public someInt;
+    uint256 public walletBalance;
 
     uint256[] someIntArray;
     address[FileConstant] constantLengthArray;
@@ -306,12 +307,24 @@ abstract contract Associations is
         Processed
     }
 
+    event WalletBalanceUpdated(uint256 newBalance);
+
     constructor(
         ConstructorParamAssoc constructorAssoc,
         ConstructorParamAbstract constructorAbstract,
         ConstructorParamInterface constructorInterface
     ) {
         someInt = 11;
+        walletBalance = 0;
+    }
+
+    function getWalletBalance() public view returns (uint256) {
+        return walletBalance;
+    }
+
+    function updateWalletBalance(uint256 newBalance) public {
+        walletBalance = newBalance;
+        emit WalletBalanceUpdated(newBalance);
     }
 
     function someFunction(
