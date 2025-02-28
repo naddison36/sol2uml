@@ -1,0 +1,88 @@
+Solidity UML Diagram
+For
+0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+
+WETH9
+0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+Public:
+0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+name: string
+
+symbol: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+
+decimals: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+
+balanceOf: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+
+allowance: mapping(address=>mapping(address=>u
+
+Public:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+
+<<fallback>> (0xf58cefd63742d67175404e571240806f6b6e0c27)
+
+<<payable>> deposit(0xf58cefd63742d67175404e571240806f6b6e0c27)
+
+<<event>> Approval (src: address, guy: address, wad
+0xf58cefd63742d67175404e571240806f6b6e0c27 
+<<event>> Transfer(src: address, dst: address, wad:1
+
+<<event>> Deposit(dst: address, wad: uint)
+0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+
+WETH9
+
+Public:
+
+name: string
+
+symbol: string
+
+decimals: uint8
+
+balanceOf: mapping(address=>uint)
+
+allowance: mapping(address=>mapping(address=>u
+
+Public:
+
+<<fallback>> ()
+
+<<payable>> deposit()
+
+<<event>> Approval (src: address, guy: address, wad
+
+<<event>> Transfer(src: address, dst: address, wad:1
+
+<<event>> Deposit(dst: address, wad: uint)
+
+<<event>> Withdrawal (src: address, wad: uint)
+
+withdraw(wad: uint)
+
+totalSupply(): uint
+
+approve(guy: address, wad: uint): bool
+
+transfer(dst: address, wad: uint): bool
+
+transferFrom(src: address, dst: address, wad: uint):]
+
+transferFrom(src: address, dst: address, wad: uint):
+
+Credits: UML diagram generated with SOL2UML
+<<event>> Withdrawal (src: address, wad: uint)
+
+withdraw(wad: uint)
+
+totalSupply(): uint
+
+approve(guy: address, wad: uint): bool
+
+transfer(dst: address, wad: uint): bool
+
+transferFrom(src: address, dst: address, wad: uint):]
+
+transferFrom(src: address, dst: address, wad: uint):
+
+Credits: UML diagram generated with SOL2UML
