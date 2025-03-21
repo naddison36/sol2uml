@@ -57,9 +57,9 @@ Options:
   -f, --outputFormat <value>                      output file format. (choices: "svg", "png", "dot", "all", default: "svg")
   -o, --outputFileName <value>                    output file name
   -i, --ignoreFilesOrFolders <names>              comma-separated list of files or folders to ignore
-  -n, --network <network>                         Ethereum network which maps to a blockchain explorer (choices: "mainnet", "holesky", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam", "optimism", "gnosis", "celo", "scroll", "base", default: "mainnet", env: ETH_NETWORK)
+  -n, --network <network>                         Ethereum network which maps to a blockchain explorer (choices: "mainnet", "holesky", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam", "optimism", "gnosis", "celo", "scroll", "base", "sonic", default: "mainnet", env: ETH_NETWORK)
   -e, --explorerUrl <url>                         Override the `network` option with a custom blockchain explorer API URL. eg Polygon Mumbai testnet https://api-testnet.polygonscan.com/api (env: EXPLORER_URL)
-  -k, --apiKey <key>                              Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan or SnowTrace API key (env: SCAN_API_KEY)
+  -k, --apiKey <key>                              Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan, SonicScan or SnowTrace API key (env: SCAN_API_KEY)
   -bc, --backColor <color>                        Canvas background color. "none" will use a transparent canvas. (default: "white")
   -sc, --shapeColor <color>                       Basic drawing color for graphics, not text (default: "black")
   -fc, --fillColor <color>                        Color used to fill the background of a node (default: "gray95")

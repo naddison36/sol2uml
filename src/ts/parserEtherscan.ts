@@ -32,6 +32,7 @@ export const networks = <const>[
     'celo',
     'scroll',
     'base',
+    'sonic',
 ]
 export type Network = (typeof networks)[number]
 
@@ -89,6 +90,9 @@ export class EtherscanParser {
         } else if (network === 'base') {
             this.url = 'https://api.basescan.org/api'
             this.apikey = '9I5HUJHPD4ZNXJ4M8TZJ1HD2QBVP1U3M3J'
+        } else if (network === 'sonic') {
+            this.url = 'https://api.sonicscan.org/api'
+            this.apikey = 'STCM7CPYP341C66C4IVV1IFMWDYRUTI1QY'
         } else {
             this.url = `https://api-${network}.etherscan.io/api`
         }
