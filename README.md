@@ -4,6 +4,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/naddison?style=social)](https://twitter.com/naddison)
 
 A visualisation tool for [Solidity](https://solidity.readthedocs.io/) contracts featuring:
+
 1. [Unified Modeling Language (UML)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) [class diagram](https://en.wikipedia.org/wiki/Class_diagram) generator for Solidity contracts.
 2. Contract storage layout diagrams.
 3. Flatten Solidity files on Etherscan-like explorers to a local file.
@@ -19,7 +20,7 @@ Storage layout diagram of USDC's [verified source code](https://etherscan.io/add
 
 See an explanation of how storage diagrams work with lots of examples [here](./examples/storage/README.md#example-storage-diagrams).
 
-# Install
+## Install
 
 The following installation assumes [Node.js](https://nodejs.org/en/download/) has already been installed which comes with [Node Package Manager (NPM)](https://www.npmjs.com/).
 `sol2uml` works with node 14 or above.
@@ -42,10 +43,12 @@ To see which version you are using
 npm ls sol2uml -g
 ```
 
-# Usage
+## Usage
 
 ## Command Line Interface (CLI)
 
+```bash
+```
 ```
 Usage: sol2uml [command] <options>
 
