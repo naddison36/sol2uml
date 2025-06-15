@@ -21,4 +21,5 @@ jobs:
       env:
         DEBUG: sol2uml
         CI: true
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}

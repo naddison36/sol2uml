@@ -19,16 +19,20 @@ jobs:
     - name: KoiosECDSA class
       run: sol2uml class 0x2762e676a9f17c7de34fe4b124424837c7e18e1c -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
     - name: KoiosECDSA storage
       run: sol2uml storage 0x2762e676a9f17c7de34fe4b124424837c7e18e1c -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
     - name: Resonate Fantom flatten
       run: sol2uml flatten --network fantom 0x1a5c2ee3fb7fe4a2c2e42474a3657c71f6c775cf -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
     - name: Diff OUSD VaultCore upgrade
       run: sol2uml diff 0x48Cf14DeA2f5dD31c57218877195913412D3278A 0x997c35A0bf8E21404aE4379841E0603C957138c3 -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}

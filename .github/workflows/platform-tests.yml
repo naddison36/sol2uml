@@ -21,20 +21,25 @@ jobs:
     - name: KoiosECDSA class
       run: sol2uml class 0x2762e676a9f17c7de34fe4b124424837c7e18e1c -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
     - name: Class diagram of Replica contract used in Nomad bridge
       run: sol2uml class 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
     - name: Storage diagram of Replica contract used in Nomad bridge
       run: sol2uml storage 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
     - name: Flatten Replica contract used in Nomad bridge
       run: sol2uml flatten 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
     - name: Diff OUSD VaultCore upgrade
       run: sol2uml diff 0x48Cf14DeA2f5dD31c57218877195913412D3278A 0x997c35A0bf8E21404aE4379841E0603C957138c3 -v
       env:
+        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
         NODE_URL: ${{ secrets.NODE_URL }}
