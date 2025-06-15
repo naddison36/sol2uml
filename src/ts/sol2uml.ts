@@ -79,10 +79,9 @@ Can also flatten or compare verified source files on Etherscan-like explorers.`,
         ).env('EXPLORER_URL'),
     )
     .addOption(
-        new Option(
-            '-k, --apiKey <key>',
-            'Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan, SonicScan or SnowTrace API key',
-        ).env('SCAN_API_KEY'),
+        new Option('-k, --apiKey <key>', 'Blockchain explorer API key.').env(
+            'SCAN_API_KEY',
+        ),
     )
     .option(
         '-bc, --backColor <color>',

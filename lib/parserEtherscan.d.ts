@@ -4,7 +4,7 @@ export interface Remapping {
     from: RegExp;
     to: string;
 }
-export declare const networks: readonly ["ethereum", "sepolia", "holesky", "hoodi", "arbitrum", "optimisim", "polygon", "avalanche", "base", "bsc", "crono", "fantom", "sonic", "gnosis", "moonbeam", "celo", "scroll", "linea", "blast", "berachain", "zksync"];
+export declare const networks: readonly ["ethereum", "sepolia", "holesky", "hoodi", "arbitrum", "optimism", "polygon", "avalanche", "base", "bsc", "crono", "fantom", "sonic", "gnosis", "moonbeam", "celo", "scroll", "linea", "blast", "berachain", "zksync"];
 export type Network = (typeof networks)[number];
 export declare const setChainId: (network: string) => number;
 export declare class EtherscanParser {

@@ -57,9 +57,9 @@ Options:
   -f, --outputFormat <value>                      output file format. (choices: "svg", "png", "dot", "all", default: "svg")
   -o, --outputFileName <value>                    output file name
   -i, --ignoreFilesOrFolders <names>              comma-separated list of files or folders to ignore
-  -n, --network <network>                         Name or chain id of the blockchain explorer. A name like `ethereum` or `base` will map to a chain id, eg 1 or 8453. Alternatively, use an integer of the chain id. Supported names: ethereum, sepolia, holesky, hoodi, arbitrum, optimisim, polygon, avalanche, base, bsc, crono, fantom, sonic, gnosis, moonbeam, celo, scroll, linea, blast, berachain, zksync (default: "ethereum", env: ETH_NETWORK)
+  -n, --network <network>                         Name or chain id of the blockchain explorer. A name like `ethereum` or `base` will map to a chain id, eg 1 or 8453. Alternatively, use an integer of the chain id. Supported names: ethereum, sepolia, holesky, hoodi, arbitrum, optimism, polygon, avalanche, base, bsc, crono, fantom, sonic, gnosis, moonbeam, celo, scroll, linea, blast, berachain, zksync (default: "ethereum", env: ETH_NETWORK)
   -e, --explorerUrl <url>                         Override the `network` option with a custom blockchain explorer API URL. eg Polygon Mumbai testnet https://api-testnet.polygonscan.com/api (env: EXPLORER_URL)
-  -k, --apiKey <key>                              Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan, SonicScan or SnowTrace API key (env: SCAN_API_KEY)
+  -k, --apiKey <key>                              Blockchain explorer API key. (env: SCAN_API_KEY)
   -bc, --backColor <color>                        Canvas background color. "none" will use a transparent canvas. (default: "white")
   -sc, --shapeColor <color>                       Basic drawing color for graphics, not text (default: "black")
   -fc, --fillColor <color>                        Color used to fill the background of a node (default: "gray95")
@@ -203,11 +203,12 @@ Options:
   -s, --summary              Only show a summary of the file differences (default: false)
   -af --aFile <value>        Limit code compare to contract A source file with the full path and extension as displayed in the file summary (default: compares all source files)
   -bf --bFile <value>        Contract B source file with the full path and extension as displayed in the file summary. Used if aFile is specified and the source file has been renamed (default: aFile if specified)
-  -bn, --bNetwork <network>  Ethereum network which maps to a blockchain explorer for contract B if on a different blockchain to contract A. Contract A uses the `network` option (default: value of `network` option) (choices: "ethereum", "sepolia", "holesky", "hoodi", "arbitrum", "optimisim", "polygon", "avalanche", "base", "bsc", "crono", "fantom", "sonic", "gnosis", "moonbeam", "celo", "scroll", "linea", "blast", "berachain", "zksync")
+  -bn, --bNetwork <network>  Ethereum network which maps to a blockchain explorer for contract B if on a different blockchain to contract A. Contract A uses the `network` option (default: value of `network` option) (choices: "ethereum", "sepolia", "holesky", "hoodi", "arbitrum", "optimism", "polygon", "avalanche", "base", "bsc", "crono", "fantom", "sonic", "gnosis", "moonbeam", "celo", "scroll", "linea", "blast", "berachain", "zksync")
   --flatten                  Flatten into a single file before comparing. Only works when comparing two verified contracts, not to local files (default: false)
   --saveFiles                Save the flattened contract code to the filesystem when using the `flatten` option. The file names will be the contract address with a .sol extension (default: false)
   -l, --lineBuffer <value>   Minimum number of lines before and after changes (default: 4)
   -h, --help                 display help for command
+
 ```
 
 ## UML Class diagram examples

@@ -11,7 +11,7 @@ sol2uml class --ignoreFilesOrFolders parent, ../src/contracts/inheritance
 
 # Flatten
 
-### Aave V3 Pool mainnet
+### Aave V3 Pool Ethereum
 sol2uml flatten 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2
 
 # Diff
@@ -83,16 +83,16 @@ sol2uml diff 0x0c58c509305a8a7fe9a6a60ceaac6185b96ecbb7 0xd82c2eb10f4895cabed6ed
 sol2uml diff 0x9d1784097ffeadae206faf65188561abaa9093a8 0x16f780aed4e5caa1b0c9a3ae6f67460d4d0cfeb5
 # 16 to 32 days ago
 sol2uml diff 0x901ac4816b427cea4a26099ead7051c8e54dace9 0x16f780aed4e5caa1b0c9a3ae6f67460d4d0cfeb5
-### FRAX/USDC (crvFRAX) mainnet v arbitrum
+### FRAX/USDC (crvFRAX) Ethereum v Arbitrum
 sol2uml diff 0xdcef968d416a41cdac0ed8702fac8128a64241a2 0xc9b8a3fdecb9d5b218d02555a8baf332e5b740d5 --bNetwork arbitrum
-sol2uml diff 0xdcef968d416a41cdac0ed8702fac8128a64241a2 0xc9b8a3fdecb9d5b218d02555a8baf332e5b740d5 --bn arbitrum
+sol2uml diff 0xdcef968d416a41cdac0ed8702fac8128a64241a2 0xc9b8a3fdecb9d5b218d02555a8baf332e5b740d5 -bn arbitrum
 
 ## Aave
-### Aave V3 Pool mainnet v Optimism
+### Aave V3 Pool Ethereum v Optimism
 sol2uml diff 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2 0x794a61358d6845594f94dc1db02a252b5b4814ad --bNetwork optimism
-### Aave V3 Pool mainnet v Optimism flattened
+### Aave V3 Pool Ethereum v Optimism flattened
 sol2uml diff 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2 0x794a61358d6845594f94dc1db02a252b5b4814ad -bn optimism --flatten
-### Aave V3 Pool Polygon v Optimism
+### Aave V3 Pool Polygon v optimism
 ### all files are the same
 sol2uml diff 0x794a61358D6845594F94dc1DB02A252b5b4814aD 0x794a61358d6845594f94dc1db02a252b5b4814ad -n polygon -bn optimism
 
@@ -103,15 +103,15 @@ sol2uml diff 0xb7277a6e95992041568d9391d09d0122023778a2 0xa2327a938febf5fec13bac
 sol2uml diff 0x6b175474e89094c44da98b954eedeac495271d0f 0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf
 
 ## Balancer
-## Compare Balancer Vault on Mainnet and Arbitrum
+## Compare Balancer Vault on Ethereum and Arbitrum
 sol2uml diff 0xBA12222222228d8Ba445958a75a0704d566BF2C8 0xBA12222222228d8Ba445958a75a0704d566BF2C8 --bNetwork arbitrum
-## Compare Balancer Vault on Mainnet and Optimism
+## Compare Balancer Vault on Ethereum and optimism
 sol2uml diff 0xBA12222222228d8Ba445958a75a0704d566BF2C8 0xBA12222222228d8Ba445958a75a0704d566BF2C8 --bNetwork optimism
 
 # Uniswap
-## Compare Uniswap SwapRouter02 between Mainnet and Celo
+## Compare Uniswap SwapRouter02 between Ethereum and Celo
 sol2uml diff 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 0x5615CDAb10dc425a742d643d949a7F474C01abc4 --bNetwork celo
-## Compare Uniswap SwapRouter02 between Mainnet and BNB
+## Compare Uniswap SwapRouter02 between Ethereum and BNB
 sol2uml diff 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2 --bNetwork bsc
 
 # Storage

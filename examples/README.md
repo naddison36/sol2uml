@@ -43,10 +43,10 @@ Generated from version [4.7.3 contracts](https://github.com/OpenZeppelin/openzep
 
 ## Uniswap V3 Router
 
--   -hp hide private and internal variables and functions
--   -hi hide interfaces
--   -hl hide libraries
--   -he hide enums
+- -hp hide private and internal variables and functions
+- -hi hide interfaces
+- -hl hide libraries
+- -he hide enums
 
 ![Uniswap V3 Router](./uniswap-router.svg)
 Generated from running

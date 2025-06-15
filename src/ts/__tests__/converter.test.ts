@@ -3,7 +3,6 @@ import { convertUmlClasses2Dot, EtherscanParser } from '../index'
 import { convertDot2Svg, writeSVG } from '../writerFiles'
 
 const etherDelta = '0x8d12A197cB00D4747a1fe03395095ce2A5CC6819'
-const etherscanKey = 'HPD85TXCG1HW3N5G6JJXK1A7EE5K86CYBJ'
 
 describe('Converter', () => {
     test('generateFilesFromUmlClasses a valid dot to svg', (done) => {
@@ -27,7 +26,7 @@ describe('Converter', () => {
     })
 
     test('Parse EtherDelta from Etherscan and convert to svg string', async () => {
-        const etherscan = new EtherscanParser(etherscanKey)
+        const etherscan = new EtherscanParser(process.env.SCAN_API_KEY)
 
         const { umlClasses } = await etherscan.getUmlClasses(etherDelta)
 
