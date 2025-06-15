@@ -24,24 +24,24 @@ export const findAssociatedClass = (
     // If a link was found
     if (umlClass) return umlClass
 
-    // Could not find association so now need to recursively look at imports of imports
-    // add to already recursively processed files to avoid getting stuck in circular imports
-    searchedAbsolutePaths.push(sourceUmlClass.absolutePath)
-    const importedType = findChainedImport(
-        association,
-        sourceUmlClass,
-        umlClasses,
-        searchedAbsolutePaths,
-    )
-    if (importedType) return importedType
+    // // Could not find association so now need to recursively look at imports of imports
+    // // add to already recursively processed files to avoid getting stuck in circular imports
+    // searchedAbsolutePaths.push(sourceUmlClass.absolutePath)
+    // const importedType = findChainedImport(
+    //     association,
+    //     sourceUmlClass,
+    //     umlClasses,
+    //     searchedAbsolutePaths,
+    // )
+    // if (importedType) return importedType
 
-    // Still could not find association so now need to recursively look for inherited types
-    const inheritedType = findInheritedType(
-        association,
-        sourceUmlClass,
-        umlClasses,
-    )
-    if (inheritedType) return inheritedType
+    // // Still could not find association so now need to recursively look for inherited types
+    // const inheritedType = findInheritedType(
+    //     association,
+    //     sourceUmlClass,
+    //     umlClasses,
+    // )
+    // if (inheritedType) return inheritedType
 
     return undefined
 }
@@ -161,61 +161,61 @@ const findInheritedType = (
     return undefined
 }
 
-const findChainedImport = (
-    association: Association,
-    sourceUmlClass: UmlClass,
-    umlClasses: readonly UmlClass[],
-    searchedRelativePaths: string[],
-): UmlClass | undefined => {
-    // Get all valid imports. That is, imports that do not explicitly import contracts or interfaces
-    // or explicitly import the source class
-    const imports = sourceUmlClass.imports.filter(
-        (i) =>
-            i.classNames.length === 0 ||
-            i.classNames.some(
-                (cn) =>
-                    (association.targetUmlClassName === cn.className &&
-                        !cn.alias) ||
-                    association.targetUmlClassName === cn.alias,
-            ),
-    )
-    // For each import
-    for (const importDetail of imports) {
-        // Find a class with the same absolute path as the import so we can get the new imports
-        const newSourceUmlClass = umlClasses.find(
-            (c) => c.absolutePath === importDetail.absolutePath,
-        )
-        if (!newSourceUmlClass) {
-            // Could not find a class in the import file so just move onto the next loop
-            continue
-        }
-        // Avoid circular imports
-        if (searchedRelativePaths.includes(newSourceUmlClass.absolutePath)) {
-            // Have already recursively looked for imports of imports in this file
-            continue
-        }
-
-        // find class linked to the association without aliased imports
-        const umlClass = findAssociatedClass(
-            association,
-            newSourceUmlClass,
-            umlClasses,
-            searchedRelativePaths,
-        )
-        if (umlClass) return umlClass
-
-        // find all aliased imports
-        const aliasedImports = importDetail.classNames.filter((cn) => cn.alias)
-        // For each aliased import
-        for (const aliasedImport of aliasedImports) {
-            const umlClass = findAssociatedClass(
-                { ...association, targetUmlClassName: aliasedImport.className },
-                newSourceUmlClass,
-                umlClasses,
-                searchedRelativePaths,
-            )
-            if (umlClass) return umlClass
-        }
-    }
-    return undefined
-}
+// const findChainedImport = (
+//     association: Association,
+//     sourceUmlClass: UmlClass,
+//     umlClasses: readonly UmlClass[],
+//     searchedRelativePaths: string[],
+// ): UmlClass | undefined => {
+//     // Get all valid imports. That is, imports that do not explicitly import contracts or interfaces
+//     // or explicitly import the source class
+//     const imports = sourceUmlClass.imports.filter(
+//         (i) =>
+//             i.classNames.length === 0 ||
+//             i.classNames.some(
+//                 (cn) =>
+//                     (association.targetUmlClassName === cn.className &&
+//                         !cn.alias) ||
+//                     association.targetUmlClassName === cn.alias,
+//             ),
+//     )
+//     // For each import
+//     for (const importDetail of imports) {
+//         // Find a class with the same absolute path as the import so we can get the new imports
+//         const newSourceUmlClass = umlClasses.find(
+//             (c) => c.absolutePath === importDetail.absolutePath,
+//         )
+//         if (!newSourceUmlClass) {
+//             // Could not find a class in the import file so just move onto the next loop
+//             continue
+//         }
+//         // Avoid circular imports
+//         if (searchedRelativePaths.includes(newSourceUmlClass.absolutePath)) {
+//             // Have already recursively looked for imports of imports in this file
+//             continue
+//         }
+//
+//         // find class linked to the association without aliased imports
+//         const umlClass = findAssociatedClass(
+//             association,
+//             newSourceUmlClass,
+//             umlClasses,
+//             searchedRelativePaths,
+//         )
+//         if (umlClass) return umlClass
+//
+//         // find all aliased imports
+//         const aliasedImports = importDetail.classNames.filter((cn) => cn.alias)
+//         // For each aliased import
+//         for (const aliasedImport of aliasedImports) {
+//             const umlClass = findAssociatedClass(
+//                 { ...association, targetUmlClassName: aliasedImport.className },
+//                 newSourceUmlClass,
+//                 umlClasses,
+//                 searchedRelativePaths,
+//             )
+//             if (umlClass) return umlClass
+//         }
+//     }
+//     return undefined
+// }
