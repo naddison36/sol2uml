@@ -57,7 +57,7 @@ Options:
   -f, --outputFormat <value>                      output file format. (choices: "svg", "png", "dot", "all", default: "svg")
   -o, --outputFileName <value>                    output file name
   -i, --ignoreFilesOrFolders <names>              comma-separated list of files or folders to ignore
-  -n, --network <network>                         Ethereum network which maps to a blockchain explorer (choices: "mainnet", "holesky", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam", "optimism", "gnosis", "celo", "scroll", "base", "sonic", default: "mainnet", env: ETH_NETWORK)
+  -n, --network <network>                         Name or chain id of the blockchain explorer. A name like `ethereum` or `base` will map to a chain id, eg 1 or 8453. Alternatively, use an integer of the chain id. Supported names: ethereum, sepolia, holesky, hoodi, arbitrum, optimisim, polygon, avalanche, base, bsc, crono, fantom, sonic, gnosis, moonbeam, celo, scroll, linea, blast, berachain, zksync (default: "ethereum", env: ETH_NETWORK)
   -e, --explorerUrl <url>                         Override the `network` option with a custom blockchain explorer API URL. eg Polygon Mumbai testnet https://api-testnet.polygonscan.com/api (env: EXPLORER_URL)
   -k, --apiKey <key>                              Blockchain explorer API key. eg Etherscan, Arbiscan, Optimism, BscScan, CronoScan, FTMScan, PolygonScan, SonicScan or SnowTrace API key (env: SCAN_API_KEY)
   -bc, --backColor <color>                        Canvas background color. "none" will use a transparent canvas. (default: "white")
@@ -81,7 +81,7 @@ Commands:
                                                   3. File imports are commented out.
                                                   4. "SPDX-License-Identifier" is renamed to "SPDX--License-Identifier".
                                                   5. Contract dependencies are analysed so the files are merged in an order that will compile.
-  diff [options] <addressA> <fileFoldersAddress>  Compare verified Solidity code to another verified contract, a local file or local source files.
+  diff [options] <addressA> <fileFoldersAddress>  Compare verified contract code on Etherscan-like explorers to another verified contract, a local file or multiple local files.
   
                                                   The results show the comparison of contract A to B.
                                                   The green sections are additions to contract B that are not in contract A.
@@ -106,7 +106,7 @@ Arguments:
                                         sol2uml 0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9
 
 Options:
-  -b, --baseContractNames <names>  only output contracts connected to these comma separated base contract names
+  -b, --baseContractNames <names>  only output contracts connected to these comma-separated base contract names
   -d, --depth <value>              depth of connected classes to the base contracts. 1 will only show directly connected contracts, interfaces, libraries, structs and enums. (default: all)
   -c, --clusterFolders             cluster contracts into source folders (default: false)
   -hv, --hideVariables             hide variables from contracts, interfaces, structs and enums (default: false)
@@ -139,8 +139,8 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
 Arguments:
   fileFolderAddress               file name, folder(s) or contract address.
                                   When a folder is used, all *.sol files in that folder and all sub folders are used.
-                                  A comma-separated list of files and folders can also be used. For example
-                                        sol2uml contracts,node_modules/openzeppelin-solidity
+                                  A comma-separated list of files and folders can also be used. For example,
+                                        sol2uml contracts,node_modules/@openzeppelin
                                   If an Ethereum address with a 0x prefix is passed, the verified source code from Etherscan will be used. For example
                                         sol2uml 0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9
 
@@ -203,9 +203,7 @@ Options:
   -s, --summary              Only show a summary of the file differences (default: false)
   -af --aFile <value>        Limit code compare to contract A source file with the full path and extension as displayed in the file summary (default: compares all source files)
   -bf --bFile <value>        Contract B source file with the full path and extension as displayed in the file summary. Used if aFile is specified and the source file has been renamed (default: aFile if specified)
-  -bn, --bNetwork <network>  Ethereum network which maps to a blockchain explorer for contract B if on a different blockchain to contract A. Contract A uses the `network` option (default: value of `network` option) (choices: "mainnet", "holesky", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam", "optimism", "gnosis", "celo", "base")
-  -be, --bExplorerUrl <url>  Override the `bNetwork` option with custom blockchain explorer API URL for contract B if on a different blockchain to contract A. Contract A uses the `explorerUrl` (default: value of `explorerUrl` option)
-  -bk, --bApiKey <key>       Blockchain explorer API key for contract B if on a different blockchain to contract A. Contract A uses the `apiKey` option (default: value of `apiKey` option)
+  -bn, --bNetwork <network>  Ethereum network which maps to a blockchain explorer for contract B if on a different blockchain to contract A. Contract A uses the `network` option (default: value of `network` option) (choices: "ethereum", "sepolia", "holesky", "hoodi", "arbitrum", "optimisim", "polygon", "avalanche", "base", "bsc", "crono", "fantom", "sonic", "gnosis", "moonbeam", "celo", "scroll", "linea", "blast", "berachain", "zksync")
   --flatten                  Flatten into a single file before comparing. Only works when comparing two verified contracts, not to local files (default: false)
   --saveFiles                Save the flattened contract code to the filesystem when using the `flatten` option. The file names will be the contract address with a .sol extension (default: false)
   -l, --lineBuffer <value>   Minimum number of lines before and after changes (default: 4)

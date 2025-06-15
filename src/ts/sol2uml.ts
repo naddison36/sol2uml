@@ -66,10 +66,10 @@ Can also flatten or compare verified source files on Etherscan-like explorers.`,
     .addOption(
         new Option(
             '-n, --network <network>',
-            'Ethereum network which maps to a blockchain explorer',
+            'Name or chain id of the blockchain explorer. A name like `ethereum` or `base` will map to a chain id, eg 1 or 8453. Alternatively, use an integer of the chain id. Supported names: ' +
+                networks.join(', '),
         )
-            .choices(networks)
-            .default('mainnet')
+            .default('ethereum')
             .env('ETH_NETWORK'),
     )
     .addOption(
@@ -506,14 +506,6 @@ The line numbers are from contract B. There are no line numbers for the red sect
         ).choices(networks),
     )
     .option(
-        '-be, --bExplorerUrl <url>',
-        'Override the `bNetwork` option with custom blockchain explorer API URL for contract B if on a different blockchain to contract A. Contract A uses the `explorerUrl` (default: value of `explorerUrl` option)',
-    )
-    .option(
-        '-bk, --bApiKey <key>',
-        'Blockchain explorer API key for contract B if on a different blockchain to contract A. Contract A uses the `apiKey` option (default: value of `apiKey` option)',
-    )
-    .option(
         '--flatten',
         'Flatten into a single file before comparing. Only works when comparing two verified contracts, not to local files',
         false,
@@ -546,9 +538,9 @@ The line numbers are from contract B. There are no line numbers for the red sect
             if (isAddress(fileFoldersAddress)) {
                 const addressB = fileFoldersAddress
                 const bEtherscanParser = new EtherscanParser(
-                    combinedOptions.bApiKey || combinedOptions.apiKey,
+                    combinedOptions.apiKey,
                     combinedOptions.bNetwork || combinedOptions.network,
-                    combinedOptions.bExplorerUrl || combinedOptions.explorerUrl,
+                    combinedOptions.explorerUrl,
                 )
                 // If flattening
                 if (options.flatten) {

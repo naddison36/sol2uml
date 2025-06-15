@@ -36,8 +36,7 @@ export const parserUmlClasses = async (
             `argument ${fileFolderAddress} is an Ethereum address so checking Etherscan for the verified source code`,
         )
 
-        const etherscanApiKey =
-            options.apiKey || 'ZAD4UI2RCXCQTP38EXS3UY2MPHFU5H9KB1'
+        const etherscanApiKey = options.apiKey
         const etherscanParser = new EtherscanParser(
             etherscanApiKey,
             options.network,

@@ -17,85 +17,99 @@ export interface Remapping {
 }
 
 export const networks = <const>[
-    'mainnet',
-    'holesky',
+    'ethereum',
     'sepolia',
-    'polygon',
+    'holesky',
+    'hoodi',
     'arbitrum',
+    'optimisim',
+    'polygon',
     'avalanche',
+    'base',
     'bsc',
     'crono',
     'fantom',
-    'moonbeam',
-    'optimism',
+    'sonic',
     'gnosis',
+    'moonbeam',
     'celo',
     'scroll',
-    'base',
-    'sonic',
+    'linea',
+    'blast',
+    'berachain',
+    'zksync',
 ]
 export type Network = (typeof networks)[number]
+
+export const setChainId = (network: string): number =>
+    // If an integer is passed, return it as is
+    /^-?(0|[1-9]\d*)$/.test(network)
+        ? parseInt(network)
+        : network === 'sepolia'
+        ? 11155111
+        : network === 'holesky'
+        ? 17000
+        : network === 'hoodi'
+        ? 560048
+        : network === 'arbitrum'
+        ? 42161
+        : network === 'optimisim'
+        ? 10
+        : network === 'polygon'
+        ? 137
+        : network === 'avalanche'
+        ? 43114
+        : network === 'base'
+        ? 8453
+        : network === 'bsc'
+        ? 56
+        : network === 'crono'
+        ? 25
+        : network === 'fantom'
+        ? 250
+        : network === 'sonic'
+        ? 146
+        : network === 'gnosis'
+        ? 100
+        : network === 'moonbeam'
+        ? 1284
+        : network === 'celo'
+        ? 42220
+        : network === 'scroll'
+        ? 534352
+        : network === 'linea'
+        ? 59144
+        : network === 'blast'
+        ? 81457
+        : network === 'berachain'
+        ? 80094
+        : network === 'zksync'
+        ? 324
+        : 1
 
 export class EtherscanParser {
     readonly url: string
 
     constructor(
-        protected apikey: string = 'ZAD4UI2RCXCQTP38EXS3UY2MPHFU5H9KB1',
-        public network: Network = 'mainnet',
+        protected apiKey?: string,
+        public network: Network = 'ethereum',
         url?: string,
     ) {
         if (url) {
             this.url = url
             return
         }
-        if (!networks.includes(network)) {
-            throw new Error(
-                `Invalid network "${network}". Must be one of ${networks}`,
+
+        if (!apiKey) {
+            console.error(
+                `The apiKey option must be set when getting verified source code from an Etherscan like explorer`,
             )
-        } else if (network === 'mainnet') {
-            this.url = 'https://api.etherscan.io/api'
-        } else if (network === 'polygon') {
-            this.url = 'https://api.polygonscan.com/api'
-            this.apikey = 'AMHGNTV5A7XYGX2M781JB3RC1DZFVRWQEB'
-        } else if (network === 'arbitrum') {
-            this.url = 'https://api.arbiscan.io/api'
-            this.apikey = 'ZGTK2TAGWMAB6IAC12BMK8YYPNCPIM8VDQ'
-        } else if (network === 'avalanche') {
-            this.url = 'https://api.snowtrace.io/api'
-            this.apikey = 'U5FAN98S5XNH5VI83TI4H35R9I4TDCKEJY'
-        } else if (network === 'bsc') {
-            this.url = 'https://api.bscscan.com/api'
-            this.apikey = 'APYH49FXVY9UA3KTDI6F4WP3KPIC86NITN'
-        } else if (network === 'crono') {
-            this.url = 'https://api.cronoscan.com/api'
-            this.apikey = '76A3RG5WHTPMMR66E9SFI2EIDT6MP976W2'
-        } else if (network === 'fantom') {
-            this.url = 'https://api.ftmscan.com/api'
-            this.apikey = '71KRX13XPZMGR3D1Q85W78G2DSZ4JPMAEX'
-        } else if (network === 'optimism') {
-            this.url = `https://api-optimistic.etherscan.io/api`
-            this.apikey = 'FEXS1HXVA4Y2RNTMEA8V1UTK21S4JWHH9U'
-        } else if (network === 'moonbeam') {
-            this.url = 'https://api-moonbeam.moonscan.io/api'
-            this.apikey = '5EUFXW6TDC16VERF3D9SCWRRU6AEMTBHNJ'
-        } else if (network === 'gnosis') {
-            this.url = 'https://api.gnosisscan.io/api'
-            this.apikey = '2RWGXIWK538EJ8XSP9DE2JUINSCG7UCSJB'
-        } else if (network === 'scroll') {
-            this.url = 'https://api.scrollscan.com/api'
-            this.apikey = '4V37ZJFIN9AURJSU9YG1RP3MSVTPH6D6Z4'
-        } else if (network === 'celo') {
-            this.url = 'https://api.celoscan.io/api'
-            this.apikey = 'JBV78T5KP15W7WKKKD6KC4J8RX2F4PK8AF'
-        } else if (network === 'base') {
-            this.url = 'https://api.basescan.org/api'
-            this.apikey = '9I5HUJHPD4ZNXJ4M8TZJ1HD2QBVP1U3M3J'
-        } else if (network === 'sonic') {
-            this.url = 'https://api.sonicscan.org/api'
-            this.apikey = 'STCM7CPYP341C66C4IVV1IFMWDYRUTI1QY'
-        } else {
-            this.url = `https://api-${network}.etherscan.io/api`
+            process.exit(1)
         }
+
+        const chainId = setChainId(network)
+        debug(`Chain id ${chainId} for network ${network}`)
+        this.url = `https://api.etherscan.io/v2/api?chainid=${chainId}`
     }
 
     /**
@@ -254,7 +268,7 @@ export class EtherscanParser {
                     module: 'contract',
                     action: 'getsourcecode',
                     address: contractAddress,
-                    apikey: this.apikey,
+                    apikey: this.apiKey,
                 },
             })
 

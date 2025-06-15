@@ -4,13 +4,14 @@ export interface Remapping {
     from: RegExp;
     to: string;
 }
-export declare const networks: readonly ["mainnet", "holesky", "sepolia", "polygon", "arbitrum", "avalanche", "bsc", "crono", "fantom", "moonbeam", "optimism", "gnosis", "celo", "scroll", "base", "sonic"];
+export declare const networks: readonly ["ethereum", "sepolia", "holesky", "hoodi", "arbitrum", "optimisim", "polygon", "avalanche", "base", "bsc", "crono", "fantom", "sonic", "gnosis", "moonbeam", "celo", "scroll", "linea", "blast", "berachain", "zksync"];
 export type Network = (typeof networks)[number];
+export declare const setChainId: (network: string) => number;
 export declare class EtherscanParser {
-    protected apikey: string;
+    protected apiKey?: string;
     network: Network;
     readonly url: string;
-    constructor(apikey?: string, network?: Network, url?: string);
+    constructor(apiKey?: string, network?: Network, url?: string);
     /**
      * Parses the verified source code files from Etherscan
      * @param contractAddress Ethereum contract address with a 0x prefix

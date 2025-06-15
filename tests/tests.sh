@@ -25,6 +25,8 @@ sol2uml diff 0x1091588Cc431275F99DC5Df311fd8E1Ab81c89F3 0xEA24e9Bac006DE9635Ac7f
 sol2uml diff 0x1091588Cc431275F99DC5Df311fd8E1Ab81c89F3 0xEA24e9Bac006DE9635Ac7fA4D767fFb64FB5645c --aFile contracts/vault/OETHVaultCore.sol --bFile contracts/vault/VaultCore.sol -v
 sol2uml diff 0x1091588Cc431275F99DC5Df311fd8E1Ab81c89F3 0xEA24e9Bac006DE9635Ac7fA4D767fFb64FB5645c --aFile contracts/vault/VaultStorage.sol
 sol2uml diff 0xEA24e9Bac006DE9635Ac7fA4D767fFb64FB5645c .,node_modules
+sol2uml diff 0x1091588Cc431275F99DC5Df311fd8E1Ab81c89F3 0xe1b612b654891e0b311069b2aa0ac0e2a48be4a2 --bNetwork base -v
+sol2uml diff 0x1091588Cc431275F99DC5Df311fd8E1Ab81c89F3 0xe1b612b654891e0b311069b2aa0ac0e2a48be4a2 --aFile contracts/vault/OETHVaultCore.sol --bNetwork base -v
 
 ### OETH VaultAdmin
 sol2uml diff 0x31a91336414d3B955E494E7d485a6B06b55FC8fB .,node_modules
@@ -183,7 +185,12 @@ sol2uml storage 0x8115366Ca7Cf280a760f0bC0F6Db3026e2437115 -v --data --storage 0
 # Test import of imports including aliased imports
 sol2uml storage -v -c Concrete ../src/contracts/chainedImports
 
+# Storage of a proxied multisig Safe on ApeChain
+sol2uml storage --network 33139 0xfb1bffC9d739B8D520DaF37dF666da4C687191EA -d -s 0xcf8DEBAFA34E0Ab7d1F3452FF3024454F8Fea32b -v
+
 # Class
+
+export SCAN_API_KEY=your_api_key_here
 
 ## Maker DSR Strategy Implementation
 sol2uml 0x8a3b6D3739461137d20825c36ED6016803d3104F -v
@@ -201,3 +208,9 @@ sol2uml 0x1833C6171E0A3389B156eAedB301CFfbf328B463 -v --network base
 # All OpenZeppelin contracts
 sol2uml ../node_modules/@openzeppelin/contracts
 
+## A contract on the Hoodi network
+sol2uml 0x610866c6089768dA95524bcc4cE7dB61eDa3931c -v --network hoodi
+## Proxy on Holesky
+sol2uml 0x5fbe74a283f7954f10aa04c2edf55578811aeb03 -v --network holesky
+## ApeChain using chain id
+sol2uml 0xd22ba2ff50d5c086d4bc34e9612b92fcbf8c1152 -v --network 33139
