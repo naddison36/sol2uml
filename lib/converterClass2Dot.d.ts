@@ -4,6 +4,8 @@ export interface ClassOptions {
     hideContracts?: boolean;
     hideVariables?: boolean;
     hideFunctions?: boolean;
+    hideArguments?: boolean;
+    hideReturns?: boolean;
     hideModifiers?: boolean;
     hideEvents?: boolean;
     hideStructs?: boolean;

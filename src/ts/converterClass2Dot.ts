@@ -15,6 +15,8 @@ export interface ClassOptions {
     hideContracts?: boolean
     hideVariables?: boolean
     hideFunctions?: boolean
+    hideArguments?: boolean
+    hideReturns?: boolean
     hideModifiers?: boolean
     hideEvents?: boolean
     hideStructs?: boolean
@@ -255,6 +257,8 @@ const dotOperators = (
         hideModifiers?: boolean
         hideEvents?: boolean
         hideSourceContract?: boolean
+        hideArguments?: boolean
+        hideReturns?: boolean
     },
 ): string => {
     // Skip if there are no operators
@@ -288,10 +292,10 @@ const dotOperators = (
 
         dotString += operator.name
 
-        dotString += dotParameters(operator.parameters)
+        dotString += dotParameters(operator.parameters, false, options.hideArguments)
 
-        if (operator.returnParameters?.length > 0) {
-            dotString += ': ' + dotParameters(operator.returnParameters, true)
+        if (operator.returnParameters?.length > 0 && !options.hideReturns) {
+            dotString += ': ' + dotParameters(operator.returnParameters, true, options.hideArguments)
         }
 
         if (options.hideModifiers === false && operator.modifiers?.length > 0) {
@@ -341,7 +345,14 @@ const dotOperatorStereotype = (
 const dotParameters = (
     parameters: Parameter[],
     returnParams: boolean = false,
+    hideArguments: boolean = false,
 ): string => {
+    // If hiding arguments, just return empty parentheses for input parameters
+    // but still show return types
+    if (hideArguments && !returnParams) {
+        return '()'
+    }
+
     if (parameters.length == 1 && !parameters[0].name) {
         if (returnParams) {
             return parameters[0].type

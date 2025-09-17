@@ -145,6 +145,16 @@ program
         false,
     )
     .option(
+        '-hg, --hideArguments',
+        'hide function arguments from contracts, interfaces and libraries',
+        false,
+    )
+    .option(
+        '-hr, --hideReturns',
+        'hide function return types from contracts, interfaces and libraries',
+        false,
+    )
+    .option(
         '-hp, --hidePrivates',
         'hide private and internal attributes and operators',
         false,
