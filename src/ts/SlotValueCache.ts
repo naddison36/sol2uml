@@ -24,7 +24,7 @@ export class SlotValueCache {
     } {
         const cachedValues: string[] = []
         const missingKeys: string[] = []
-        slotKeys.forEach((slotKey, i) => {
+        slotKeys.forEach((slotKey) => {
             const key = BigNumber.from(slotKey).toHexString()
             if (this.slotCache[key]) {
                 cachedValues.push(this.slotCache[key])

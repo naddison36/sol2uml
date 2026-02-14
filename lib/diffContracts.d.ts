@@ -27,7 +27,7 @@ export declare const compareFlattenContracts: (addressA: string, addressB: strin
     contractNameB: string;
 }>;
 export declare const diffVerified2Local: (addressA: string, etherscanParserA: EtherscanParser, fileOrBaseFolders: string[], ignoreFilesOrFolders?: string[]) => Promise<CompareContracts>;
-export declare const diffVerifiedContracts: (addressA: string, addressB: string, etherscanParserA: EtherscanParser, etherscanParserB: EtherscanParser, options: DiffOptions) => Promise<CompareContracts>;
+export declare const diffVerifiedContracts: (addressA: string, addressB: string, etherscanParserA: EtherscanParser, etherscanParserB: EtherscanParser, _options: DiffOptions) => Promise<CompareContracts>;
 export declare const displayFileDiffSummary: (fileDiffs: DiffFiles[]) => void;
 export declare const displayFileDiffs: (fileDiffs: DiffFiles[], options?: {
     lineBuffer?: number;

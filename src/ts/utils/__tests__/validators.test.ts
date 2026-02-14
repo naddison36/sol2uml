@@ -30,7 +30,7 @@ describe('Validators', () => {
             '0xf7749B41db006860cEc0650D18b8013d69C44Eeb,',
             ',0xf7749B41db006860cEc0650D18b8013d69C44Eeb',
         ])('%s', (address) => {
-            // @ts-ignore
+            // @ts-expect-error testing invalid input
             expect(() => validateAddress(address)).toThrow(
                 'Address must be in hexadecimal format with a 0x prefix',
             )
@@ -46,13 +46,13 @@ describe('Validators', () => {
             ['10', 10],
             ['13', 13],
         ])('%s', (depth, expected) => {
-            // @ts-ignore
+            // @ts-expect-error testing invalid input
             return expect(validateLineBuffer(depth)).toEqual(expected)
         })
     })
     describe('invalid line buffer', () => {
         test.each(['-1', -2, 'X', 'depth'])('%s', (depth) => {
-            // @ts-ignore
+            // @ts-expect-error testing invalid input
             expect(() => validateLineBuffer(depth)).toThrow(
                 'Must be a zero or a positive integer',
             )
@@ -83,7 +83,7 @@ describe('Validators', () => {
             'gap1,gap2,',
             'gap1,gap2,gap3,',
         ])('%s', (variables) => {
-            // @ts-ignore
+            // @ts-expect-error testing invalid input
             expect(() => validateNames(variables)).toThrow(
                 'Must be a comma-separate list of names with no white spaces.',
             )

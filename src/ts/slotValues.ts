@@ -66,7 +66,7 @@ export const addSlotValues = async (
     const uniqueFromSlots = [...new Set(slots)]
 
     // Convert slot numbers to BigNumbers and offset dynamic arrays
-    let slotKeys = uniqueFromSlots.map((fromSlot) => {
+    const slotKeys = uniqueFromSlots.map((fromSlot) => {
         if (storageSection.offset) {
             return BigNumber.from(storageSection.offset).add(fromSlot)
         }

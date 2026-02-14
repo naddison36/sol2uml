@@ -16,7 +16,7 @@ export const squashUmlClasses = (
     let removedClassIds: number[] = []
     for (const baseContractName of baseContractNames) {
         // Find the base UML Class to squash
-        let baseIndex = umlClasses.findIndex(({ name }) => {
+        const baseIndex = umlClasses.findIndex(({ name }) => {
             return name === baseContractName
         })
         if (baseIndex === undefined) {
@@ -26,7 +26,7 @@ export const squashUmlClasses = (
         }
         const baseClass = umlClasses[baseIndex]
 
-        let squashedClass = new UmlClass({
+        const squashedClass = new UmlClass({
             name: baseClass.name,
             absolutePath: baseClass.absolutePath,
             relativePath: baseClass.relativePath,

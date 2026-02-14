@@ -5,7 +5,7 @@ export const findAssociatedClass = (
     association: Association,
     sourceUmlClass: UmlClass,
     umlClasses: readonly UmlClass[],
-    searchedAbsolutePaths: string[] = [],
+    _searchedAbsolutePaths: string[] = [],
 ): UmlClass | undefined => {
     const umlClass = umlClasses.find((targetUmlClass) => {
         const targetParentClass =
@@ -120,7 +120,7 @@ const isAssociated = (
     )
 }
 
-const findInheritedType = (
+const _findInheritedType = (
     association: Association,
     sourceUmlClass: UmlClass,
     umlClasses: readonly UmlClass[],
@@ -154,7 +154,7 @@ const findInheritedType = (
         }
 
         // Recursively look for inherited types
-        const targetClass = findInheritedType(association, parent, umlClasses)
+        const targetClass = _findInheritedType(association, parent, umlClasses)
         if (targetClass) return targetClass
     }
 

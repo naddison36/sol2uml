@@ -269,7 +269,7 @@ const dotOperators = (
         return b.stereotype - a.stereotype
     })
     // Filter out any modifiers or events if options are flagged to hide them
-    let operatorsFiltered = operatorsSortedByStereotype.filter(
+    const operatorsFiltered = operatorsSortedByStereotype.filter(
         (o) =>
             !(
                 (options.hideModifiers === true &&

@@ -173,7 +173,7 @@ export const isFile = (fileName: string): boolean => {
     try {
         const file = lstatSync(fileName)
         return file.isFile()
-    } catch (err) {
+    } catch {
         return false
     }
 }
@@ -181,7 +181,7 @@ export const isFolder = (fileName: string): boolean => {
     try {
         const file = lstatSync(fileName)
         return file.isDirectory()
-    } catch (err) {
+    } catch {
         return false
     }
 }

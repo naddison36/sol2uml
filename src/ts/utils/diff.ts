@@ -15,7 +15,7 @@ const SkippedLinesMarker = `\n---`
  * @param lineBuff the number of lines to display before and after each change.
  */
 export const diffCode = (codeA: string, codeB: string, lineBuff: number) => {
-    // @ts-ignore
+    // @ts-ignore diff_match_patch constructor has no type declarations
     const dmp = new diff_match_patch()
     const diff = dmp.diff_main(codeA, codeB)
     dmp.diff_cleanupSemantic(diff)
@@ -43,18 +43,20 @@ const diff_pretty = (diffs: Diff[], lines: number, lineBuff = 2) => {
         const op = diff[0] // Operation (insert, delete, equal)
         const text: string = diff[1] // Text of change.
         switch (op) {
-            case DIFF_INSERT:
+            case DIFF_INSERT: {
                 // If first diff then we need to add the first line number
                 const linesInserted = addLineNumbers(text, lineCount, linePad)
                 output += initialLineNumber + clc.green(linesInserted)
                 lineCount += countLines(text)
                 break
-            case DIFF_DELETE:
+            }
+            case DIFF_DELETE: {
                 // zero start line means blank line numbers are used
                 const linesDeleted = addLineNumbers(text, 0, linePad)
                 output += initialLineNumber + clc.red(linesDeleted)
                 break
-            case DIFF_EQUAL:
+            }
+            case DIFF_EQUAL: {
                 const eolPositions = findEOLPositions(text)
 
                 // If no changes yet
@@ -82,6 +84,7 @@ const diff_pretty = (diffs: Diff[], lines: number, lineBuff = 2) => {
                 }
                 lineCount += eolPositions.length
                 break
+            }
         }
     }
 
@@ -197,7 +200,7 @@ const addLineNumbers = (
 ): string => {
     let lineCount = lineStart
     let textWithLineNumbers = ''
-    text.split('').forEach((c, i) => {
+    text.split('').forEach((c) => {
         if (c === '\n') {
             if (lineStart > 0) {
                 textWithLineNumbers += `\n${(++lineCount)

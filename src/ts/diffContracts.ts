@@ -266,7 +266,7 @@ export const diffVerifiedContracts = async (
     addressB: string,
     etherscanParserA: EtherscanParser,
     etherscanParserB: EtherscanParser,
-    options: DiffOptions,
+    _options: DiffOptions,
 ): Promise<CompareContracts> => {
     const files: DiffFiles[] = []
     const { files: aFiles, contractName: contractNameA } =

@@ -372,7 +372,7 @@ WARNING: sol2uml does not use the Solidity compiler so may differ with solc. A k
                     storageAddress = fileFolderAddress
                 }
 
-                let block = await getBlock(combinedOptions)
+                const block = await getBlock(combinedOptions)
 
                 // Get slot values for each storage section
                 for (const storageSection of storageSections) {

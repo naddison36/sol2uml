@@ -15,7 +15,7 @@ export const getBlock = async (options: {
                 `Latest block is ${block}. All storage slot values will be from this block.`,
             )
             return block
-        } catch (err) {
+        } catch {
             const defaultMessage =
                 options.url === 'http://localhost:8545'
                     ? 'This is the default url. Use the `-u, --url` option or `NODE_URL` environment variable to set the url of your blockchain node.'
@@ -28,7 +28,7 @@ export const getBlock = async (options: {
     }
     try {
         return parseInt(options.block)
-    } catch (err) {
+    } catch {
         throw Error(`Invalid block number: ${options.block}`)
     }
 }

@@ -8,6 +8,7 @@
     "buildSol": "cd ./src/contracts && solc **/*.sol",
     "build": "tsc --build ./tsconfig.json",
     "clean": "tsc --build --clean ./tsconfig.json",
+    "lint": "eslint src/ts",
     "package-lock": "npm i --package-lock-only",
     "permit": " chmod 775 lib/sol2uml.js",
     "prettier": "prettier --write src/**/*.ts **/*.md",
@@ -36,15 +37,19 @@
     "klaw": "^4.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@openzeppelin/contracts": "^4.9.3",
     "@types/diff-match-patch": "^1.0.36",
     "@types/jest": "^29.5.14",
     "@types/klaw": "^3.0.7",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
     "jest": "^30.0.0",
     "prettier": "^3.5.3",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.55.0"
   },
   "files": [
     "lib/*.js",

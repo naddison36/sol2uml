@@ -36,7 +36,7 @@ export const writeOutputFiles = async (
                     '.' +
                     outputExt
             }
-        } catch (err) {} // we can ignore errors as it just means outputFilename does not exist yet
+        } catch { /* outputFilename does not exist yet */ }
     }
 
     if (outputFormat === 'dot' || outputFormat === 'all') {

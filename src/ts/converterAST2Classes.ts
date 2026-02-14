@@ -60,7 +60,7 @@ export function convertAST2UmlClasses(
     if (node.type === 'SourceUnit') {
         node.children.forEach((childNode) => {
             if (childNode.type === 'ContractDefinition') {
-                let umlClass = new UmlClass({
+                const umlClass = new UmlClass({
                     name: childNode.name,
                     absolutePath: filesystem
                         ? path.resolve(relativePath) // resolve the absolute path
@@ -75,7 +75,7 @@ export function convertAST2UmlClasses(
             } else if (childNode.type === 'StructDefinition') {
                 debug(`Adding file level struct ${childNode.name}`)
 
-                let umlClass = new UmlClass({
+                const umlClass = new UmlClass({
                     name: childNode.name,
                     stereotype: ClassStereotype.Struct,
                     absolutePath: filesystem
@@ -92,7 +92,7 @@ export function convertAST2UmlClasses(
             } else if (childNode.type === 'EnumDefinition') {
                 debug(`Adding file level enum ${childNode.name}`)
 
-                let umlClass = new UmlClass({
+                const umlClass = new UmlClass({
                     name: childNode.name,
                     stereotype: ClassStereotype.Enum,
                     absolutePath: filesystem
@@ -133,7 +133,7 @@ export function convertAST2UmlClasses(
                             )}`,
                         )
                         imports.push(newImport)
-                    } catch (err) {
+                    } catch {
                         debug(
                             `Failed to resolve import ${childNode.path} from file ${relativePath}`,
                         )
@@ -697,7 +697,7 @@ function parseTypeName(typeName: TypeName): [string, AttributeType] {
         case 'FunctionTypeName':
             // TODO add params and return type
             return [typeName.type + '\\(\\)', AttributeType.Function]
-        case 'ArrayTypeName':
+        case 'ArrayTypeName': {
             const [arrayElementType] = parseTypeName(typeName.baseTypeName)
             let length: string = ''
             if (Number.isInteger(typeName.length)) {
@@ -709,7 +709,8 @@ function parseTypeName(typeName: TypeName): [string, AttributeType] {
             }
             // TODO does not currently handle Expression types like BinaryOperation
             return [arrayElementType + '[' + length + ']', AttributeType.Array]
-        case 'Mapping':
+        }
+        case 'Mapping': {
             const key =
                 (<ElementaryTypeName>typeName.keyType)?.name ||
                 (<UserDefinedTypeName>typeName.keyType)?.namePath
@@ -718,6 +719,7 @@ function parseTypeName(typeName: TypeName): [string, AttributeType] {
                 'mapping\\(' + key + '=\\>' + valueType + '\\)',
                 AttributeType.Mapping,
             ]
+        }
         default:
             throw Error(`Invalid typeName ${typeName}`)
     }
@@ -733,7 +735,7 @@ function parseParameters(params: readonly VariableDeclaration[]): Parameter[] {
         return []
     }
 
-    let parameters: Parameter[] = []
+    const parameters: Parameter[] = []
 
     for (const param of params) {
         const [type] = parseTypeName(param.typeName)

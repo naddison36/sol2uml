@@ -9,7 +9,7 @@ export const validateAddress = (address: string): string => {
     try {
         if (typeof address === 'string' && address?.match(ethereumAddress))
             return getAddress(address)
-    } catch (err) {}
+    } catch { /* validation failed */ }
 
     throw new InvalidArgumentError(
         `Address must be in hexadecimal format with a 0x prefix.`,
@@ -24,7 +24,7 @@ export const validateNames = (variables: string): string[] => {
             variables.match(commaSeparatedList)
         )
             return variables.split(',')
-    } catch (err) {}
+    } catch { /* validation failed */ }
 
     throw new InvalidArgumentError(
         `Must be a comma-separate list of names with no white spaces.`,
@@ -35,7 +35,7 @@ export const validateLineBuffer = (lineBufferParam: string): number => {
     try {
         const lineBuffer = parseInt(lineBufferParam, 10)
         if (lineBuffer >= 0) return lineBuffer
-    } catch (err) {}
+    } catch { /* validation failed */ }
     throw new InvalidOptionArgumentError(
         `Must be a zero or a positive integer.`,
     )
@@ -62,7 +62,7 @@ export const validateSlotNames = (
         })
         console.log(results.length)
         return results
-    } catch (err) {}
+    } catch { /* validation failed */ }
     throw new InvalidOptionArgumentError(
         `Must be a comma-separate list of slots with no white spaces.`,
     )
@@ -79,7 +79,7 @@ export const validateTypes = (typesString: string): string[] => {
             })
             return types
         }
-    } catch (err) {}
+    } catch { /* validation failed */ }
 
     throw new InvalidArgumentError(
         `Slot type must be an elementary type which includes dynamic and fixed size arrays. eg address, address[], uint256, int256[2], bytes32, string, bool`,

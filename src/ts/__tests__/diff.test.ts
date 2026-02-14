@@ -15,7 +15,7 @@ describe('Diff', () => {
             ${'added to fourth line'}        | ${'line 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\nline 8\nline 9'} | ${'line 1\nline 2\nline 3\n1ine 42434\nline 5\nline 6\nline 7\nline 8\nline 9'}
             ${'changed fourth line'}         | ${'line 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\nline 8\nline 9'} | ${'line 1\nline 2\nline 3\nline 42434\nline 5\nline 6\nadded 8\nline 9'}
             ${'large block between changes'} | ${'line 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\nline 8\nline 9'} | ${'line one\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\nline 8\nadded two\nnew lines'}
-        `('$description', ({ description, codeA, codeB }) => {
+        `('$description', ({ codeA, codeB }) => {
             diffCode(codeA, codeB, 2)
         })
     })

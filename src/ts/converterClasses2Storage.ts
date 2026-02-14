@@ -265,8 +265,8 @@ const parseVariables = (
 
         // Get the toSlot of the last storage item
         const lastVariable = variables[variables.length - 1]
-        let lastToSlot = lastVariable ? lastVariable.toSlot : 0
-        let nextOffset = lastVariable
+        const lastToSlot = lastVariable ? lastVariable.toSlot : 0
+        const nextOffset = lastVariable
             ? lastVariable.byteOffset + lastVariable.byteSize
             : 0
         let fromSlot
@@ -545,7 +545,7 @@ export const parseStorageSectionFromAttribute = (
             )
 
             if (typeClass.stereotype === ClassStereotype.Struct) {
-                let variables = parseVariables(
+                const variables = parseVariables(
                     typeClass,
                     otherClasses,
                     [],
@@ -795,7 +795,7 @@ export const calcStorageByteSize = (
             case ClassStereotype.Interface:
             case ClassStereotype.Library:
                 return { size: 20, dynamic: false }
-            case ClassStereotype.Struct:
+            case ClassStereotype.Struct: {
                 let structByteSize = 0
                 attributeTypeClass.attributes.forEach((structAttribute) => {
                     // If next attribute is an array, then we need to start in a new slot
@@ -841,6 +841,7 @@ export const calcStorageByteSize = (
                     size: Math.ceil(structByteSize / 32) * 32,
                     dynamic: false,
                 }
+            }
             default:
                 return { size: 20, dynamic: false }
         }
@@ -870,7 +871,7 @@ const calcElementaryTypeSize = (
         case 'ufixed':
         case 'fixed':
             return { size: 32, dynamic: false }
-        default:
+        default: {
             const result = type.match(/[u]*(int|fixed|bytes)([0-9]+)/)
             if (result === null || !result[2]) {
                 throw Error(`Failed size elementary type "${type}"`)
@@ -884,6 +885,7 @@ const calcElementaryTypeSize = (
             // If an int
             const bitSize = parseInt(result[2])
             return { size: bitSize / 8, dynamic: false }
+        }
     }
 }
 
@@ -898,9 +900,10 @@ export const isElementary = (type: string): boolean => {
         case 'ufixed':
         case 'fixed':
             return true
-        default:
+        default: {
             const result = type.match(/^[u]?(int|fixed|bytes)([0-9]+)$/)
             return result !== null
+        }
     }
 }
 
