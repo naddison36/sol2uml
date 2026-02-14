@@ -1,7 +1,7 @@
 # Solidity 2 UML
 
 [![npm (tag)](https://img.shields.io/npm/v/sol2uml)](https://www.npmjs.com/package/sol2uml)
-[![Twitter Follow](https://img.shields.io/twitter/follow/naddison?style=social)](https://twitter.com/naddison)
+[![X Follow](https://img.shields.io/twitter/follow/naddison?style=social)](https://x.com/naddison)
 
 A visualisation tool for [Solidity](https://solidity.readthedocs.io/) contracts featuring:
 1. [Unified Modeling Language (UML)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) [class diagram](https://en.wikipedia.org/wiki/Class_diagram) generator for Solidity contracts.
@@ -22,7 +22,7 @@ See an explanation of how storage diagrams work with lots of examples [here](./e
 # Install
 
 The following installation assumes [Node.js](https://nodejs.org/en/download/) has already been installed which comes with [Node Package Manager (NPM)](https://www.npmjs.com/).
-`sol2uml` works with node 14 or above.
+`sol2uml` works with node 20 or above.
 
 To install globally so you can run `sol2uml` from anywhere
 
@@ -58,7 +58,7 @@ Options:
   -o, --outputFileName <value>                    output file name
   -i, --ignoreFilesOrFolders <names>              comma-separated list of files or folders to ignore
   -n, --network <network>                         Name or chain id of the blockchain explorer. A name like `ethereum` or `base` will map to a chain id, eg 1 or 8453. Alternatively, use an integer of the chain id. Supported names: ethereum, sepolia, holesky, hoodi, arbitrum, optimism, polygon, avalanche, base, bsc, crono, fantom, sonic, gnosis, moonbeam, celo, scroll, linea, blast, berachain, zksync (default: "ethereum", env: ETH_NETWORK)
-  -e, --explorerUrl <url>                         Override the `network` option with a custom blockchain explorer API URL. eg Polygon Mumbai testnet https://api-testnet.polygonscan.com/api (env: EXPLORER_URL)
+  -e, --explorerUrl <url>                         Override the `network` option with a custom blockchain explorer API URL. eg Polygon Amoy testnet https://api-amoy.polygonscan.com/api (env: EXPLORER_URL)
   -k, --apiKey <key>                              Blockchain explorer API key. (env: SCAN_API_KEY)
   -bc, --backColor <color>                        Canvas background color. "none" will use a transparent canvas. (default: "white")
   -sc, --shapeColor <color>                       Basic drawing color for graphics, not text (default: "black")
@@ -225,10 +225,10 @@ To generate a diagram of EtherDelta's contract from the verified source code on 
 sol2uml class 0x8d12A197cB00D4747a1fe03395095ce2A5CC6819
 ```
 
-To generate a diagram of EtherDelta's contract from the verified source code on [Etherscan Ropsten](https://ropsten.etherscan.io/address/0xa19833bd291b66aB0E17b9C6d46D2Ec5fEC15190#code). The output will be a svg file `0xa19833bd291b66aB0E17b9C6d46D2Ec5fEC15190.svg` in the working folder.
+To generate a diagram of a contract on [Hoodi](https://hoodi.etherscan.io/address/0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6#code). The output will be a svg file `0x036CbD53842c5426634e7929541eC2318f3dCF7e.svg` in the working folder.
 
 ```bash
-sol2uml class 0xa19833bd291b66aB0E17b9C6d46D2Ec5fEC15190 -n ropsten
+sol2uml class 0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6 -n hoodi
 ```
 
 To generate all Solidity files under some root folder and output the svg file to a specific location
@@ -354,7 +354,7 @@ npm run clean
 npm run package-lock
 npm run build
 npm run permit
-# make tx2uml globally available for local testing
+# make sol2uml globally available for local testing
 npm link
 # check all the files are included in the npm package
 npm pack --dry-run
