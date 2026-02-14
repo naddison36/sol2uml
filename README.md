@@ -225,7 +225,7 @@ To generate a diagram of EtherDelta's contract from the verified source code on 
 sol2uml class 0x8d12A197cB00D4747a1fe03395095ce2A5CC6819
 ```
 
-To generate a diagram of a contract on [Hoodi](https://hoodi.etherscan.io/address/0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6#code). The output will be a svg file `0x036CbD53842c5426634e7929541eC2318f3dCF7e.svg` in the working folder.
+To generate a diagram of a contract on [Hoodi](https://hoodi.etherscan.io/address/0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6#code). The output will be a svg file `0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6.svg` in the working folder.
 
 ```bash
 sol2uml class 0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6 -n hoodi
