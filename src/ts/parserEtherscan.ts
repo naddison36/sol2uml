@@ -102,7 +102,7 @@ export class EtherscanParser {
 
         if (!apiKey) {
             console.error(
-                `The apiKey option must be set when getting verified source code from an Etherscan like explorer`,
+                `The -k, --apiKey option or SCAN_API_KEY env var must be set when getting verified source code from an Etherscan like explorer`,
             )
             process.exit(1)
         }
