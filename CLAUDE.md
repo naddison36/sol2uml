@@ -58,7 +58,7 @@ Input (files/folders/address)
 - **converterClasses2Storage.ts / converterStorage2Dot.ts** — Storage slot layout visualization
 - **writerFiles.ts** — Output dispatch: DOT → SVG (viz.js) → PNG (convert-svg-to-png)
 - **diffContracts.ts** — Contract comparison logic using diff-match-patch
-- **slotValues.ts** — Fetches on-chain storage values via ethers.js v5
+- **slotValues.ts** — Fetches on-chain storage values via ethers.js v6
 - **index.ts** — Barrel exports for library usage
 
 ### Important Domain Types (umlClass.ts)
