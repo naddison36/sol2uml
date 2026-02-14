@@ -202,16 +202,10 @@ export const diffVerified2Local = async (
                 baseFolder,
                 aFile.filename,
             )
-            bFile = bFiles.find((bFile) => bFile === aFileResolvedPath)
-            if (bFile) {
-                // Found match of aFile in bFiles, break out of loop to try next aFile
-                break
-            }
-
-            // Try resolving symlinks. For example, pnpm compatibility where
-            // node_modules/@openzeppelin/contracts is a symlink to
-            // node_modules/.pnpm/@openzeppelin+contracts@x.y.z/node_modules/@openzeppelin/contracts
             try {
+                // Resolve full path including symlinks. For example,
+                // node_modules/@openzeppelin/contracts is a symlink to
+                // node_modules/.pnpm/@openzeppelin+contracts@x.y.z/node_modules/@openzeppelin/contracts
                 const aFileRealPath = realpathSync(aFileResolvedPath)
                 bFile = bFiles.find((bFile) => bFile === aFileRealPath)
                 if (bFile) {
