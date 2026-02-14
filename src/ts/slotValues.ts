@@ -1,18 +1,26 @@
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import axios from 'axios'
 import { StorageSection, Variable } from './converterClasses2Storage'
 import { AttributeType } from './umlClass'
 import {
-    commify,
+    BigNumberish,
     formatUnits,
     getAddress,
-    hexValue,
+    JsonRpcProvider,
+    toQuantity,
     toUtf8String,
-} from 'ethers/lib/utils'
+} from 'ethers'
 import { SlotValueCache } from './SlotValueCache'
-import { ethers } from 'ethers'
 
 const debug = require('debug')('sol2uml')
+
+const commify = (value: string): string => {
+    const match = value.match(/^(-?)(\d+)(\.(.*))?$/)
+    if (!match) return value
+    const neg = match[1]
+    const whole = match[2]
+    const frac = match[4] ? '.' + match[4] : ''
+    return neg + whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + frac
+}
 
 interface StorageAtResponse {
     jsonrpc: '2.0'
@@ -48,7 +56,7 @@ export const addSlotValues = async (
     const slots: BigNumberish[] = []
     valueVariables.forEach((variable) => {
         if (variable.offset) {
-            slots.push(BigNumber.from(variable.offset))
+            slots.push(BigInt(variable.offset))
         } else {
             for (let i = 0; variable.fromSlot + i <= variable.toSlot; i++) {
                 if (
@@ -65,12 +73,12 @@ export const addSlotValues = async (
     // remove duplicate slot numbers
     const uniqueFromSlots = [...new Set(slots)]
 
-    // Convert slot numbers to BigNumbers and offset dynamic arrays
+    // Convert slot numbers to BigInts and offset dynamic arrays
     const slotKeys = uniqueFromSlots.map((fromSlot) => {
         if (storageSection.offset) {
-            return BigNumber.from(storageSection.offset).add(fromSlot)
+            return BigInt(storageSection.offset) + BigInt(fromSlot)
         }
-        return BigNumber.from(fromSlot)
+        return BigInt(fromSlot)
     })
 
     // Get the contract slot values from the node provider
@@ -86,7 +94,7 @@ export const addSlotValues = async (
             if (
                 variable.getValue &&
                 variable.offset &&
-                BigNumber.from(variable.offset).eq(fromSlot)
+                BigInt(variable.offset) === BigInt(fromSlot)
             ) {
                 debug(
                     `Set slot value ${value} for section "${storageSection.name}", var type ${variable.type}, slot ${variable.offset}`,
@@ -109,7 +117,7 @@ export const addSlotValues = async (
             // if variable is past the slot that has the value
             else if (
                 variable.toSlot &&
-                BigNumber.from(variable.toSlot).gt(fromSlot)
+                BigInt(variable.toSlot) > BigInt(fromSlot)
             ) {
                 break
             }
@@ -164,7 +172,7 @@ const parseUserDefinedValue = (
     // this will also be wrong if the alias is to a 1 byte type. eg bytes1, int8 or uint8
     if (variable.byteSize === 1) {
         // assume 1 byte is an enum so convert value to enum index number
-        const index = BigNumber.from('0x' + variableValue).toNumber()
+        const index = Number(BigInt('0x' + variableValue))
         // lookup enum value if its available
         return variable?.enumValues ? variable?.enumValues[index] : undefined
     }
@@ -187,18 +195,15 @@ const parseElementaryValue = (
     if (variable.type === 'string' || variable.type === 'bytes') {
         if (variable.dynamic) {
             const lastByte = variable.slotValue.slice(-2)
-            const size = BigNumber.from('0x' + lastByte)
+            const size = BigInt('0x' + lastByte)
             // Check if the last bit is set by AND the size with 0x01
-            if (size.and(1).eq(1)) {
+            if ((size & 1n) === 1n) {
                 // Return the number of chars or bytes
-                return BigNumber.from(variable.slotValue)
-                    .sub(1)
-                    .div(2)
-                    .toString()
+                return ((BigInt(variable.slotValue) - 1n) / 2n).toString()
             }
 
             // The last byte holds the length of the string or bytes in the slot
-            const valueHex = '0x' + variableValue.slice(0, size.toNumber())
+            const valueHex = '0x' + variableValue.slice(0, Number(size))
             if (variable.type === 'bytes') return valueHex
             return `\\"${convert2String(valueHex)}\\"`
         }
@@ -212,26 +217,27 @@ const parseElementaryValue = (
         const parsedValue = formatUnits('0x' + variableValue, 0)
         return commify(parsedValue)
     }
+
     if (variable.type.match(/^bytes([0-9]+)$/)) {
         return '0x' + variableValue
     }
     if (variable.type.match(/^int([0-9]*)/)) {
         // parse variable value as an unsigned number
-        let rawValue = BigNumber.from('0x' + variableValue)
+        let rawValue = BigInt('0x' + variableValue)
 
         // parse the number of bits
         const result = variable.type.match(/^int([0-9]*$)/)
-        const bitSize = result[1] ? result[1] : 256
+        const bitSize = result[1] ? Number(result[1]) : 256
         // Convert the number of bits to the number of hex characters
-        const hexSize = BigNumber.from(bitSize).div(4).toNumber()
+        const hexSize = bitSize / 4
         // bit mask has a leading 1 and the rest 0. 0x8 = 1000 binary
-        const mask = '0x80' + '0'.repeat(hexSize - 2)
+        const mask = BigInt('0x80' + '0'.repeat(hexSize - 2))
         // is the first bit a 1?
-        const negative = rawValue.and(mask)
-        if (negative.gt(0)) {
+        const negative = rawValue & mask
+        if (negative > 0n) {
             // Convert unsigned number to a signed negative
-            const negativeOne = '0xFF' + 'F'.repeat(hexSize - 2)
-            rawValue = BigNumber.from(negativeOne).sub(rawValue).add(1).mul(-1)
+            const negativeOne = BigInt('0xFF' + 'F'.repeat(hexSize - 2))
+            rawValue = (negativeOne - rawValue + 1n) * -1n
         }
         const parsedValue = formatUnits(rawValue, 0)
         return commify(parsedValue)
@@ -263,7 +269,7 @@ export const getSlotValues = async (
         const block =
             blockTag === 'latest'
                 ? blockTag
-                : hexValue(BigNumber.from(blockTag))
+                : toQuantity(BigInt(blockTag))
 
         // get cached values and missing slot keys from the cache
         const { cachedValues, missingKeys } =
@@ -275,7 +281,7 @@ export const getSlotValues = async (
         }
 
         // Check we are pointing to the correct chain by checking the contract has code
-        const provider = new ethers.providers.JsonRpcProvider(url)
+        const provider = new JsonRpcProvider(url)
 
         const code = await provider.getCode(contractAddress, block)
         if (!code || code === '0x') {
@@ -307,8 +313,8 @@ export const getSlotValues = async (
             )
         }
         const responseData = response.data as StorageAtResponse[]
-        const sortedResponses = responseData.sort((a, b) =>
-            BigNumber.from(a.id).gt(b.id) ? 1 : -1,
+        const sortedResponses = responseData.sort(
+            (a, b) => Number(a.id) - Number(b.id),
         )
         const missingValues = sortedResponses.map((data) => {
             if (data.error) {
@@ -374,11 +380,11 @@ export const dynamicSlotSize = (variable: {
     try {
         if (!variable?.slotValue) throw Error(`Missing slot value.`)
         const last4bits = '0x' + variable.slotValue.slice(-1)
-        const last4bitsNum = BigNumber.from(last4bits).toNumber()
+        const last4bitsNum = Number(BigInt(last4bits))
         // If the last 4 bits is an even number then it's not a dynamic slot
         if (last4bitsNum % 2 === 0) return 0
 
-        const sizeRaw = BigNumber.from(variable.slotValue).toNumber()
+        const sizeRaw = Number(BigInt(variable.slotValue))
         // Adjust the size to bytes
         return (sizeRaw - 1) / 2
     } catch (err) {

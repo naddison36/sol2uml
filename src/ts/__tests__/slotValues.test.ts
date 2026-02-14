@@ -5,7 +5,6 @@ import {
     getSlotValues,
     parseValue,
 } from '../slotValues'
-import { BigNumber } from 'ethers'
 import { AttributeType } from '../umlClass'
 import { SlotValueCache } from '../SlotValueCache'
 
@@ -32,7 +31,7 @@ describe('Slot Values', () => {
             await getSlotValue(
                 url,
                 emissionController,
-                BigNumber.from(1),
+                1,
                 13761579,
             ),
         ).toEqual(

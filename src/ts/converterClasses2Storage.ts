@@ -6,10 +6,8 @@ import {
     UmlClass,
 } from './umlClass'
 import { findAssociatedClass } from './associations'
-import { hexZeroPad, keccak256 } from 'ethers/lib/utils'
-import { BigNumber } from 'ethers'
+import { BigNumberish, keccak256, toBeHex, zeroPadValue } from 'ethers'
 import path from 'path'
-import { BigNumberish } from '@ethersproject/bignumber'
 import { addSlotValues, dynamicSlotSize, parseValue } from './slotValues'
 
 const debug = require('debug')('sol2uml')
@@ -912,13 +910,13 @@ export const calcSectionOffset = (
     sectionOffset = '0',
 ): string => {
     if (variable.dynamic) {
-        const hexStringOf32Bytes = hexZeroPad(
-            BigNumber.from(variable.fromSlot).add(sectionOffset).toHexString(),
+        const hexStringOf32Bytes = zeroPadValue(
+            toBeHex(BigInt(variable.fromSlot) + BigInt(sectionOffset)),
             32,
         )
         return keccak256(hexStringOf32Bytes)
     }
-    return BigNumber.from(variable.fromSlot).add(sectionOffset).toHexString()
+    return toBeHex(BigInt(variable.fromSlot) + BigInt(sectionOffset))
 }
 
 export const findDimensionLength = (
@@ -1140,7 +1138,7 @@ export const addDynamicVariables = async (
             }
 
             // Add missing dynamic array variables
-            const arrayLength = BigNumber.from(variable.slotValue).toNumber()
+            const arrayLength = Number(BigInt(variable.slotValue))
             if (arrayLength > 1) {
                 // Add missing array variables to the referenced dynamic array
                 addArrayVariables(

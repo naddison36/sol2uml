@@ -1,5 +1,5 @@
-import { BigNumberish } from '@ethersproject/bignumber';
 import { StorageSection, Variable } from './converterClasses2Storage';
+import { BigNumberish } from 'ethers';
 /**
  * Adds the slot values to the variables in the storage section.
  * This can be rerun for a section as it will only get if the slot value

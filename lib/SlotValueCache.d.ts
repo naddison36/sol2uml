@@ -1,4 +1,4 @@
-import { BigNumberish } from '@ethersproject/bignumber';
+import { BigNumberish } from 'ethers';
 /**
  * Singleton that caches a mapping of slot keys to values.
  * Assumes all data is read from the same block and contract

@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { JsonRpcProvider } from 'ethers'
 
 const debug = require('debug')('sol2uml')
 
@@ -9,7 +9,7 @@ export const getBlock = async (options: {
 }): Promise<number> => {
     if (options.block === 'latest') {
         try {
-            const provider = new ethers.providers.JsonRpcProvider(options.url)
+            const provider = new JsonRpcProvider(options.url)
             const block = await provider.getBlockNumber()
             debug(
                 `Latest block is ${block}. All storage slot values will be from this block.`,

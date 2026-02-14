@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
+import { BigNumberish, toBeHex } from 'ethers'
 
 const debug = require('debug')('sol2uml')
 
@@ -25,7 +25,7 @@ export class SlotValueCache {
         const cachedValues: string[] = []
         const missingKeys: string[] = []
         slotKeys.forEach((slotKey) => {
-            const key = BigNumber.from(slotKey).toHexString()
+            const key = toBeHex(BigInt(slotKey))
             if (this.slotCache[key]) {
                 cachedValues.push(this.slotCache[key])
             } else {
@@ -61,7 +61,7 @@ export class SlotValueCache {
             }
         })
         return slotKeys.map((slotKey) => {
-            const key = BigNumber.from(slotKey).toHexString()
+            const key = toBeHex(BigInt(slotKey))
             // it should find the slot value in the cache. if not it'll return undefined
             return this.slotCache[key]
         })

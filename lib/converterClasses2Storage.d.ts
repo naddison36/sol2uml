@@ -1,5 +1,5 @@
 import { Attribute, AttributeType, UmlClass } from './umlClass';
-import { BigNumberish } from '@ethersproject/bignumber';
+import { BigNumberish } from 'ethers';
 export declare enum StorageSectionType {
     Contract = "Contract",
     Struct = "Struct",
