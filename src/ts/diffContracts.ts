@@ -1,4 +1,5 @@
 const clc = require('cli-color')
+import { realpathSync } from 'fs'
 import { resolve } from 'path'
 
 import { EtherscanParser } from './parserEtherscan'
@@ -196,16 +197,29 @@ export const diffVerified2Local = async (
         let bFile: string
         // for each of the base folders
         for (const baseFolder of fileOrBaseFolders) {
-            bFile = bFiles.find((bFile) => {
-                const resolvedPath = resolve(
-                    process.cwd(),
-                    baseFolder,
-                    aFile.filename,
-                )
-                return bFile === resolvedPath
-            })
+            const aFileResolvedPath = resolve(
+                process.cwd(),
+                baseFolder,
+                aFile.filename,
+            )
+            bFile = bFiles.find((bFile) => bFile === aFileResolvedPath)
             if (bFile) {
+                // Found match of aFile in bFiles, break out of loop to try next aFile
                 break
+            }
+
+            // Try resolving symlinks. For example, pnpm compatibility where
+            // node_modules/@openzeppelin/contracts is a symlink to
+            // node_modules/.pnpm/@openzeppelin+contracts@x.y.z/node_modules/@openzeppelin/contracts
+            try {
+                const aFileRealPath = realpathSync(aFileResolvedPath)
+                bFile = bFiles.find((bFile) => bFile === aFileRealPath)
+                if (bFile) {
+                    // Found match of aFile in bFiles, break out of loop to try next aFile
+                    break
+                }
+            } catch {
+                // Do nothing, continue to next bFile in loop
             }
         }
 
