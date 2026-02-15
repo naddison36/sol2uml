@@ -184,6 +184,7 @@ sol2uml storage 0x8115366Ca7Cf280a760f0bC0F6Db3026e2437115 -v --data --storage 0
 
 # Test import of imports including aliased imports
 sol2uml storage -v -c Concrete ../src/contracts/chainedImports
+sol2uml class -v ../src/contracts/chainedImports
 
 # Storage of a proxied multisig Safe on ApeChain
 sol2uml storage --network 33139 0xfb1bffC9d739B8D520DaF37dF666da4C687191EA -d -s 0xcf8DEBAFA34E0Ab7d1F3452FF3024454F8Fea32b -v
