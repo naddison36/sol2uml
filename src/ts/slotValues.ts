@@ -267,9 +267,7 @@ export const getSlotValues = async (
             return []
         }
         const block =
-            blockTag === 'latest'
-                ? blockTag
-                : toQuantity(BigInt(blockTag))
+            blockTag === 'latest' ? blockTag : toQuantity(BigInt(blockTag))
 
         // get cached values and missing slot keys from the cache
         const { cachedValues, missingKeys } =
