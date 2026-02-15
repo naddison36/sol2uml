@@ -2,6 +2,7 @@ import { lstatSync, writeFile } from 'fs'
 import path from 'path'
 import vizRenderStringSync from '@aduh95/viz.js/sync'
 const { convert } = require('convert-svg-to-png')
+const puppeteer = require('puppeteer')
 
 const debug = require('debug')('sol2uml')
 
@@ -162,7 +163,7 @@ export async function writePng(svg: any, filename: string): Promise<void> {
 
     try {
         const png = await convert(svg, {
-            outputFilePath: pngFilename,
+            launch: { executablePath: puppeteer.executablePath() },
         })
 
         return new Promise<void>((resolve, reject) => {

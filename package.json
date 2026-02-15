@@ -29,12 +29,13 @@
     "axios-debug-log": "^1.0.0",
     "cli-color": "^2.0.4",
     "commander": "^12.1.0",
-    "convert-svg-to-png": "^0.6.4",
+    "convert-svg-to-png": "^0.7.1",
     "debug": "^4.4.1",
     "diff-match-patch": "^1.0.5",
     "ethers": "^6.16.0",
     "js-graph-algorithms": "^1.0.18",
-    "klaw": "^4.1.0"
+    "klaw": "^4.1.0",
+    "puppeteer": "^24.37.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

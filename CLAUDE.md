@@ -76,6 +76,7 @@ Tests are in `src/ts/__tests__/*.test.ts` using Jest with ts-jest. Test Solidity
 
 - `@openzeppelin/contracts` — Do NOT update this dependency. It is only used as test input for generating diagrams, not as a runtime or build dependency.
 - `commander` — Do NOT upgrade past v12. Commander v13+ rejects multi-character short flags (e.g. `-hv`, `-sf`, `-bc`) which sol2uml uses extensively (~28 options). Upgrading would require changing all short flags, breaking existing user scripts and documentation.
+- `puppeteer` — Required by `convert-svg-to-png` to provide a bundled Chromium for PNG rendering. `convert-svg-to-png` v0.7+ depends on `puppeteer-core` (no bundled browser), so `puppeteer` is a direct dependency to supply the Chromium executable.
 
 ## Environment Variables
 

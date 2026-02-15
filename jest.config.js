@@ -2,8 +2,9 @@
 module.exports = {
     verbose: true,
     transform: {
-        '^.+\\.tsx?$': 'ts-jest',
+        '^.+\\.[tj]sx?$': ['ts-jest', { tsconfig: { allowJs: true } }],
     },
+    transformIgnorePatterns: ['/node_modules/(?!(file-url)/)'],
     testPathIgnorePatterns: ['/build/', '/node_modules/'],
     testRegex: '/__tests__/.*\\.test\\.ts$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
