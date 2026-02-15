@@ -15,6 +15,7 @@ export interface ClassOptions {
     hideContracts?: boolean
     hideVariables?: boolean
     hideFunctions?: boolean
+    hideTypes?: boolean
     hideModifiers?: boolean
     hideEvents?: boolean
     hideStructs?: boolean
@@ -112,7 +113,11 @@ const dotClassTitle = (
 
 const dotAttributeVisibilities = (
     umlClass: UmlClass,
-    options: { hidePrivates?: boolean; hideSourceContract?: boolean },
+    options: {
+        hidePrivates?: boolean
+        hideTypes?: boolean
+        hideSourceContract?: boolean
+    },
 ): string => {
     if (umlClass.attributes.length === 0) return ''
 
@@ -172,7 +177,7 @@ const dotAttributeVisibilities = (
 
 const dotAttributes = (
     attributes: Attribute[],
-    options: { hideSourceContract?: boolean },
+    options: { hideTypes?: boolean; hideSourceContract?: boolean },
     vizGroup?: string,
     indent = true,
 ): string => {
@@ -189,7 +194,8 @@ const dotAttributes = (
             attribute.sourceContract && !options.hideSourceContract
                 ? ` \\<\\<${attribute.sourceContract}\\>\\>`
                 : ''
-        dotString += `${indentString}${attribute.name}: ${attribute.type}${sourceContract}\\l`
+        const type = options.hideTypes ? '' : `: ${attribute.type}`
+        dotString += `${indentString}${attribute.name}${type}${sourceContract}\\l`
     })
 
     return dotString
@@ -253,6 +259,7 @@ const dotOperators = (
     vizGroup: string,
     operators: Operator[],
     options: {
+        hideTypes?: boolean
         hideModifiers?: boolean
         hideEvents?: boolean
         hideSourceContract?: boolean
@@ -289,9 +296,13 @@ const dotOperators = (
 
         dotString += operator.name
 
-        dotString += dotParameters(operator.parameters)
+        dotString += dotParameters(
+            operator.parameters,
+            false,
+            options.hideTypes,
+        )
 
-        if (operator.returnParameters?.length > 0) {
+        if (operator.returnParameters?.length > 0 && !options.hideTypes) {
             dotString += ': ' + dotParameters(operator.returnParameters, true)
         }
 
@@ -342,7 +353,11 @@ const dotOperatorStereotype = (
 const dotParameters = (
     parameters: Parameter[],
     returnParams: boolean = false,
+    hideTypes: boolean = false,
 ): string => {
+    if (hideTypes && !returnParams) {
+        return '()'
+    }
     if (parameters.length == 1 && !parameters[0].name) {
         if (returnParams) {
             return parameters[0].type

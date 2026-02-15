@@ -145,6 +145,11 @@ program
         false,
     )
     .option(
+        '-hy, --hideTypes',
+        'hide types of variables, function arguments and return types',
+        false,
+    )
+    .option(
         '-hp, --hidePrivates',
         'hide private and internal attributes and operators',
         false,

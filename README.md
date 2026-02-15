@@ -111,6 +111,7 @@ Options:
   -c, --clusterFolders             cluster contracts into source folders (default: false)
   -hv, --hideVariables             hide variables from contracts, interfaces, structs and enums (default: false)
   -hf, --hideFunctions             hide functions from contracts, interfaces and libraries (default: false)
+  -hy, --hideTypes                 hide types of variables, function arguments and return types (default: false)
   -hp, --hidePrivates              hide private and internal attributes and operators (default: false)
   -hm, --hideModifiers             hide modifier functions from contracts (default: false)
   -ht, --hideEvents                hide events from contracts, interfaces and libraries (default: false)
