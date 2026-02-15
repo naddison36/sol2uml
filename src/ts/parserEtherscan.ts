@@ -263,14 +263,35 @@ export class EtherscanParser {
             debug(
                 `About to get Solidity source code for ${contractAddress} from ${this.url}`,
             )
-            const response: any = await axios.get(this.url, {
-                params: {
-                    module: 'contract',
-                    action: 'getsourcecode',
-                    address: contractAddress,
-                    apikey: this.apiKey,
-                },
-            })
+
+            let response: any
+            const maxRetries = 3
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                response = await axios.get(this.url, {
+                    params: {
+                        module: 'contract',
+                        action: 'getsourcecode',
+                        address: contractAddress,
+                        apikey: this.apiKey,
+                    },
+                })
+
+                // Retry on rate limit errors
+                if (
+                    !Array.isArray(response?.data?.result) &&
+                    typeof response?.data?.result === 'string' &&
+                    response.data.result.includes('rate limit') &&
+                    attempt < maxRetries
+                ) {
+                    const delay = attempt * 2000
+                    debug(
+                        `Rate limited on attempt ${attempt}. Retrying in ${delay}ms...`,
+                    )
+                    await new Promise((resolve) => setTimeout(resolve, delay))
+                    continue
+                }
+                break
+            }
 
             if (!Array.isArray(response?.data?.result)) {
                 throw new Error(
