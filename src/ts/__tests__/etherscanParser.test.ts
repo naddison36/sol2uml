@@ -1,10 +1,17 @@
 import { EtherscanParser, parseRemapping, renameFile } from '../index'
 
-jest.setTimeout(20000) // timeout for each test in milliseconds
+jest.setTimeout(30000) // timeout for each test in milliseconds
 
 const etherDelta = '0x8d12A197cB00D4747a1fe03395095ce2A5CC6819'
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 describe('Etherscan', () => {
+    // Delay between tests to avoid Etherscan rate limiting (3 calls/sec)
+    beforeEach(async () => {
+        await sleep(2000)
+    })
+
     test('get source code', async () => {
         const etherscan = new EtherscanParser(process.env.SCAN_API_KEY)
 
