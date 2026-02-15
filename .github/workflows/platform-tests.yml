@@ -1,45 +1,48 @@
 name: Platform tests
-on: [push]
+on:
+    workflow_run:
+        workflows: ['Unit Tests']
+        types: [completed]
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        platform: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: [20.x, 22.x, 24.x]
-    runs-on: ${{ matrix.platform }}
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }} on ${{ matrix.platform }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm link
-    - name: KoiosECDSA class
-      run: sol2uml class 0x2762e676a9f17c7de34fe4b124424837c7e18e1c -v
-      env:
-        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
-        NODE_URL: ${{ secrets.NODE_URL }}
-    - name: Class diagram of Replica contract used in Nomad bridge
-      run: sol2uml class 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
-      env:
-        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
-        NODE_URL: ${{ secrets.NODE_URL }}
-    - name: Storage diagram of Replica contract used in Nomad bridge
-      run: sol2uml storage 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
-      env:
-        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
-        NODE_URL: ${{ secrets.NODE_URL }}
-    - name: Flatten Replica contract used in Nomad bridge
-      run: sol2uml flatten 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
-      env:
-        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
-        NODE_URL: ${{ secrets.NODE_URL }}
-    - name: Diff OUSD VaultCore upgrade
-      run: sol2uml diff 0x48Cf14DeA2f5dD31c57218877195913412D3278A 0x997c35A0bf8E21404aE4379841E0603C957138c3 -v
-      env:
-        SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
-        NODE_URL: ${{ secrets.NODE_URL }}
+    build:
+        strategy:
+            fail-fast: false
+            max-parallel: 1
+            matrix:
+                platform: [ubuntu-latest, macos-latest, windows-latest]
+                node-version: [20.x, 22.x, 24.x]
+        runs-on: ${{ matrix.platform }}
+        steps:
+            - uses: actions/checkout@v3
+            - name: Use Node.js ${{ matrix.node-version }} on ${{ matrix.platform }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - run: npm install
+            - run: npm run build --if-present
+            - run: npm link
+            - name: KoiosECDSA class
+              run: sol2uml class 0x2762e676a9f17c7de34fe4b124424837c7e18e1c -v
+              env:
+                  SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
+                  NODE_URL: ${{ secrets.NODE_URL }}
+            - name: Class diagram of Replica contract used in Nomad bridge
+              run: sol2uml class 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
+              env:
+                  SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
+                  NODE_URL: ${{ secrets.NODE_URL }}
+            - name: Storage diagram of Replica contract used in Nomad bridge
+              run: sol2uml storage 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
+              env:
+                  SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
+                  NODE_URL: ${{ secrets.NODE_URL }}
+            - name: Flatten Replica contract used in Nomad bridge
+              run: sol2uml flatten 0xB92336759618F55bd0F8313bd843604592E27bd8 -v
+              env:
+                  SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
+                  NODE_URL: ${{ secrets.NODE_URL }}
+            - name: Diff OUSD VaultCore upgrade
+              run: sol2uml diff 0x48Cf14DeA2f5dD31c57218877195913412D3278A 0x997c35A0bf8E21404aE4379841E0603C957138c3 -v
+              env:
+                  SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
+                  NODE_URL: ${{ secrets.NODE_URL }}
