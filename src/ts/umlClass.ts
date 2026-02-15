@@ -85,6 +85,7 @@ export interface Association {
     parentUmlClassName?: string
     targetUmlClassName: string
     realization?: boolean
+    functionsCalled?: string[]
 }
 
 export interface Constants {
@@ -129,6 +130,8 @@ export class UmlClass implements ClassProperties {
     enums: number[] = []
     structs: number[] = []
     associations: { [name: string]: Association } = {}
+    // Tracks all member access function call names for cross-referencing with using...for libraries
+    memberAccessCalls: Set<string> = new Set()
 
     constructor(properties: ClassProperties) {
         if (!properties || !properties.name) {
@@ -161,6 +164,20 @@ export class UmlClass implements ClassProperties {
                 this.associations[
                     association.targetUmlClassName
                 ].referenceType = ReferenceType.Storage
+            }
+            // Merge functionsCalled arrays with deduplication
+            if (association.functionsCalled?.length) {
+                const existing =
+                    this.associations[association.targetUmlClassName]
+                if (!existing.functionsCalled) {
+                    existing.functionsCalled = [...association.functionsCalled]
+                } else {
+                    for (const fn of association.functionsCalled) {
+                        if (!existing.functionsCalled.includes(fn)) {
+                            existing.functionsCalled.push(fn)
+                        }
+                    }
+                }
             }
         }
     }

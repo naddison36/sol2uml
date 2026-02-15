@@ -128,6 +128,13 @@ const recursiveSquash = (
 
     baseClass.imports.forEach((i) => squashedClass.imports.push(i))
 
+    // Merge memberAccessCalls for cross-referencing function names on dependency arrows
+    if (baseClass.memberAccessCalls?.size > 0) {
+        for (const call of baseClass.memberAccessCalls) {
+            squashedClass.memberAccessCalls.add(call)
+        }
+    }
+
     // copy the functions
     baseClass.operators.forEach((f) =>
         squashedClass.operators.push({

@@ -186,5 +186,55 @@ function addAssociationToDot(
         }
     }
 
+    // Add function name labels on dependency arrows (not on realization/inheritance)
+    if (!association.realization && !classOptions.hideDepFunctions) {
+        const functionNames = getAssociationFunctionNames(
+            sourceUmlClass,
+            targetUmlClass,
+            association,
+        )
+        if (functionNames.length > 0) {
+            const label = functionNames.map((fn) => fn + '\\l').join('')
+            dotString += `label="${label}", fontsize=10, `
+        }
+    }
+
     return dotString + ']'
+}
+
+function getAssociationFunctionNames(
+    sourceUmlClass: UmlClass,
+    targetUmlClass: UmlClass,
+    association: Association,
+): string[] {
+    const names = new Set<string>()
+
+    // Add explicitly captured function names
+    if (association.functionsCalled) {
+        for (const fn of association.functionsCalled) {
+            names.add(fn)
+        }
+    }
+
+    // Cross-reference: if no explicit calls, check if source class's member
+    // access calls match any of the target class's operator names.
+    // Applies to libraries (using...for) and interfaces (e.g. IERC20(token).transfer())
+    if (
+        names.size === 0 &&
+        (targetUmlClass.stereotype === ClassStereotype.Library ||
+            targetUmlClass.stereotype === ClassStereotype.Interface) &&
+        sourceUmlClass.memberAccessCalls?.size > 0 &&
+        targetUmlClass.operators?.length > 0
+    ) {
+        const targetOperatorNames = new Set(
+            targetUmlClass.operators.map((op) => op.name),
+        )
+        for (const callName of sourceUmlClass.memberAccessCalls) {
+            if (targetOperatorNames.has(callName)) {
+                names.add(callName)
+            }
+        }
+    }
+
+    return [...names].sort()
 }

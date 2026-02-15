@@ -69,6 +69,7 @@ export interface Association {
     parentUmlClassName?: string;
     targetUmlClassName: string;
     realization?: boolean;
+    functionsCalled?: string[];
 }
 export interface Constants {
     name: string;
@@ -108,6 +109,7 @@ export declare class UmlClass implements ClassProperties {
     associations: {
         [name: string]: Association;
     };
+    memberAccessCalls: Set<string>;
     constructor(properties: ClassProperties);
     addAssociation(association: Association): void;
     /**

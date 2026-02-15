@@ -598,7 +598,25 @@ function parseExpression(expression: Expression, umlClass: UmlClass) {
         parseExpression(expression.left, umlClass)
         parseExpression(expression.right, umlClass)
     } else if (expression.type === 'FunctionCall') {
-        parseExpression(expression.expression, umlClass)
+        if (
+            expression.expression.type === 'MemberAccess' &&
+            expression.expression.expression?.type === 'Identifier'
+        ) {
+            // Pattern: ClassName.functionName(args) — explicit library/contract call
+            const memberName = expression.expression.memberName
+            umlClass.addAssociation({
+                referenceType: ReferenceType.Memory,
+                targetUmlClassName: expression.expression.expression.name,
+                functionsCalled: [memberName],
+            })
+            umlClass.memberAccessCalls.add(memberName)
+        } else {
+            // Track member access calls inside other FunctionCall patterns (e.g. x.functionName())
+            if (expression.expression.type === 'MemberAccess') {
+                umlClass.memberAccessCalls.add(expression.expression.memberName)
+            }
+            parseExpression(expression.expression, umlClass)
+        }
         expression.arguments.forEach((arg) => {
             parseExpression(arg, umlClass)
         })

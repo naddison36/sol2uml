@@ -168,6 +168,11 @@ program
     .option('-ha, --hideAbstracts', 'hide abstract contracts', false)
     .option('-hn, --hideFilename', 'hide relative path and file name', false)
     .option(
+        '-hd, --hideDepFunctions',
+        'hide function names on dependency arrows',
+        false,
+    )
+    .option(
         '-s, --squash',
         'squash inherited contracts to the base contract(s)',
         false,

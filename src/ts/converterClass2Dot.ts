@@ -25,6 +25,7 @@ export interface ClassOptions {
     hideAbstracts?: boolean
     hideFilename?: boolean
     hideSourceContract?: boolean
+    hideDepFunctions?: boolean
     backColor?: string
     shapeColor?: string
     fillColor?: string
