@@ -75,7 +75,7 @@ Can also flatten or compare verified source files on Etherscan-like explorers.`,
     .addOption(
         new Option(
             '-e, --explorerUrl <url>',
-            'Override the `network` option with a custom blockchain explorer API URL. eg Polygon Mumbai testnet https://api-testnet.polygonscan.com/api',
+            'Override the `network` option with a custom blockchain explorer API URL. eg Polygon Amoy testnet https://api-amoy.polygonscan.com/api',
         ).env('EXPLORER_URL'),
     )
     .addOption(
