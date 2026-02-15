@@ -1,47 +1,35 @@
 import { Association, UmlClass } from './umlClass'
 
+interface ImportChainEntry {
+    source: UmlClass
+    targetName: string
+}
+
 // Find the UML class linked to the association
 export const findAssociatedClass = (
     association: Association,
     sourceUmlClass: UmlClass,
     umlClasses: readonly UmlClass[],
-    _searchedAbsolutePaths: string[] = [],
 ): UmlClass | undefined => {
-    const umlClass = umlClasses.find((targetUmlClass) => {
-        const targetParentClass =
-            association.parentUmlClassName &&
-            targetUmlClass.parentId !== undefined
-                ? umlClasses[targetUmlClass.parentId]
-                : undefined
-        return isAssociated(
+    // Phase 1: Iterative BFS through import chain, trying direct match at each level
+    const { result, visitedSources } = _findViaImportChain(
+        association,
+        sourceUmlClass,
+        umlClasses,
+    )
+    if (result) return result
+
+    // Phase 2: Try inherited types for each source visited during import chain traversal
+    const visitedClassIds = new Set<number>()
+    for (const source of visitedSources) {
+        const inherited = _findInheritedType(
             association,
-            sourceUmlClass,
-            targetUmlClass,
-            targetParentClass,
+            source,
+            umlClasses,
+            visitedClassIds,
         )
-    })
-
-    // If a link was found
-    if (umlClass) return umlClass
-
-    // // Could not find association so now need to recursively look at imports of imports
-    // // add to already recursively processed files to avoid getting stuck in circular imports
-    // searchedAbsolutePaths.push(sourceUmlClass.absolutePath)
-    // const importedType = findChainedImport(
-    //     association,
-    //     sourceUmlClass,
-    //     umlClasses,
-    //     searchedAbsolutePaths,
-    // )
-    // if (importedType) return importedType
-
-    // // Still could not find association so now need to recursively look for inherited types
-    // const inheritedType = findInheritedType(
-    //     association,
-    //     sourceUmlClass,
-    //     umlClasses,
-    // )
-    // if (inheritedType) return inheritedType
+        if (inherited) return inherited
+    }
 
     return undefined
 }
@@ -120,23 +108,132 @@ const isAssociated = (
     )
 }
 
-const _findInheritedType = (
+// Try to find a direct match for the association from the given source class
+const _tryDirectMatch = (
     association: Association,
     sourceUmlClass: UmlClass,
     umlClasses: readonly UmlClass[],
 ): UmlClass | undefined => {
-    // Get all realized associations.
+    return umlClasses.find((targetUmlClass) => {
+        const targetParentClass =
+            association.parentUmlClassName &&
+            targetUmlClass.parentId !== undefined
+                ? umlClasses[targetUmlClass.parentId]
+                : undefined
+        return isAssociated(
+            association,
+            sourceUmlClass,
+            targetUmlClass,
+            targetParentClass,
+        )
+    })
+}
+
+// Iterative BFS through import chain, trying direct match at each level.
+// Returns the matched class (if found) and the list of source classes visited.
+const _findViaImportChain = (
+    association: Association,
+    sourceUmlClass: UmlClass,
+    umlClasses: readonly UmlClass[],
+): { result?: UmlClass; visitedSources: UmlClass[] } => {
+    const searched = new Set<string>()
+    const visitedSources: UmlClass[] = []
+    const visitedPaths = new Set<string>()
+
+    const queue: ImportChainEntry[] = [
+        {
+            source: sourceUmlClass,
+            targetName: association.targetUmlClassName,
+        },
+    ]
+
+    while (queue.length > 0) {
+        const { source, targetName } = queue.shift()!
+        const key = `${source.absolutePath}::${targetName}`
+        if (searched.has(key)) continue
+        searched.add(key)
+
+        // Track unique visited sources for phase 2 inherited type lookup
+        if (!visitedPaths.has(source.absolutePath)) {
+            visitedPaths.add(source.absolutePath)
+            visitedSources.push(source)
+        }
+
+        // Build association with potentially de-aliased target name
+        const currentAssoc: Association = {
+            ...association,
+            targetUmlClassName: targetName,
+        }
+
+        // Try direct match from this source
+        const match = _tryDirectMatch(currentAssoc, source, umlClasses)
+        if (match) return { result: match, visitedSources }
+
+        // Get imports that could lead to the target
+        const imports = source.imports.filter(
+            (i) =>
+                i.classNames.length === 0 ||
+                i.classNames.some(
+                    (cn) =>
+                        (targetName === cn.className && !cn.alias) ||
+                        targetName === cn.alias,
+                ),
+        )
+
+        for (const importDetail of imports) {
+            const importedClass = umlClasses.find(
+                (c) => c.absolutePath === importDetail.absolutePath,
+            )
+            if (!importedClass) continue
+
+            // Queue with current target name to continue the chain
+            const origKey = `${importedClass.absolutePath}::${targetName}`
+            if (!searched.has(origKey)) {
+                queue.push({ source: importedClass, targetName })
+            }
+
+            // Queue with de-aliased names for aliased imports
+            for (const cn of importDetail.classNames) {
+                if (cn.alias && targetName === cn.alias) {
+                    const deAliasedKey = `${importedClass.absolutePath}::${cn.className}`
+                    if (!searched.has(deAliasedKey)) {
+                        queue.push({
+                            source: importedClass,
+                            targetName: cn.className,
+                        })
+                    }
+                }
+            }
+        }
+    }
+
+    return { visitedSources }
+}
+
+// Walk the inheritance chain to find types (structs, enums) defined on parent contracts.
+// Uses visitedClassIds to prevent re-processing in diamond inheritance hierarchies.
+const _findInheritedType = (
+    association: Association,
+    sourceUmlClass: UmlClass,
+    umlClasses: readonly UmlClass[],
+    visitedClassIds: Set<number>,
+): UmlClass | undefined => {
+    if (visitedClassIds.has(sourceUmlClass.id)) return undefined
+    visitedClassIds.add(sourceUmlClass.id)
+
     const parentAssociations = sourceUmlClass.getParentContracts()
 
-    // For each parent association
     for (const parentAssociation of parentAssociations) {
-        const parent = findAssociatedClass(
+        // Resolve the parent class using import chain only (no inherited types)
+        // to avoid mutual recursion between findAssociatedClass and _findInheritedType
+        const { result: parent } = _findViaImportChain(
             parentAssociation,
             sourceUmlClass,
             umlClasses,
         )
         if (!parent) continue
-        // For each struct on the parent
+
+        // Check parent's structs for the target type
         for (const structId of parent.structs) {
             const structUmlClass = umlClasses.find((c) => c.id === structId)
             if (!structUmlClass) continue
@@ -144,7 +241,8 @@ const _findInheritedType = (
                 return structUmlClass
             }
         }
-        // For each enum on the parent
+
+        // Check parent's enums for the target type
         for (const enumId of parent.enums) {
             const enumUmlClass = umlClasses.find((c) => c.id === enumId)
             if (!enumUmlClass) continue
@@ -153,69 +251,15 @@ const _findInheritedType = (
             }
         }
 
-        // Recursively look for inherited types
-        const targetClass = _findInheritedType(association, parent, umlClasses)
+        // Recursively check parent's parents
+        const targetClass = _findInheritedType(
+            association,
+            parent,
+            umlClasses,
+            visitedClassIds,
+        )
         if (targetClass) return targetClass
     }
 
     return undefined
 }
-
-// const findChainedImport = (
-//     association: Association,
-//     sourceUmlClass: UmlClass,
-//     umlClasses: readonly UmlClass[],
-//     searchedRelativePaths: string[],
-// ): UmlClass | undefined => {
-//     // Get all valid imports. That is, imports that do not explicitly import contracts or interfaces
-//     // or explicitly import the source class
-//     const imports = sourceUmlClass.imports.filter(
-//         (i) =>
-//             i.classNames.length === 0 ||
-//             i.classNames.some(
-//                 (cn) =>
-//                     (association.targetUmlClassName === cn.className &&
-//                         !cn.alias) ||
-//                     association.targetUmlClassName === cn.alias,
-//             ),
-//     )
-//     // For each import
-//     for (const importDetail of imports) {
-//         // Find a class with the same absolute path as the import so we can get the new imports
-//         const newSourceUmlClass = umlClasses.find(
-//             (c) => c.absolutePath === importDetail.absolutePath,
-//         )
-//         if (!newSourceUmlClass) {
-//             // Could not find a class in the import file so just move onto the next loop
-//             continue
-//         }
-//         // Avoid circular imports
-//         if (searchedRelativePaths.includes(newSourceUmlClass.absolutePath)) {
-//             // Have already recursively looked for imports of imports in this file
-//             continue
-//         }
-//
-//         // find class linked to the association without aliased imports
-//         const umlClass = findAssociatedClass(
-//             association,
-//             newSourceUmlClass,
-//             umlClasses,
-//             searchedRelativePaths,
-//         )
-//         if (umlClass) return umlClass
-//
-//         // find all aliased imports
-//         const aliasedImports = importDetail.classNames.filter((cn) => cn.alias)
-//         // For each aliased import
-//         for (const aliasedImport of aliasedImports) {
-//             const umlClass = findAssociatedClass(
-//                 { ...association, targetUmlClassName: aliasedImport.className },
-//                 newSourceUmlClass,
-//                 umlClasses,
-//                 searchedRelativePaths,
-//             )
-//             if (umlClass) return umlClass
-//         }
-//     }
-//     return undefined
-// }
