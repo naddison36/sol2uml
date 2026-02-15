@@ -29,8 +29,8 @@ jobs:
               env:
                   SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
                   NODE_URL: ${{ secrets.NODE_URL }}
-            - name: Resonate Fantom flatten
-              run: sol2uml flatten --network fantom 0x1a5c2ee3fb7fe4a2c2e42474a3657c71f6c775cf -v
+            - name: Base flatten
+              run: sol2uml flatten --network base 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v
               env:
                   SCAN_API_KEY: ${{ secrets.SCAN_API_KEY }}
                   NODE_URL: ${{ secrets.NODE_URL }}
