@@ -215,3 +215,10 @@ sol2uml 0x610866c6089768dA95524bcc4cE7dB61eDa3931c -v --network hoodi
 sol2uml 0x5fbe74a283f7954f10aa04c2edf55578811aeb03 -v --network holesky
 ## ApeChain using chain id
 sol2uml 0xd22ba2ff50d5c086d4bc34e9612b92fcbf8c1152 -v --network 33139
+
+# CrossChainRemoteStrategy
+sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base
+# Hide variables and functions
+sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base -he -hs -hv -hf -hp -hm -he -hc -he -d 1
+# Squashed with variables and functions hidden
+sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base -he -hs -hv -hf -hp -hm -he -hc -he -d 1 -s
