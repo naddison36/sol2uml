@@ -4,7 +4,9 @@
       "WebSearch",
       "Bash(npm run build:*)",
       "Bash(npx jest:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(node lib/sol2uml.js:*)"
     ]
   },
   "hooks": {
