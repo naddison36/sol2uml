@@ -1,36 +1,46 @@
 {
-  "permissions": {
-    "allow": [
-      "WebSearch",
-      "Bash(npm run build:*)",
-      "Bash(npx jest:*)",
-      "Bash(npm view:*)",
-      "WebFetch(domain:api.github.com)",
-      "Bash(node lib/sol2uml.js:*)"
-    ]
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write",
-            "statusMessage": "Running Prettier"
-          }
+    "permissions": {
+        "allow": [
+            "WebSearch",
+            "Bash(npm run build:*)",
+            "Bash(npx jest:*)",
+            "Bash(npm view:*)",
+            "WebFetch(domain:api.github.com)",
+            "Bash(node lib/sol2uml.js:*)"
         ]
-      },
-      {
-        "matcher": "Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write",
-            "statusMessage": "Running Prettier"
-          }
+    },
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write",
+                        "statusMessage": "Running Prettier"
+                    },
+                    {
+                        "type": "command",
+                        "command": "jq -r '.tool_input.file_path' | xargs npx eslint --fix",
+                        "statusMessage": "Running ESLint"
+                    }
+                ]
+            },
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write",
+                        "statusMessage": "Running Prettier"
+                    },
+                    {
+                        "type": "command",
+                        "command": "jq -r '.tool_input.file_path' | xargs npx eslint --fix",
+                        "statusMessage": "Running ESLint"
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  }
+    }
 }
