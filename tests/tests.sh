@@ -218,7 +218,13 @@ sol2uml 0xd22ba2ff50d5c086d4bc34e9612b92fcbf8c1152 -v --network 33139
 
 # CrossChainRemoteStrategy
 sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base
-# Hide variables and functions
-sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base -he -hs -hv -hf -hp -hm -he -hc -he -d 1
-# Squashed with variables and functions hidden
-sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base -he -hs -hv -hf -hp -hm -he -hc -he -d 1 -s
+# Hide variables, functions, enums, structs, constants and file names. Limit depth to 1
+sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base -hv -hf -he -hs -hc -hn -d 1
+# Same as before but squash inheritance
+sol2uml 0x5F81a5a22375ebCC2075b162D23a5b16a1e7A92d -v --network base -hv -hf -he -hs -hc -hn -d 1 -s
+
+# Lido ARM hide variables, functions, file names. Squash inheritance. Limit depth to 1
+sol2uml 0xC0297a0E39031F09406F0987C9D9D41c5dfbc3df -v -hv -hf -hn -d 1 -s
+sol2uml 0xC0297a0E39031F09406F0987C9D9D41c5dfbc3df -v -hv -hf -hn -d 1 -s -f png
+# Morpho Market connected to Lido ARM
+sol2uml 0x90c7ABC962f96de171ee395A242D2Ff794D0a04c -v -hv -hf -hn -d 1 -s
