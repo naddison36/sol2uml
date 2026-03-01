@@ -405,6 +405,8 @@ abstract contract Associations is
     }
 
     function callContractCalledViaStorageVariable() public returns (uint256) {
+        uint256 calledNumber = contractCalledViaStorageVariable.someNumber();
+
         return contractCalledViaStorageVariable.doSomething();
     }
 
