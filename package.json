@@ -25,7 +25,7 @@
     "dependencies": {
         "@aduh95/viz.js": "^3.7.0",
         "@solidity-parser/parser": "^0.20.1",
-        "axios": "^1.10.0",
+        "axios": "^1.13.6",
         "axios-debug-log": "^1.0.0",
         "cli-color": "^2.0.4",
         "commander": "^12.1.0",
@@ -35,7 +35,7 @@
         "ethers": "^6.16.0",
         "js-graph-algorithms": "^1.0.18",
         "klaw": "^4.1.0",
-        "puppeteer": "^24.37.3"
+        "puppeteer": "^24.37.5"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
@@ -50,7 +50,7 @@
         "ts-jest": "^29.4.6",
         "ts-node": "^10.9.2",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.55.0"
+        "typescript-eslint": "^8.56.1"
     },
     "files": [
         "lib/*.js",
