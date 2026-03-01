@@ -1,81 +1,81 @@
 {
-  "name": "sol2uml",
-  "version": "2.5.25",
-  "description": "Solidity contract visualisation tool.",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "scripts": {
-    "buildSol": "cd ./src/contracts && solc **/*.sol",
-    "build": "tsc --build ./tsconfig.json",
-    "clean": "tsc --build --clean ./tsconfig.json",
-    "lint": "eslint src/ts",
-    "package-lock": "npm i --package-lock-only",
-    "permit": " chmod 775 lib/sol2uml.js",
-    "prettier": "prettier --write src/**/*.ts **/*.md",
-    "prettier:check": "prettier --check src/**/*.ts  **/*.md",
-    "test": "npx jest",
-    "prepublishOnly": "npm run clean && npm run package-lock && npm run build && npm run permit"
-  },
-  "preferGlobal": true,
-  "contributors": [
-    "Nick Addison"
-  ],
-  "repository": "github:naddison36/sol2uml",
-  "license": "MIT",
-  "dependencies": {
-    "@aduh95/viz.js": "^3.7.0",
-    "@solidity-parser/parser": "^0.20.1",
-    "axios": "^1.10.0",
-    "axios-debug-log": "^1.0.0",
-    "cli-color": "^2.0.4",
-    "commander": "^12.1.0",
-    "convert-svg-to-png": "^0.7.1",
-    "debug": "^4.4.1",
-    "diff-match-patch": "^1.0.5",
-    "ethers": "^6.16.0",
-    "js-graph-algorithms": "^1.0.18",
-    "klaw": "^4.1.0",
-    "puppeteer": "^24.37.3"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@openzeppelin/contracts": "^4.9.3",
-    "@types/diff-match-patch": "^1.0.36",
-    "@types/jest": "^30.0.0",
-    "@types/klaw": "^3.0.7",
-    "eslint": "^9.39.2",
-    "eslint-config-prettier": "^10.1.8",
-    "jest": "^30.2.0",
-    "prettier": "^3.8.1",
-    "ts-jest": "^29.4.6",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0"
-  },
-  "files": [
-    "lib/*.js",
-    "lib/*.d.ts",
-    "lib/utils/*.js",
-    "lib/utils/*.d.ts",
-    "sol2uml"
-  ],
-  "bin": {
-    "sol2uml": "lib/sol2uml.js"
-  },
-  "keywords": [
-    "Unified Modeling Language",
-    "UML",
-    "Solidity",
-    "Ethereum",
-    "diagram",
-    "class",
-    "diagram",
-    "contract",
-    "Blockchain",
-    "storage",
-    "flatten",
-    "visual",
-    "tool",
-    "cli"
-  ]
+    "name": "sol2uml",
+    "version": "2.5.26",
+    "description": "Solidity contract visualisation tool.",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "scripts": {
+        "buildSol": "cd ./src/contracts && solc **/*.sol",
+        "build": "tsc --build ./tsconfig.json",
+        "clean": "tsc --build --clean ./tsconfig.json",
+        "lint": "eslint src/ts",
+        "package-lock": "npm i --package-lock-only",
+        "permit": " chmod 775 lib/sol2uml.js",
+        "prettier": "prettier --write src/**/*.ts **/*.md",
+        "prettier:check": "prettier --check src/**/*.ts  **/*.md",
+        "test": "npx jest",
+        "prepublishOnly": "npm run clean && npm run package-lock && npm run build && npm run permit"
+    },
+    "preferGlobal": true,
+    "contributors": [
+        "Nick Addison"
+    ],
+    "repository": "github:naddison36/sol2uml",
+    "license": "MIT",
+    "dependencies": {
+        "@aduh95/viz.js": "^3.7.0",
+        "@solidity-parser/parser": "^0.20.1",
+        "axios": "^1.10.0",
+        "axios-debug-log": "^1.0.0",
+        "cli-color": "^2.0.4",
+        "commander": "^12.1.0",
+        "convert-svg-to-png": "^0.7.1",
+        "debug": "^4.4.1",
+        "diff-match-patch": "^1.0.5",
+        "ethers": "^6.16.0",
+        "js-graph-algorithms": "^1.0.18",
+        "klaw": "^4.1.0",
+        "puppeteer": "^24.37.3"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.2",
+        "@openzeppelin/contracts": "^4.9.3",
+        "@types/diff-match-patch": "^1.0.36",
+        "@types/jest": "^30.0.0",
+        "@types/klaw": "^3.0.7",
+        "eslint": "^9.39.2",
+        "eslint-config-prettier": "^10.1.8",
+        "jest": "^30.2.0",
+        "prettier": "^3.8.1",
+        "ts-jest": "^29.4.6",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.55.0"
+    },
+    "files": [
+        "lib/*.js",
+        "lib/*.d.ts",
+        "lib/utils/*.js",
+        "lib/utils/*.d.ts",
+        "sol2uml"
+    ],
+    "bin": {
+        "sol2uml": "lib/sol2uml.js"
+    },
+    "keywords": [
+        "Unified Modeling Language",
+        "UML",
+        "Solidity",
+        "Ethereum",
+        "diagram",
+        "class",
+        "diagram",
+        "contract",
+        "Blockchain",
+        "storage",
+        "flatten",
+        "visual",
+        "tool",
+        "cli"
+    ]
 }
