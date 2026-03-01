@@ -191,6 +191,11 @@ sol2uml storage --network 33139 0xfb1bffC9d739B8D520DaF37dF666da4C687191EA -d -s
 
 # Class
 
+sol2uml ../src/contracts -b Associations -d 1 -v
+
+sol2uml ../src/contracts -hi -hl -he -hs -ha -b Associations -d 1 -v
+
+
 export SCAN_API_KEY=your_api_key_here
 
 ## Maker DSR Strategy Implementation

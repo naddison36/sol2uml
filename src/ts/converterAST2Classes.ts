@@ -602,13 +602,30 @@ function parseExpression(expression: Expression, umlClass: UmlClass) {
             expression.expression.type === 'MemberAccess' &&
             expression.expression.expression?.type === 'Identifier'
         ) {
-            // Pattern: ClassName.functionName(args) — explicit library/contract call
             const memberName = expression.expression.memberName
-            umlClass.addAssociation({
-                referenceType: ReferenceType.Memory,
-                targetUmlClassName: expression.expression.expression.name,
-                functionsCalled: [memberName],
-            })
+            const identifierName = expression.expression.expression.name
+            // Check if the identifier is a storage variable of a user-defined type
+            const storageAttr = umlClass.attributes.find(
+                (attr) =>
+                    attr.name === identifierName &&
+                    attr.attributeType === AttributeType.UserDefined,
+            )
+            if (storageAttr) {
+                // storageVariable.functionName() — call via storage variable
+                const { umlClassName } = parseClassName(storageAttr.type)
+                umlClass.addAssociation({
+                    referenceType: ReferenceType.Storage,
+                    targetUmlClassName: umlClassName,
+                    functionsCalled: [memberName],
+                })
+            } else {
+                // Pattern: ClassName.functionName(args) — explicit library/contract call
+                umlClass.addAssociation({
+                    referenceType: ReferenceType.Memory,
+                    targetUmlClassName: identifierName,
+                    functionsCalled: [memberName],
+                })
+            }
             umlClass.memberAccessCalls.add(memberName)
         } else {
             // Track member access calls inside other FunctionCall patterns (e.g. x.functionName())

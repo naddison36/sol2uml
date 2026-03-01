@@ -242,6 +242,18 @@ enum FileLevelMemoryEnum {
 
 uint256 constant FileConstant = 5;
 
+contract ContractCalledViaStorageVariable {
+    uint256 public someNumber = 99;
+
+    function doSomething(uint256 limit) public returns (uint256) {
+        return someNumber;
+    }
+}
+
+contract InterfaceCalledViaStorageVariable {
+    function deposit(uint256 amount, uint256 minAmount) public returns (uint256 shares);
+}
+
 abstract contract Associations is
     ContractInterface,
     ContractAbstract,
@@ -305,6 +317,9 @@ abstract contract Associations is
         Cancel,
         Processed
     }
+
+    ContractCalledViaStorageVariable public contractCalledViaStorageVariable;
+    InterfaceCalledViaStorageVariable public interfaceCalledViaStorageVariable;
 
     constructor(
         ConstructorParamAssoc constructorAssoc,
@@ -387,5 +402,13 @@ abstract contract Associations is
 
     function createContractUsingLibFunction() private {
         new ConstructorContract(ConstructorDeclarationLibrary.min(2, 3));
+    }
+
+    function callContractCalledViaStorageVariable() public returns (uint256) {
+        return contractCalledViaStorageVariable.doSomething();
+    }
+
+    function callInterfaceCalledViaStorageVariable(uint256 amount, uint256 minAmount) public returns (uint256) {
+        return interfaceCalledViaStorageVariable.deposit(amount, minAmount);
     }
 }
