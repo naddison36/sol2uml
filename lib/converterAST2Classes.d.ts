@@ -9,7 +9,7 @@ import { Remapping } from './parserEtherscan';
  * @param filesystem flag if Solidity source code was parsed from the filesystem or Etherscan
  * @return umlClasses array of UML class definitions of type `UmlClass`
  */
-export declare function convertAST2UmlClasses(node: ASTNode, relativePath: string, remappings: Remapping[], filesystem?: boolean): UmlClass[];
+export declare function convertAST2UmlClasses(node: ASTNode, relativePath: string, remappings: Remapping[], filesystem?: boolean, remappingsBase?: string): UmlClass[];
 /**
  * Used to rename import file names. For example
  * @openzeppelin/contracts/token/ERC721/IERC721Receiver.sol

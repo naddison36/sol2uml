@@ -14,6 +14,7 @@ import {
 } from '@solidity-parser/parser/dist/src/ast-types'
 import * as path from 'path'
 import { posix } from 'path'
+import { existsSync } from 'fs'
 
 import {
     AttributeType,
@@ -53,6 +54,7 @@ export function convertAST2UmlClasses(
     relativePath: string,
     remappings: Remapping[],
     filesystem: boolean = false,
+    remappingsBase?: string,
 ): UmlClass[] {
     const imports: Import[] = []
     umlClasses = []
@@ -134,9 +136,43 @@ export function convertAST2UmlClasses(
                         )
                         imports.push(newImport)
                     } catch {
-                        debug(
-                            `Failed to resolve import ${childNode.path} from file ${relativePath}`,
-                        )
+                        // Fallback: apply Foundry/soldeer remappings for non-npm imports
+                        let resolved = false
+                        if (remappings.length > 0 && remappingsBase) {
+                            const remappedPath = renameFile(
+                                childNode.path,
+                                remappings,
+                            )
+                            if (remappedPath !== childNode.path) {
+                                const absoluteRemappedPath = path.resolve(
+                                    remappingsBase,
+                                    remappedPath,
+                                )
+                                if (existsSync(absoluteRemappedPath)) {
+                                    const newImport = {
+                                        absolutePath: absoluteRemappedPath,
+                                        classNames: childNode.symbolAliases
+                                            ? childNode.symbolAliases.map(
+                                                  (alias) => ({
+                                                      className: alias[0],
+                                                      alias: alias[1],
+                                                  }),
+                                              )
+                                            : [],
+                                    }
+                                    imports.push(newImport)
+                                    resolved = true
+                                    debug(
+                                        `Resolved import via remapping: ${childNode.path} → ${absoluteRemappedPath}`,
+                                    )
+                                }
+                            }
+                        }
+                        if (!resolved) {
+                            debug(
+                                `Failed to resolve import ${childNode.path} from file ${relativePath}`,
+                            )
+                        }
                     }
                 } else {
                     // this has come from Etherscan

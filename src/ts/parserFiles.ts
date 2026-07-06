@@ -1,13 +1,65 @@
 import { lstatSync, readFileSync } from 'fs'
-import { basename, extname, relative } from 'path'
+import { basename, dirname, extname, join, relative, resolve } from 'path'
 import klaw from 'klaw'
 import { ASTNode } from '@solidity-parser/parser/dist/src/ast-types'
 import { parse } from '@solidity-parser/parser'
 
 import { convertAST2UmlClasses } from './converterAST2Classes'
 import { UmlClass } from './umlClass'
+import { Remapping, parseRemapping } from './parserEtherscan'
 
 const debug = require('debug')('sol2uml')
+
+const parseFoundryTomlRemappings = (content: string): Remapping[] => {
+    const match = content.match(/^remappings\s*=\s*\[([^\]]*)\]/ms)
+    if (!match) return []
+    const remappings: Remapping[] = []
+    for (const line of match[1].split('\n')) {
+        const trimmed = line.trim()
+        if (!trimmed || trimmed.startsWith('#')) continue
+        const stringMatch = trimmed.match(/^"([^"]+)"/)
+        if (stringMatch) {
+            try {
+                remappings.push(parseRemapping(stringMatch[1]))
+            } catch {
+                // skip invalid remapping entries
+            }
+        }
+    }
+    return remappings
+}
+
+const findFoundryTomlRemappings = (
+    startPath: string,
+): { remappings: Remapping[]; base: string } | null => {
+    let dir: string
+    try {
+        dir = lstatSync(startPath).isDirectory()
+            ? resolve(startPath)
+            : dirname(resolve(startPath))
+    } catch {
+        dir = resolve(startPath)
+    }
+    while (true) {
+        const foundryTomlPath = join(dir, 'foundry.toml')
+        try {
+            const content = readFileSync(foundryTomlPath, 'utf8')
+            const remappings = parseFoundryTomlRemappings(content)
+            if (remappings.length > 0) {
+                debug(
+                    `Found ${remappings.length} Foundry remappings in ${foundryTomlPath}`,
+                )
+                return { remappings, base: dir }
+            }
+        } catch {
+            // file not found, search parent
+        }
+        const parent = dirname(dir)
+        if (parent === dir) break
+        dir = parent
+    }
+    return null
+}
 
 export const parseUmlClassesFromFiles = async (
     filesOrFolders: readonly string[],
@@ -20,6 +72,17 @@ export const parseUmlClassesFromFiles = async (
         subfolders,
     )
 
+    // Auto-detect Foundry remappings to resolve non-npm imports (e.g. soldeer dependencies)
+    let remappings: Remapping[] = []
+    let remappingsBase: string | undefined
+    const foundryResult = findFoundryTomlRemappings(
+        filesOrFolders[0] || process.cwd(),
+    )
+    if (foundryResult) {
+        remappings = foundryResult.remappings
+        remappingsBase = foundryResult.base
+    }
+
     let umlClasses: UmlClass[] = []
 
     for (const file of files) {
@@ -30,8 +93,9 @@ export const parseUmlClassesFromFiles = async (
         const newUmlClasses = convertAST2UmlClasses(
             node,
             relativePath,
-            [],
+            remappings,
             true,
+            remappingsBase,
         )
         umlClasses = umlClasses.concat(newUmlClasses)
     }
