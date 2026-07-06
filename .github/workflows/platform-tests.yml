@@ -10,7 +10,7 @@ jobs:
             max-parallel: 1
             matrix:
                 platform: [ubuntu-latest, macos-latest, windows-latest]
-                node-version: [20.x, 22.x, 24.x]
+                node-version: [22.x, 24.x, 26.x]
         runs-on: ${{ matrix.platform }}
         steps:
             - uses: actions/checkout@v3
