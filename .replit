@@ -1,0 +1,7 @@
+modules = ["nodejs-20", "bash"]
+
+[nix]
+channel = "stable-25_05"
+
+[agent]
+expertMode = true
