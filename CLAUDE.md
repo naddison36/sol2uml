@@ -56,7 +56,7 @@ Input (files/folders/address)
 - **squashClasses.ts** — Collapses inheritance hierarchies
 - **converterClasses2Dot.ts / converterClass2Dot.ts** — UmlClass array/single → Graphviz DOT format
 - **converterClasses2Storage.ts / converterStorage2Dot.ts** — Storage slot layout visualization
-- **writerFiles.ts** — Output dispatch: DOT → SVG (viz.js) → PNG (convert-svg-to-png)
+- **writerFiles.ts** — Output dispatch: DOT → SVG (viz.js) → PNG (Puppeteer)
 - **diffContracts.ts** — Contract comparison logic using diff-match-patch
 - **slotValues.ts** — Fetches on-chain storage values via ethers.js v6
 - **index.ts** — Barrel exports for library usage
@@ -76,7 +76,8 @@ Tests are in `src/ts/__tests__/*.test.ts` using Jest with ts-jest. Test Solidity
 
 - `@openzeppelin/contracts` — Do NOT update this dependency. It is only used as test input for generating diagrams, not as a runtime or build dependency.
 - `commander` — Do NOT upgrade past v12. Commander v13+ rejects multi-character short flags (e.g. `-hv`, `-sf`, `-bc`) which sol2uml uses extensively (~28 options). Upgrading would require changing all short flags, breaking existing user scripts and documentation.
-- `puppeteer` — Required by `convert-svg-to-png` to provide a bundled Chromium for PNG rendering. `convert-svg-to-png` v0.7+ depends on `puppeteer-core` (no bundled browser), so `puppeteer` is a direct dependency to supply the Chromium executable.
+- `puppeteer` — Renders SVG diagrams to PNG using bundled Chromium. Requires Node.js 22.12 or above. Loaded only during PNG export so other commands do not load its ESM dependencies.
+- `@istanbuljs/load-nyc-config` — Its `js-yaml` dependency is overridden to v4 to remove the vulnerable `sprintf-js` dependency used by v3. The loader uses the compatible `load` API.
 
 ## Environment Variables
 

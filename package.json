@@ -4,6 +4,9 @@
     "description": "Solidity contract visualisation tool.",
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
+    "engines": {
+        "node": ">=22.12.0"
+    },
     "scripts": {
         "buildSol": "cd ./src/contracts && solc **/*.sol",
         "build": "tsc --build ./tsconfig.json",
@@ -25,17 +28,16 @@
     "dependencies": {
         "@aduh95/viz.js": "^3.7.0",
         "@solidity-parser/parser": "^0.20.1",
-        "axios": "^1.13.6",
+        "axios": "^1.20.0",
         "axios-debug-log": "^1.0.0",
         "cli-color": "^2.0.4",
         "commander": "^12.1.0",
-        "convert-svg-to-png": "^0.7.1",
         "debug": "^4.4.1",
         "diff-match-patch": "^1.0.5",
         "ethers": "^6.16.0",
         "js-graph-algorithms": "^1.0.18",
         "klaw": "^4.1.0",
-        "puppeteer": "^24.37.5"
+        "puppeteer": "^25.13.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
@@ -77,5 +79,10 @@
         "visual",
         "tool",
         "cli"
-    ]
+    ],
+    "overrides": {
+        "@istanbuljs/load-nyc-config": {
+            "js-yaml": "^4.3.2"
+        }
+    }
 }

@@ -22,7 +22,7 @@ See an explanation of how storage diagrams work with lots of examples [here](./e
 # Install
 
 The following installation assumes [Node.js](https://nodejs.org/en/download/) has already been installed which comes with [Node Package Manager (NPM)](https://www.npmjs.com/).
-`sol2uml` works with node 20 or above.
+`sol2uml` works with Node.js 22.12 or above.
 
 To install globally so you can run `sol2uml` from anywhere
 
