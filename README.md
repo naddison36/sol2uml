@@ -22,18 +22,18 @@ See an explanation of how storage diagrams work with lots of examples [here](./e
 # Install
 
 The following installation assumes [Node.js](https://nodejs.org/en/download/) has already been installed which comes with [Node Package Manager (NPM)](https://www.npmjs.com/).
-`sol2uml` works with node 20 or above.
+`sol2uml` works with Node.js 22.12 or above.
 
 To install globally so you can run `sol2uml` from anywhere
 
 ```bash
-npm link sol2uml --only=production
+npm install --global sol2uml
 ```
 
 To upgrade run
 
 ```bash
-npm upgrade sol2uml -g
+npm install --global sol2uml@latest
 ```
 
 To see which version you are using
@@ -41,6 +41,30 @@ To see which version you are using
 ```bash
 npm ls sol2uml -g
 ```
+
+## PNG output
+
+PNG output (`-f png` or `-f all`) uses headless Chrome through Puppeteer. Puppeteer normally downloads a compatible browser during installation. SVG and DOT output do not require Chrome.
+
+### Linux
+
+Chrome requires additional system libraries on Linux, particularly on minimal server or container installations. See [Puppeteer's Linux troubleshooting guide](https://pptr.dev/troubleshooting#chrome-doesnt-launch-on-linux) for distribution-specific dependencies. A desktop display is not required.
+
+On Ubuntu 23.10 and later, AppArmor can prevent Puppeteer's downloaded Chrome from starting with a `No usable sandbox!` error. Install Google Chrome using its official Linux package, then select its executable when running sol2uml:
+
+```bash
+PUPPETEER_EXECUTABLE_PATH=/opt/google/chrome/chrome sol2uml class ./contracts -f png
+```
+
+This path assumes Google Chrome's default Linux installation location. See [Puppeteer's Ubuntu sandbox guidance](https://pptr.dev/troubleshooting#issues-with-apparmor-on-ubuntu) for details.
+
+### macOS and Windows
+
+No additional setup is normally required for PNG output on macOS or Windows.
+
+### Browser installation troubleshooting
+
+On any platform, installation must allow Puppeteer's browser download. If installation scripts or downloads are blocked, PNG output may fail because Chrome is missing. You can use an installed Chrome browser by setting `PUPPETEER_EXECUTABLE_PATH` to its executable path. Corporate security policies may also restrict browser execution; see [Puppeteer's troubleshooting guide](https://pptr.dev/troubleshooting).
 
 # Usage
 
@@ -215,22 +239,26 @@ Options:
 
 ## UML Class diagram examples
 
+Examples that fetch verified source code from Etherscan require an API key. Pass `-k YOUR_API_KEY` or set the `SCAN_API_KEY` environment variable. Local Solidity files do not require an API key. By default, explorer requests use the Etherscan V2 API for the selected network; `--explorerUrl` overrides the endpoint.
+
 To generate a diagram of all contracts under the contracts folder and its sub folders
 
 ```bash
 sol2uml class ./contracts
 ```
 
-To generate a diagram of EtherDelta's contract from the verified source code on [Etherscan](https://etherscan.io/address/0x8d12A197cB00D4747a1fe03395095ce2A5CC6819#code). The output will be a svg file `0x8d12A197cB00D4747a1fe03395095ce2A5CC6819.svg` in the working folder.
+The default output is SVG. Local class diagrams use `classDiagram.svg`; diagrams from verified source code use the contract name returned by the explorer. Use `-o` to choose an output filename.
+
+To generate a diagram of EtherDelta's contract from the verified source code on [Etherscan](https://etherscan.io/address/0x8d12A197cB00D4747a1fe03395095ce2A5CC6819#code) and save it as `etherDelta.svg` in the working folder:
 
 ```bash
-sol2uml class 0x8d12A197cB00D4747a1fe03395095ce2A5CC6819
+sol2uml class 0x8d12A197cB00D4747a1fe03395095ce2A5CC6819 -o etherDelta.svg
 ```
 
-To generate a diagram of a contract on [Hoodi](https://hoodi.etherscan.io/address/0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6#code). The output will be a svg file `0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6.svg` in the working folder.
+To generate a diagram of a contract on [Hoodi](https://hoodi.etherscan.io/address/0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6#code) and save it as `hoodiContract.svg` in the working folder:
 
 ```bash
-sol2uml class 0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6 -n hoodi
+sol2uml class 0x8d62350d6DfC8A928bBF5efD2e44c66034Afa7C6 -n hoodi -o hoodiContract.svg
 ```
 
 To generate all Solidity files under some root folder and output the svg file to a specific location
@@ -245,16 +273,16 @@ To generate a diagram of all contracts in a single Solidity file, the output fil
 sol2uml class path/to/contracts/root/folder/solidity/file.sol -f png -o ./someFile.png
 ```
 
-To generate a diagram of all Solidity files under the `contracts` and `node_modules/@openzeppelin` folders. The output will be `contracts.svg` and `contracts.png` files in the working folder.
+To generate a diagram of all Solidity files under the `contracts` and `node_modules/@openzeppelin` folders. The output will be `classDiagram.dot`, `classDiagram.svg` and `classDiagram.png` files in the working folder.
 
 ```bash
 sol2uml class ./contracts,node_modules/@openzeppelin -f all -v
 ```
 
-To generate a diagram of all Solidity files under the working folder ignoring and files under the `solparse`, `@solidity-parser` and `ethlint` folders, which will be under the `node_modules` folder.
+To generate a diagram of all Solidity files under the working folder, ignoring files under the `solparse`, `@solidity-parser` and `ethlint` folders:
 
 ```bash
-sol2uml class -i solparse,@solidity-parser,ethlint
+sol2uml class . -i solparse,@solidity-parser,ethlint
 ```
 
 # UML Class Diagram Syntax
@@ -273,8 +301,11 @@ A Solidity variable becomes an attribute in UML and a Solidity function becomes 
 ### Class stereotypes
 
 -   Interface
--   Abstract - if any of the contract's functions are abstract, the class will have an Abstract stereotype. Child contracts of abstract contracts that do not implement all the abstract functions are currently not marked as Abstract.
+-   Abstract - contracts declared `abstract`, or containing functions without bodies, have an Abstract stereotype. Inherited abstract functions alone do not cause a child contract to be marked as Abstract.
 -   Library
+-   Struct
+-   Enum
+-   Constant - file-level constants
 
 ### Operator stereotypes
 
@@ -317,7 +348,7 @@ See [Graphviz color](https://graphviz.org/docs/attr-types/color/) documentation 
 
 Here's an example using the color options
 ```
-sol2uml storage -sc deeppink -tc #ffffff -fc dimgrey -bc black 0xfCc00A1e250644d89AF0df661bC6f04891E21585
+sol2uml storage -sc deeppink -tc "#ffffff" -fc dimgrey -bc black 0xfCc00A1e250644d89AF0df661bC6f04891E21585
 ```
 
 ![Aave V3 Pool](./examples/storage/AaveV3PoolStorageColor.svg )
@@ -330,6 +361,10 @@ See [version 2.x](./version2.md) for a list of changes from 1.x.
 
 # Contribution
 
+Install dependencies from the repository root before building or running tests:
+
+`npm ci`
+
 To build the test contracts in this repository, run the following. This assumes you have the [Solidity compiler](https://docs.soliditylang.org/en/v0.7.5/installing-solidity.html) `solc` installed on your machine.
 
 `npm run buildSol`
@@ -341,6 +376,8 @@ To build the TypeScript files
 To run the Jest tests
 
 `npm run test`
+
+Tests that fetch verified contracts require `SCAN_API_KEY`. Storage value tests also require `NODE_URL` pointing to an Ethereum mainnet RPC endpoint. Export these environment variables before running the full test suite. PNG tests require Chrome as described in [PNG output](#png-output).
 
 To access your local changes on your machine globally.
 

@@ -17,6 +17,12 @@ jobs:
                   node-version: ${{ matrix.node-version }}
             - run: npm install
             - run: npm run build --if-present
+            - name: Use system Chrome for Linux PNG tests
+              if: runner.os == 'Linux'
+              run: |
+                  # Ubuntu's AppArmor profile allows the installed Chrome to use its sandbox.
+                  test -x /opt/google/chrome/chrome
+                  echo "PUPPETEER_EXECUTABLE_PATH=/opt/google/chrome/chrome" >> "$GITHUB_ENV"
             - run: npm test
               env:
                   DEBUG: sol2uml

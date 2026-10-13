@@ -20,9 +20,9 @@ describe('Converter', () => {
         })
     })
 
-    test('writeSVG with invalid dot', () => {
+    test('writeSVG with invalid dot', async () => {
         const dot = ''
-        writeSVG(dot, 'converterTest')
+        await writeSVG(dot, 'converterTest')
     })
 
     test('Parse EtherDelta from Etherscan and convert to svg string', async () => {

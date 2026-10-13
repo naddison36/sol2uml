@@ -20,7 +20,7 @@
 ### New command line options
 
 -   Added `-d --depth` to limit the depth of contracts connected to the base contracts.
--   Added `-ha --hideAbstract` to hide all abstract contracts.
+-   Added `-ha --hideAbstracts` to hide all abstract contracts.
 -   Added `-hn, --hideFilename` to hide the relative filename of a contract.
 
 # Fixes
