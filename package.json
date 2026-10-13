@@ -40,19 +40,19 @@
         "puppeteer": "^25.13.0"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.2",
+        "@eslint/js": "^9.39.5",
         "@openzeppelin/contracts": "^4.9.3",
         "@types/diff-match-patch": "^1.0.36",
         "@types/jest": "^30.0.0",
-        "@types/klaw": "^3.0.7",
-        "eslint": "^9.39.2",
+        "@types/klaw": "^3.0.8",
+        "eslint": "^9.39.5",
         "eslint-config-prettier": "^10.1.8",
         "jest": "^30.2.0",
-        "prettier": "^3.8.1",
-        "ts-jest": "^29.4.6",
+        "prettier": "^3.9.10",
+        "ts-jest": "^29.4.14",
         "ts-node": "^10.9.2",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.56.1"
+        "typescript-eslint": "^8.71.2"
     },
     "files": [
         "lib/*.js",
