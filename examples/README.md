@@ -1,5 +1,7 @@
 # Example UML Diagrams
 
+These examples fetch verified source code from Etherscan. Set `SCAN_API_KEY` to your Etherscan API key or pass `-k YOUR_API_KEY`. See the [installation instructions](../README.md#install) for Node.js and PNG requirements. The diagrams are saved examples; regenerating them with newer source code or sol2uml versions may change their appearance.
+
 See [Account Abstraction](./accountAbstraction/README.md) for example diagrams against [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) contracts.
 
 ## Bored Ape Yacht Club NFT
@@ -8,7 +10,7 @@ See [Account Abstraction](./accountAbstraction/README.md) for example diagrams a
 Generated from running
 
 ```
-sol2uml 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D
+sol2uml class 0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D -o BoredApeYachtClub.svg
 ```
 
 This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d#code
@@ -24,7 +26,7 @@ Generated from version [4.7.3 contracts/token/ERC20](https://github.com/OpenZepp
 Generated from running
 
 ```
-sol2uml -n polygon 0xcA9cf48aD534f1efA2B0f6923457F2953df86e0b
+sol2uml class -n polygon 0xcA9cf48aD534f1efA2B0f6923457F2953df86e0b -o polygonMusd.svg
 ```
 
 ## Crypto Blades on BSC
@@ -33,7 +35,7 @@ sol2uml -n polygon 0xcA9cf48aD534f1efA2B0f6923457F2953df86e0b
 Generated from running
 
 ```
-sol2uml -n bsc 0xB07c1C479b2Fdeb9f9B2d02300C13b328BF86d65
+sol2uml class -n bsc 0xB07c1C479b2Fdeb9f9B2d02300C13b328BF86d65 -o bscCryptoBlades.svg
 ```
 
 ## Open Zeppelin All
@@ -52,7 +54,7 @@ Generated from version [4.7.3 contracts](https://github.com/OpenZeppelin/openzep
 Generated from running
 
 ```
-sol2uml -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+sol2uml class -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 -o uniswap-router.svg
 ```
 
 This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45#code
@@ -68,7 +70,7 @@ The last stereotype is the contract the variable or function is implemented in. 
 Generated from running
 
 ```
-sol2uml -s -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+sol2uml class -s -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 -o uniswap-router-squash.svg
 ```
 
 ## Uniswap V3 Router Squashed No Source
@@ -80,7 +82,7 @@ Adding the `-hsc, --hideSourceContract` option to the previous diagram removes t
 Generated from running
 
 ```
-sol2uml -s -hsc -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+sol2uml class -s -hsc -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 -o uniswap-router-squash-no-source.svg
 ```
 
 ## Tether
@@ -89,7 +91,7 @@ sol2uml -s -hsc -hp -hi -hl -hs -he 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
 Generated from running
 
 ```
-sol2uml 0xdAC17F958D2ee523a2206206994597C13D831ec7
+sol2uml class 0xdAC17F958D2ee523a2206206994597C13D831ec7 -o tether.svg
 ```
 
 This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0xdac17f958d2ee523a2206206994597c13d831ec7#code
@@ -100,19 +102,19 @@ This uses the verified Solidity code loaded to Etherscan https://etherscan.io/ad
 Generated from running
 
 ```
-sol2uml 0xf5dce57282a584d2746faf1593d3121fcac444dc
+sol2uml class 0xf5dce57282a584d2746faf1593d3121fcac444dc -o CErc20.svg
 ```
 
 This uses the verified Solidity code loaded to Etherscan https://etherscan.io/address/0xf5dce57282a584d2746faf1593d3121fcac444dc#code
 
 ## Compound Finance's cDAI Hide
 
-Same as the previous except enums, stucts and interfaces are hidden.
+Same as the previous except enums, structs and interfaces are hidden.
 Also, only classes linked to the base `CErc20` contract are included.
 
 ![Compound Finance cDAI](./CErc20-hide.svg)
 Generated from running
 
 ```
-sol2uml -b CErc20 -he -hs -hi 0xf5dce57282a584d2746faf1593d3121fcac444dc
+sol2uml class -b CErc20 -he -hs -hi 0xf5dce57282a584d2746faf1593d3121fcac444dc -o CErc20-hide.svg
 ```

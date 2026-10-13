@@ -11,10 +11,10 @@ sol2uml is a CLI tool that generates UML class diagrams and storage layout diagr
 ```bash
 npm run clean          # Clean lib/ directory
 npm run build          # Compile TypeScript (src/ts/ → lib/)
-npm run permit         # make sol2uml executable globally with npm link
-npm npm link           # Link the package globally for testing
+npm run permit         # make lib/sol2uml.js executable
+npm link               # Link the package globally for testing
 npm test               # Run all Jest tests
-npx jest --testPathPattern=fileParser   # Run a single test file
+npx jest --testPathPatterns=fileParser   # Run a single test file
 npm run lint           # ESLint on src/ts/
 npm run prettier       # Format code with Prettier
 npm run prettier:check # Check formatting without writing
@@ -41,7 +41,7 @@ Input (files/folders/address)
   → AST Converter (AST → UmlClass domain model)
   → Filters (graph-based filtering, squashing)
   → DOT Generator (UmlClass → Graphviz DOT)
-  → Output Writer (DOT → SVG/PNG via viz.js)
+  → Output Writer (DOT → SVG via viz.js → PNG via Puppeteer)
 ```
 
 ### Key Source Files (src/ts/)
