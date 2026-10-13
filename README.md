@@ -42,6 +42,30 @@ To see which version you are using
 npm ls sol2uml -g
 ```
 
+## PNG output
+
+PNG output (`-f png` or `-f all`) uses headless Chrome through Puppeteer. Puppeteer normally downloads a compatible browser during installation. SVG and DOT output do not require Chrome.
+
+### Linux
+
+Chrome requires additional system libraries on Linux, particularly on minimal server or container installations. See [Puppeteer's Linux troubleshooting guide](https://pptr.dev/troubleshooting#chrome-doesnt-launch-on-linux) for distribution-specific dependencies. A desktop display is not required.
+
+On Ubuntu 23.10 and later, AppArmor can prevent Puppeteer's downloaded Chrome from starting with a `No usable sandbox!` error. Install Google Chrome using its official Linux package, then select its executable when running sol2uml:
+
+```bash
+PUPPETEER_EXECUTABLE_PATH=/opt/google/chrome/chrome sol2uml class ./contracts -f png
+```
+
+This path assumes Google Chrome's default Linux installation location. See [Puppeteer's Ubuntu sandbox guidance](https://pptr.dev/troubleshooting#issues-with-apparmor-on-ubuntu) for details.
+
+### macOS and Windows
+
+No additional setup is normally required for PNG output on macOS or Windows.
+
+### Browser installation troubleshooting
+
+On any platform, installation must allow Puppeteer's browser download. If installation scripts or downloads are blocked, PNG output may fail because Chrome is missing. You can use an installed Chrome browser by setting `PUPPETEER_EXECUTABLE_PATH` to its executable path. Corporate security policies may also restrict browser execution; see [Puppeteer's troubleshooting guide](https://pptr.dev/troubleshooting).
+
 # Usage
 
 ## Command Line Interface (CLI)
